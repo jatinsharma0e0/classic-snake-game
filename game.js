@@ -409,12 +409,12 @@ class SnakeGame {
         // }
         
         // Random tongue animation (only when not eating)
-        // Random interval between 5-8 seconds for more frequent tongue flicks
+        // Random interval between 10-15 seconds for more frequent tongue flicks
         if (!this.mouthOpen && Date.now() - this.lastTongueTime > this.nextTongueTime) {
             this.tongueOut = true;
-            this.tongueTimer = 500; // Show tongue for 500ms (increased for better visibility)
+            this.tongueTimer = 50; // Show tongue for 100ms (increased for better visibility)
             this.lastTongueTime = Date.now();
-            this.nextTongueTime = 5000 + Math.random() * 3000; // Set next random interval (5-8 seconds)
+            this.nextTongueTime = 10000 + Math.random() * 5000; // Set next random interval (10-15 seconds)
         }
         
         if (this.tongueOut) {
@@ -931,7 +931,8 @@ class SnakeGame {
             
             // Create wiggle effect - more noticeable side-to-side movement
             const wiggleFrequency = 0.01; // Speed of wiggle
-            const wiggleAmplitude = 3; // How far it wiggles (increased for visibility)
+            
+            const wiggleAmplitude = 1.5; // How far it wiggles (increased for visibility)
             const wiggleOffset = Math.sin(currentTime * wiggleFrequency) * wiggleAmplitude;
             
             // Create slight vertical bobbing
