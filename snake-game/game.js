@@ -603,39 +603,29 @@ class SnakeGame {
             y: interpolatedHead.y + irregularOffset
         };
         
-        // Update body points (follow the head with proper spacing)
-        if (this.bodyPoints.length === 0 || 
-            Math.abs(this.bodyPoints[0].x - adjustedHeadPos.x) > this.pointSpacing || 
-            Math.abs(this.bodyPoints[0].y - adjustedHeadPos.y) > this.pointSpacing) {
-            
-            this.bodyPoints.unshift(adjustedHeadPos);
-            if (this.bodyPoints.length > this.bodyLength) {
-                this.bodyPoints.pop();
-            }
+        // Update body points (follow the head's exact wavy path)
+        this.bodyPoints.unshift({ x: adjustedHeadPos.x, y: adjustedHeadPos.y });
+        if (this.bodyPoints.length > this.bodyLength) {
+            this.bodyPoints.pop();
         }
         
-        // Create smooth continuous body path using cubic Bezier curves
+        // Create smooth continuous body path - body follows head's exact path
         if (this.bodyPoints.length > 3) {
             let pathData = `M ${this.bodyPoints[0].x} ${this.bodyPoints[0].y}`;
             
-            // Use smooth curves between points
+            // Use smooth curves between the recorded head positions
             for (let i = 1; i < this.bodyPoints.length - 2; i++) {
                 const current = this.bodyPoints[i];
                 const next = this.bodyPoints[i + 1];
                 const next2 = this.bodyPoints[i + 2];
                 
-                // Add long, smooth wave motion to body points
-                const bodyPrimary = Math.sin((this.snakeAnimationFrame * 0.06) + (i * 0.18)) * 1.4;
-                const bodySecondary = Math.cos((this.snakeAnimationFrame * 0.04) + (i * 0.12)) * 0.8;
-                const bodyWave = bodyPrimary + bodySecondary;
-                
-                // Control points for smooth curves
+                // Control points for smooth curves (no additional wave motion)
                 const cp1x = current.x + (next.x - this.bodyPoints[i - 1].x) * 0.2;
-                const cp1y = current.y + (next.y - this.bodyPoints[i - 1].y) * 0.2 + bodyWave;
+                const cp1y = current.y + (next.y - this.bodyPoints[i - 1].y) * 0.2;
                 const cp2x = next.x - (next2.x - current.x) * 0.2;
-                const cp2y = next.y - (next2.y - current.y) * 0.2 + bodyWave;
+                const cp2y = next.y - (next2.y - current.y) * 0.2;
                 
-                pathData += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${next.x} ${next.y + bodyWave}`;
+                pathData += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${next.x} ${next.y}`;
             }
             
             this.snakeBody.setAttribute('d', pathData);
