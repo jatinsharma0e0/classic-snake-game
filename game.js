@@ -762,47 +762,53 @@ class SnakeGame {
         // Clear existing spots
         this.bodySpots.innerHTML = '';
         
-        // Add large oval spots along the snake body with proper spacing
-        for (let i = 8; i < this.bodyPoints.length; i += 20) {
-            if (i < this.bodyPoints.length) {
-                const ovalSpot = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-                ovalSpot.setAttribute('cx', this.bodyPoints[i].x);
-                ovalSpot.setAttribute('cy', this.bodyPoints[i].y);
-                ovalSpot.setAttribute('rx', 4 + Math.random() * 2); // Width
-                ovalSpot.setAttribute('ry', 3 + Math.random() * 1); // Height
-                ovalSpot.setAttribute('fill', '#FF9800');
-                ovalSpot.setAttribute('opacity', '0.85');
-                this.bodySpots.appendChild(ovalSpot);
-                
-                // Add small round spots near the oval spots (but not overlapping)
-                const smallSpot1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                smallSpot1.setAttribute('cx', this.bodyPoints[i].x + 8 + Math.random() * 3);
-                smallSpot1.setAttribute('cy', this.bodyPoints[i].y + (Math.random() - 0.5) * 6);
-                smallSpot1.setAttribute('r', 1.5 + Math.random() * 0.5);
-                smallSpot1.setAttribute('fill', '#FF9800');
-                smallSpot1.setAttribute('opacity', '0.8');
-                this.bodySpots.appendChild(smallSpot1);
-                
-                const smallSpot2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                smallSpot2.setAttribute('cx', this.bodyPoints[i].x - 8 - Math.random() * 3);
-                smallSpot2.setAttribute('cy', this.bodyPoints[i].y + (Math.random() - 0.5) * 6);
-                smallSpot2.setAttribute('r', 1.5 + Math.random() * 0.5);
-                smallSpot2.setAttribute('fill', '#FF9800');
-                smallSpot2.setAttribute('opacity', '0.8');
-                this.bodySpots.appendChild(smallSpot2);
-            }
-        }
-        
-        // Add some standalone small spots in between the large patterns
-        for (let i = 16; i < this.bodyPoints.length; i += 25) {
-            if (i < this.bodyPoints.length) {
-                const smallSpot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                smallSpot.setAttribute('cx', this.bodyPoints[i].x + (Math.random() - 0.5) * 8);
-                smallSpot.setAttribute('cy', this.bodyPoints[i].y + (Math.random() - 0.5) * 8);
-                smallSpot.setAttribute('r', 1 + Math.random() * 0.8);
-                smallSpot.setAttribute('fill', '#FF9800');
-                smallSpot.setAttribute('opacity', '0.7');
-                this.bodySpots.appendChild(smallSpot);
+        // Create segmented body pattern like in the reference image
+        for (let i = 0; i < this.bodyPoints.length - 1; i++) {
+            const segmentIndex = Math.floor(i / 8); // Create segments every 8 body points
+            
+            // Alternate between different segment types
+            if (segmentIndex % 3 === 0) {
+                // Large rectangular segments
+                if (i % 8 === 0 && i < this.bodyPoints.length - 8) {
+                    const segment = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    const startPoint = this.bodyPoints[i];
+                    const endPoint = this.bodyPoints[i + 8];
+                    
+                    const width = Math.abs(endPoint.x - startPoint.x) || 16;
+                    const height = 12;
+                    
+                    segment.setAttribute('x', startPoint.x - width/2);
+                    segment.setAttribute('y', startPoint.y - height/2);
+                    segment.setAttribute('width', width);
+                    segment.setAttribute('height', height);
+                    segment.setAttribute('fill', '#FF9800');
+                    segment.setAttribute('opacity', '0.6');
+                    segment.setAttribute('rx', '4');
+                    this.bodySpots.appendChild(segment);
+                }
+            } else if (segmentIndex % 3 === 1) {
+                // Large oval segments
+                if (i % 8 === 0) {
+                    const segment = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                    segment.setAttribute('cx', this.bodyPoints[i].x);
+                    segment.setAttribute('cy', this.bodyPoints[i].y);
+                    segment.setAttribute('rx', '8');
+                    segment.setAttribute('ry', '6');
+                    segment.setAttribute('fill', '#FF9800');
+                    segment.setAttribute('opacity', '0.7');
+                    this.bodySpots.appendChild(segment);
+                }
+            } else {
+                // Small circular segments
+                if (i % 6 === 0) {
+                    const segment = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    segment.setAttribute('cx', this.bodyPoints[i].x);
+                    segment.setAttribute('cy', this.bodyPoints[i].y);
+                    segment.setAttribute('r', '5');
+                    segment.setAttribute('fill', '#FF9800');
+                    segment.setAttribute('opacity', '0.8');
+                    this.bodySpots.appendChild(segment);
+                }
             }
         }
     }
