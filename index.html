@@ -25,33 +25,49 @@
                     <svg class="snake-svg" width="350" height="200" viewBox="0 0 350 200">
                         <defs>
                             <linearGradient id="snakeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" style="stop-color:#5DADE2;stop-opacity:1" />
-                                <stop offset="50%" style="stop-color:#7FB3D3;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#85C1E9;stop-opacity:1" />
+                                <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#66BB6A;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#81C784;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="snakeBellyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#A5D6A7;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#C8E6C9;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#DCEDC8;stop-opacity:1" />
                             </linearGradient>
                             <filter id="snakeShadow" x="-50%" y="-50%" width="200%" height="200%">
-                                <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="rgba(46, 134, 193, 0.5)"/>
+                                <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="rgba(76, 175, 80, 0.5)"/>
                             </filter>
                         </defs>
                         
                         <!-- Snake body path -->
-                        <path id="snakeBody" stroke="url(#snakeGradient)" stroke-width="18" 
+                        <path id="snakeBody" stroke="url(#snakeGradient)" stroke-width="20" 
                               fill="none" stroke-linecap="round" stroke-linejoin="round" 
                               filter="url(#snakeShadow)" opacity="0.95"
                               vector-effect="non-scaling-stroke"/>
                         
+                        <!-- Snake body spots -->
+                        <g id="bodySpots">
+                            <!-- Orange spots will be added dynamically -->
+                        </g>
+                        
                         <!-- Snake head -->
-                        <circle id="snakeHead" r="12" fill="url(#snakeGradient)" 
+                        <circle id="snakeHead" r="14" fill="url(#snakeGradient)" 
                                 filter="url(#snakeShadow)"/>
                         
                         <!-- Snake eyes -->
-                        <circle id="leftEye" r="2.5" fill="white"/>
-                        <circle id="rightEye" r="2.5" fill="white"/>
-                        <circle id="leftPupil" r="1.2" fill="black"/>
-                        <circle id="rightPupil" r="1.2" fill="black"/>
+                        <circle id="leftEye" r="4" fill="white" stroke="#E0E0E0" stroke-width="0.5"/>
+                        <circle id="rightEye" r="4" fill="white" stroke="#E0E0E0" stroke-width="0.5"/>
+                        <circle id="leftPupil" r="2" fill="#FF5722"/>
+                        <circle id="rightPupil" r="2" fill="#FF5722"/>
+                        <circle id="leftInnerPupil" r="1.2" fill="black"/>
+                        <circle id="rightInnerPupil" r="1.2" fill="black"/>
+                        
+                        <!-- Orange spots on snake head -->
+                        <circle id="headSpot1" r="2" fill="#FF9800" opacity="0.8"/>
+                        <circle id="headSpot2" r="1.5" fill="#FF9800" opacity="0.8"/>
                         
                         <!-- Snake tongue (optional) -->
-                        <path id="snakeTongue" stroke="#FF4757" stroke-width="1.5" 
+                        <path id="snakeTongue" stroke="#FFEB3B" stroke-width="2" 
                               fill="none" stroke-linecap="round"/>
                         
                         <!-- Apples for snake to eat -->

@@ -482,6 +482,11 @@ class SnakeGame {
         this.rightEye = document.getElementById('rightEye');
         this.leftPupil = document.getElementById('leftPupil');
         this.rightPupil = document.getElementById('rightPupil');
+        this.leftInnerPupil = document.getElementById('leftInnerPupil');
+        this.rightInnerPupil = document.getElementById('rightInnerPupil');
+        this.headSpot1 = document.getElementById('headSpot1');
+        this.headSpot2 = document.getElementById('headSpot2');
+        this.bodySpots = document.getElementById('bodySpots');
         this.snakeTongue = document.getElementById('snakeTongue');
         
         this.snakeAnimationFrame = 0;
@@ -699,6 +704,23 @@ class SnakeGame {
         this.rightPupil.setAttribute('cx', adjustedHeadPos.x + eyeOffsetX - perpX);
         this.rightPupil.setAttribute('cy', adjustedHeadPos.y + eyeOffsetY - perpY);
         
+        // Position inner pupils
+        this.leftInnerPupil.setAttribute('cx', adjustedHeadPos.x + eyeOffsetX + perpX);
+        this.leftInnerPupil.setAttribute('cy', adjustedHeadPos.y + eyeOffsetY + perpY);
+        this.rightInnerPupil.setAttribute('cx', adjustedHeadPos.x + eyeOffsetX - perpX);
+        this.rightInnerPupil.setAttribute('cy', adjustedHeadPos.y + eyeOffsetY - perpY);
+        
+        // Position head spots
+        this.headSpot1.setAttribute('cx', adjustedHeadPos.x + Math.cos(angle + 0.8) * 8);
+        this.headSpot1.setAttribute('cy', adjustedHeadPos.y + Math.sin(angle + 0.8) * 8);
+        this.headSpot2.setAttribute('cx', adjustedHeadPos.x + Math.cos(angle - 0.8) * 6);
+        this.headSpot2.setAttribute('cy', adjustedHeadPos.y + Math.sin(angle - 0.8) * 6);
+        
+        // Update body spots
+        if (this.bodySpots) {
+            this.updateBodySpots();
+        }
+        
         // Animate tongue (flicks occasionally with jiggle)
         if (Math.floor(this.snakeAnimationFrame / 40) % 3 === 0) {
             const tongueLength = 8;
@@ -734,6 +756,24 @@ class SnakeGame {
         
         // Continue animation
         requestAnimationFrame(() => this.animateStartScreenSnake());
+    }
+    
+    updateBodySpots() {
+        // Clear existing spots
+        this.bodySpots.innerHTML = '';
+        
+        // Add orange spots along the snake body
+        for (let i = 5; i < this.bodyPoints.length; i += 8) {
+            if (i < this.bodyPoints.length) {
+                const spot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                spot.setAttribute('cx', this.bodyPoints[i].x);
+                spot.setAttribute('cy', this.bodyPoints[i].y);
+                spot.setAttribute('r', Math.random() * 2 + 1.5);
+                spot.setAttribute('fill', '#FF9800');
+                spot.setAttribute('opacity', '0.8');
+                this.bodySpots.appendChild(spot);
+            }
+        }
     }
     
     createFixedApples() {
