@@ -762,53 +762,32 @@ class SnakeGame {
         // Clear existing spots
         this.bodySpots.innerHTML = '';
         
-        // Create segmented body pattern like in the reference image
+        // Create simple horizontal bands/stripes pattern
         for (let i = 0; i < this.bodyPoints.length - 1; i++) {
-            const segmentIndex = Math.floor(i / 8); // Create segments every 8 body points
-            
-            // Alternate between different segment types
-            if (segmentIndex % 3 === 0) {
-                // Large rectangular segments
-                if (i % 8 === 0 && i < this.bodyPoints.length - 8) {
-                    const segment = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    const startPoint = this.bodyPoints[i];
-                    const endPoint = this.bodyPoints[i + 8];
-                    
-                    const width = Math.abs(endPoint.x - startPoint.x) || 16;
-                    const height = 12;
-                    
-                    segment.setAttribute('x', startPoint.x - width/2);
-                    segment.setAttribute('y', startPoint.y - height/2);
-                    segment.setAttribute('width', width);
-                    segment.setAttribute('height', height);
-                    segment.setAttribute('fill', '#FF9800');
-                    segment.setAttribute('opacity', '0.6');
-                    segment.setAttribute('rx', '4');
-                    this.bodySpots.appendChild(segment);
-                }
-            } else if (segmentIndex % 3 === 1) {
-                // Large oval segments
-                if (i % 8 === 0) {
-                    const segment = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-                    segment.setAttribute('cx', this.bodyPoints[i].x);
-                    segment.setAttribute('cy', this.bodyPoints[i].y);
-                    segment.setAttribute('rx', '8');
-                    segment.setAttribute('ry', '6');
-                    segment.setAttribute('fill', '#FF9800');
-                    segment.setAttribute('opacity', '0.7');
-                    this.bodySpots.appendChild(segment);
-                }
-            } else {
-                // Small circular segments
-                if (i % 6 === 0) {
-                    const segment = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    segment.setAttribute('cx', this.bodyPoints[i].x);
-                    segment.setAttribute('cy', this.bodyPoints[i].y);
-                    segment.setAttribute('r', '5');
-                    segment.setAttribute('fill', '#FF9800');
-                    segment.setAttribute('opacity', '0.8');
-                    this.bodySpots.appendChild(segment);
-                }
+            // Create bands every 12 body points for clean separation
+            if (i % 12 === 0 && i < this.bodyPoints.length - 12) {
+                const band = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                const startPoint = this.bodyPoints[i];
+                const endPoint = this.bodyPoints[Math.min(i + 12, this.bodyPoints.length - 1)];
+                
+                // Calculate band dimensions
+                const centerX = (startPoint.x + endPoint.x) / 2;
+                const centerY = (startPoint.y + endPoint.y) / 2;
+                const width = Math.sqrt(Math.pow(endPoint.x - startPoint.x, 2) + Math.pow(endPoint.y - startPoint.y, 2)) || 20;
+                const height = 16;
+                
+                // Calculate rotation angle for the band
+                const angle = Math.atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x) * 180 / Math.PI;
+                
+                band.setAttribute('x', centerX - width/2);
+                band.setAttribute('y', centerY - height/2);
+                band.setAttribute('width', width);
+                band.setAttribute('height', height);
+                band.setAttribute('fill', '#A5D6A7');
+                band.setAttribute('opacity', '0.8');
+                band.setAttribute('rx', '3');
+                band.setAttribute('transform', `rotate(${angle} ${centerX} ${centerY})`);
+                this.bodySpots.appendChild(band);
             }
         }
     }
