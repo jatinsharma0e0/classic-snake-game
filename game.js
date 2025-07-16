@@ -63,6 +63,7 @@ class SnakeGame {
         this.finalScoreElement = document.getElementById('finalScore');
         this.bestScoreElement = document.getElementById('bestScore');
         this.restartBtn = document.getElementById('restartBtn');
+        this.restartGameBtn = document.getElementById('restartGameBtn');
         this.backToMenuBtn = document.getElementById('backToMenuBtn');
         this.muteBtn = document.getElementById('muteBtn');
         this.homeMuteBtn = document.getElementById('homeMuteBtn');
@@ -94,6 +95,10 @@ class SnakeGame {
             this.showGameScreen();
         });
         this.restartBtn.addEventListener('click', () => {
+            this.audioManager.playSound('buttonClick');
+            this.restartGame();
+        });
+        this.restartGameBtn.addEventListener('click', () => {
             this.audioManager.playSound('buttonClick');
             this.restartGame();
         });
