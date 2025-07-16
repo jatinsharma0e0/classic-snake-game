@@ -495,31 +495,36 @@ class SnakeGame {
     }
     
     drawSnakeBody() {
-        if (this.snake.length < 2) return;
+        if (this.snake.length === 0) return;
         
         const bodyWidth = this.gridSize * 0.8;
+        const bodyHeight = this.gridSize * 0.6;
         
-        // Draw body segments first (all segments except head)
-        for (let i = 1; i < this.snake.length; i++) {
+        // Create path for snake body
+        this.ctx.beginPath();
+        
+        for (let i = 0; i < this.snake.length; i++) {
             const segment = this.snake[i];
             const x = segment.x * this.gridSize + this.gridSize / 2;
             const y = segment.y * this.gridSize + this.gridSize / 2;
-            const radius = this.gridSize * 0.4;
             
-            // Body circle (blue)
-            this.ctx.fillStyle = '#4169E1';
-            this.ctx.beginPath();
-            this.ctx.arc(x, y, radius, 0, Math.PI * 2);
-            this.ctx.fill();
-            
-            // Body highlight
-            this.ctx.fillStyle = '#6495ED';
-            this.ctx.beginPath();
-            this.ctx.arc(x, y, radius * 0.7, 0, Math.PI * 2);
-            this.ctx.fill();
+            if (i === 0) {
+                // Start at head
+                this.ctx.moveTo(x, y);
+            } else {
+                // Line to each segment
+                this.ctx.lineTo(x, y);
+            }
         }
         
-        // Draw connections between segments
+        // Style the snake body
+        this.ctx.strokeStyle = '#4169E1';
+        this.ctx.lineWidth = bodyWidth;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        this.ctx.stroke();
+        
+        // Add inner body highlight
         this.ctx.beginPath();
         for (let i = 0; i < this.snake.length; i++) {
             const segment = this.snake[i];
@@ -533,9 +538,8 @@ class SnakeGame {
             }
         }
         
-        // Style the connecting lines
-        this.ctx.strokeStyle = '#4169E1';
-        this.ctx.lineWidth = bodyWidth * 0.6;
+        this.ctx.strokeStyle = '#6495ED';
+        this.ctx.lineWidth = bodyWidth * 0.7;
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
         this.ctx.stroke();
