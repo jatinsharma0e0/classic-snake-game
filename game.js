@@ -763,15 +763,28 @@ class SnakeGame {
         this.bodySpots.innerHTML = '';
         
         // Add orange spots along the snake body
-        for (let i = 5; i < this.bodyPoints.length; i += 8) {
+        for (let i = 5; i < this.bodyPoints.length; i += 6) {
             if (i < this.bodyPoints.length) {
                 const spot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                 spot.setAttribute('cx', this.bodyPoints[i].x);
                 spot.setAttribute('cy', this.bodyPoints[i].y);
-                spot.setAttribute('r', Math.random() * 2 + 1.5);
+                spot.setAttribute('r', Math.random() * 3 + 2.5);
                 spot.setAttribute('fill', '#FF9800');
-                spot.setAttribute('opacity', '0.8');
+                spot.setAttribute('opacity', '0.9');
                 this.bodySpots.appendChild(spot);
+            }
+        }
+        
+        // Add some larger spots for variety
+        for (let i = 12; i < this.bodyPoints.length; i += 15) {
+            if (i < this.bodyPoints.length) {
+                const largSpot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                largSpot.setAttribute('cx', this.bodyPoints[i].x + (Math.random() - 0.5) * 6);
+                largSpot.setAttribute('cy', this.bodyPoints[i].y + (Math.random() - 0.5) * 6);
+                largSpot.setAttribute('r', Math.random() * 2 + 3);
+                largSpot.setAttribute('fill', '#FF9800');
+                largSpot.setAttribute('opacity', '0.8');
+                this.bodySpots.appendChild(largSpot);
             }
         }
     }
