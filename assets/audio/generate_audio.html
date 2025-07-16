@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Snake Game Audio Files</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #2d5016;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        button {
+            background: #4a7c59;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #5a8c69;
+            transform: scale(1.05);
+        }
+        .info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Snake Game Audio Generator</h1>
+        <p>Click the button below to generate and download all audio files for the Snake Game.</p>
+        
+        <div class="info">
+            <h3>Generated Audio Files:</h3>
+            <ul>
+                <li><strong>button_click.wav</strong> - Cheerful click sound for buttons</li>
+                <li><strong>game_start.wav</strong> - Upbeat fanfare for game start</li>
+                <li><strong>snake_move.wav</strong> - Subtle movement sound</li>
+                <li><strong>eat_food.wav</strong> - Satisfying eating sound</li>
+                <li><strong>tongue_flick.wav</strong> - Quick tongue flick sound</li>
+                <li><strong>collision.wav</strong> - Funny collision sound</li>
+                <li><strong>hit_impact.wav</strong> - Dramatic impact sound</li>
+                <li><strong>game_over.wav</strong> - Lighthearted game over sound</li>
+                <li><strong>background_music.wav</strong> - Calm background music loop</li>
+            </ul>
+        </div>
+        
+        <button onclick="generateAllAudio()">Generate All Audio Files</button>
+        <button onclick="testAudio()">Test Audio System</button>
+        
+        <div id="status" style="margin-top: 20px; font-weight: bold;"></div>
+    </div>
+
+    <script src="../../generate_audio_files.js"></script>
+    <script>
+        let generator;
+        let audioManager;
+        
+        function initAudio() {
+            try {
+                generator = new AudioFileGenerator();
+                document.getElementById('status').innerHTML = '✅ Audio system ready!';
+            } catch (error) {
+                document.getElementById('status').innerHTML = '❌ Audio not supported: ' + error.message;
+            }
+        }
+        
+        function generateAllAudio() {
+            if (!generator) {
+                initAudio();
+                if (!generator) return;
+            }
+            
+            document.getElementById('status').innerHTML = '🎵 Generating audio files... Check your downloads folder!';
+            generator.generateAll();
+        }
+        
+        function testAudio() {
+            if (!audioManager) {
+                // Import and test the game's audio manager
+                try {
+                    fetch('../../audio.js')
+                        .then(response => response.text())
+                        .then(code => {
+                            eval(code);
+                            audioManager = new AudioManager();
+                            audioManager.resumeAudioContext().then(() => {
+                                audioManager.playSound('buttonClick');
+                                document.getElementById('status').innerHTML = '🔊 Audio test successful!';
+                            });
+                        });
+                } catch (error) {
+                    document.getElementById('status').innerHTML = '❌ Audio test failed: ' + error.message;
+                }
+            } else {
+                audioManager.playSound('buttonClick');
+                document.getElementById('status').innerHTML = '🔊 Audio test played!';
+            }
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', initAudio);
+    </script>
+</body>
+</html>
