@@ -7,6 +7,7 @@ This is a full-stack web application built with React/TypeScript frontend and Ex
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Landing page preference: Direct access to snake game, no hub interface.
 
 ## System Architecture
 
