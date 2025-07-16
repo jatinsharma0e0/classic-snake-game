@@ -109,3 +109,6 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Created assets folder and integrated custom start button image
 - Replaced styled button with wooden log image (start-button.png)
 - Updated CSS styling for image button with hover effects
+- Replaced snake emoji with custom snake icon image (snake-icon.png)
+- Added animated snake icon with wiggle effect in title
+- Updated title layout to flex display for proper icon alignment
