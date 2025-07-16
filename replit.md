@@ -130,3 +130,4 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Added hit animation with knockback effect and 1-second delay before Game Over screen
 - Implemented screen shake, red flash, and directional knockback based on collision type
 - Snake cannot start moving with left arrow key to prevent immediate self-collision
+- Snake pupils change to X X immediately upon death and remain visible throughout hit animation

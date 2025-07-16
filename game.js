@@ -17,6 +17,7 @@ class SnakeGame {
         this.hitAnimation = false;
         this.hitAnimationTimer = 0;
         this.knockbackOffset = { x: 0, y: 0 };
+        this.isDead = false;
         
         // Snake properties - Start with 3 blocks
         this.snake = [
@@ -227,6 +228,7 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         this.score = 0;
+        this.isDead = false;
         this.generateObstacles();
         this.food = this.generateFood();
         this.updateScoreDisplay();
@@ -318,6 +320,7 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         this.score = 0;
+        this.isDead = false;
         this.generateObstacles();
         this.food = this.generateFood();
         this.updateScoreDisplay();
@@ -461,6 +464,9 @@ class SnakeGame {
     
     gameOver() {
         this.gameRunning = false;
+        
+        // Mark snake as dead (for X X eyes)
+        this.isDead = true;
         
         // Start hit animation
         this.hitAnimation = true;
@@ -820,25 +826,48 @@ class SnakeGame {
         this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize, 0, Math.PI * 2);
         this.ctx.fill();
         
-        // Eye pupils
-        this.ctx.fillStyle = 'black';
-        this.ctx.beginPath();
-        this.ctx.arc(centerX - eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        this.ctx.beginPath();
-        this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        // Eye shine
-        this.ctx.fillStyle = 'white';
-        this.ctx.beginPath();
-        this.ctx.arc(centerX - eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        this.ctx.beginPath();
-        this.ctx.arc(centerX + eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
-        this.ctx.fill();
+        // Eye pupils - show X X when dead, normal pupils when alive
+        if (this.isDead) {
+            // Draw X X pupils for dead snake
+            this.ctx.strokeStyle = 'black';
+            this.ctx.lineWidth = 2;
+            
+            // Left eye X
+            this.ctx.beginPath();
+            this.ctx.moveTo(centerX - eyeOffset - 2, centerY - eyeOffset/2 - 2);
+            this.ctx.lineTo(centerX - eyeOffset + 2, centerY - eyeOffset/2 + 2);
+            this.ctx.moveTo(centerX - eyeOffset + 2, centerY - eyeOffset/2 - 2);
+            this.ctx.lineTo(centerX - eyeOffset - 2, centerY - eyeOffset/2 + 2);
+            this.ctx.stroke();
+            
+            // Right eye X
+            this.ctx.beginPath();
+            this.ctx.moveTo(centerX + eyeOffset - 2, centerY - eyeOffset/2 - 2);
+            this.ctx.lineTo(centerX + eyeOffset + 2, centerY - eyeOffset/2 + 2);
+            this.ctx.moveTo(centerX + eyeOffset + 2, centerY - eyeOffset/2 - 2);
+            this.ctx.lineTo(centerX + eyeOffset - 2, centerY - eyeOffset/2 + 2);
+            this.ctx.stroke();
+        } else {
+            // Normal pupils
+            this.ctx.fillStyle = 'black';
+            this.ctx.beginPath();
+            this.ctx.arc(centerX - eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            this.ctx.beginPath();
+            this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // Eye shine
+            this.ctx.fillStyle = 'white';
+            this.ctx.beginPath();
+            this.ctx.arc(centerX - eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            this.ctx.beginPath();
+            this.ctx.arc(centerX + eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
         
         // Mouth (open if near food)
         if (this.mouthOpen) {
