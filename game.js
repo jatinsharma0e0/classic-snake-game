@@ -452,62 +452,95 @@ class SnakeGame {
     drawContinuousSnake() {
         if (this.snake.length === 0) return;
         
-        // Draw snake body as continuous segments
-        for (let i = this.snake.length - 1; i >= 0; i--) {
+        // Draw continuous snake body first
+        this.drawSnakeBody();
+        
+        // Then draw the head with eyes on top
+        this.drawSnakeHead();
+    }
+    
+    drawSnakeBody() {
+        if (this.snake.length === 0) return;
+        
+        const bodyWidth = this.gridSize * 0.8;
+        const bodyHeight = this.gridSize * 0.6;
+        
+        // Create path for snake body
+        this.ctx.beginPath();
+        
+        for (let i = 0; i < this.snake.length; i++) {
             const segment = this.snake[i];
-            const x = segment.x * this.gridSize;
-            const y = segment.y * this.gridSize;
+            const x = segment.x * this.gridSize + this.gridSize / 2;
+            const y = segment.y * this.gridSize + this.gridSize / 2;
             
             if (i === 0) {
-                // Draw head
-                this.drawEnhancedSnakeHead(x, y);
-            } else if (i === this.snake.length - 1) {
-                // Draw tail
-                this.drawSnakeTail(x, y);
+                // Start at head
+                this.ctx.moveTo(x, y);
             } else {
-                // Draw body segment
-                this.drawEnhancedSnakeBody(x, y, i);
+                // Line to each segment
+                this.ctx.lineTo(x, y);
             }
         }
         
-        // Connect segments with smooth curves
-        this.connectSnakeSegments();
+        // Style the snake body
+        this.ctx.strokeStyle = '#4169E1';
+        this.ctx.lineWidth = bodyWidth;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        this.ctx.stroke();
+        
+        // Add inner body highlight
+        this.ctx.beginPath();
+        for (let i = 0; i < this.snake.length; i++) {
+            const segment = this.snake[i];
+            const x = segment.x * this.gridSize + this.gridSize / 2;
+            const y = segment.y * this.gridSize + this.gridSize / 2;
+            
+            if (i === 0) {
+                this.ctx.moveTo(x, y);
+            } else {
+                this.ctx.lineTo(x, y);
+            }
+        }
+        
+        this.ctx.strokeStyle = '#6495ED';
+        this.ctx.lineWidth = bodyWidth * 0.7;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        this.ctx.stroke();
     }
     
-    drawEnhancedSnakeHead(x, y) {
-        const centerX = x + this.gridSize / 2;
-        const centerY = y + this.gridSize / 2;
-        const radius = this.gridSize / 2 - 1;
+    drawSnakeHead() {
+        if (this.snake.length === 0) return;
         
-        // Main head body (blue gradient)
-        const gradient = this.ctx.createRadialGradient(
-            centerX - radius/3, centerY - radius/3, 0,
-            centerX, centerY, radius
-        );
-        gradient.addColorStop(0, '#5DADE2');
-        gradient.addColorStop(1, '#2E86C1');
+        const head = this.snake[0];
+        const centerX = head.x * this.gridSize + this.gridSize / 2;
+        const centerY = head.y * this.gridSize + this.gridSize / 2;
+        const radius = this.gridSize * 0.4;
         
-        this.ctx.fillStyle = gradient;
+        // Head circle (same as body color)
+        this.ctx.fillStyle = '#4169E1';
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         this.ctx.fill();
         
-        // Head outline
-        this.ctx.strokeStyle = '#1B4F72';
-        this.ctx.lineWidth = 2;
-        this.ctx.stroke();
+        // Head highlight
+        this.ctx.fillStyle = '#6495ED';
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius * 0.7, 0, Math.PI * 2);
+        this.ctx.fill();
         
         // Eyes
-        const eyeSize = 6;
-        const eyeOffset = radius / 3;
+        const eyeSize = 4;
+        const eyeOffset = radius * 0.6;
         
-        // Left eye
+        // Left eye (white background)
         this.ctx.fillStyle = 'white';
         this.ctx.beginPath();
         this.ctx.arc(centerX - eyeOffset, centerY - eyeOffset/2, eyeSize, 0, Math.PI * 2);
         this.ctx.fill();
         
-        // Right eye
+        // Right eye (white background)
         this.ctx.beginPath();
         this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize, 0, Math.PI * 2);
         this.ctx.fill();
@@ -525,18 +558,18 @@ class SnakeGame {
         // Eye shine
         this.ctx.fillStyle = 'white';
         this.ctx.beginPath();
-        this.ctx.arc(centerX - eyeOffset + 2, centerY - eyeOffset/2 - 2, 2, 0, Math.PI * 2);
+        this.ctx.arc(centerX - eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
         this.ctx.fill();
         
         this.ctx.beginPath();
-        this.ctx.arc(centerX + eyeOffset + 2, centerY - eyeOffset/2 - 2, 2, 0, Math.PI * 2);
+        this.ctx.arc(centerX + eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Mouth (open if near food)
         if (this.mouthOpen) {
             this.ctx.fillStyle = '#8B0000';
             this.ctx.beginPath();
-            this.ctx.arc(centerX, centerY + eyeOffset/2, 3, 0, Math.PI, false);
+            this.ctx.arc(centerX, centerY + eyeOffset/2, 2, 0, Math.PI, false);
             this.ctx.fill();
         }
         
@@ -546,98 +579,16 @@ class SnakeGame {
             this.ctx.lineWidth = 2;
             this.ctx.beginPath();
             this.ctx.moveTo(centerX, centerY + eyeOffset/2);
-            this.ctx.lineTo(centerX, centerY + eyeOffset/2 + 8);
-            this.ctx.moveTo(centerX, centerY + eyeOffset/2 + 8);
-            this.ctx.lineTo(centerX - 2, centerY + eyeOffset/2 + 10);
-            this.ctx.moveTo(centerX, centerY + eyeOffset/2 + 8);
-            this.ctx.lineTo(centerX + 2, centerY + eyeOffset/2 + 10);
+            this.ctx.lineTo(centerX, centerY + eyeOffset/2 + 6);
+            this.ctx.moveTo(centerX, centerY + eyeOffset/2 + 6);
+            this.ctx.lineTo(centerX - 2, centerY + eyeOffset/2 + 8);
+            this.ctx.moveTo(centerX, centerY + eyeOffset/2 + 6);
+            this.ctx.lineTo(centerX + 2, centerY + eyeOffset/2 + 8);
             this.ctx.stroke();
         }
     }
     
-    drawEnhancedSnakeBody(x, y, index) {
-        const centerX = x + this.gridSize / 2;
-        const centerY = y + this.gridSize / 2;
-        const radius = this.gridSize / 2 - 1;
-        
-        // Body gradient (lighter blue)
-        const gradient = this.ctx.createRadialGradient(
-            centerX - radius/3, centerY - radius/3, 0,
-            centerX, centerY, radius
-        );
-        gradient.addColorStop(0, '#7FB3D3');
-        gradient.addColorStop(1, '#5499C7');
-        
-        this.ctx.fillStyle = gradient;
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        // Body outline
-        this.ctx.strokeStyle = '#2E4B6B';
-        this.ctx.lineWidth = 1;
-        this.ctx.stroke();
-        
-        // Body spots (every 2nd segment)
-        if (index % 2 === 0) {
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            this.ctx.beginPath();
-            this.ctx.arc(centerX + radius/3, centerY - radius/3, 2, 0, Math.PI * 2);
-            this.ctx.fill();
-            
-            this.ctx.beginPath();
-            this.ctx.arc(centerX - radius/3, centerY + radius/3, 2, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
-    }
-    
-    drawSnakeTail(x, y) {
-        const centerX = x + this.gridSize / 2;
-        const centerY = y + this.gridSize / 2;
-        const radius = this.gridSize / 2 - 2;
-        
-        // Tail gradient (even lighter blue)
-        const gradient = this.ctx.createRadialGradient(
-            centerX - radius/3, centerY - radius/3, 0,
-            centerX, centerY, radius
-        );
-        gradient.addColorStop(0, '#AED6F1');
-        gradient.addColorStop(1, '#7FB3D3');
-        
-        this.ctx.fillStyle = gradient;
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        // Tail outline
-        this.ctx.strokeStyle = '#5499C7';
-        this.ctx.lineWidth = 1;
-        this.ctx.stroke();
-    }
-    
-    connectSnakeSegments() {
-        if (this.snake.length < 2) return;
-        
-        this.ctx.strokeStyle = '#5499C7';
-        this.ctx.lineWidth = this.gridSize - 4;
-        this.ctx.lineCap = 'round';
-        this.ctx.lineJoin = 'round';
-        
-        for (let i = 0; i < this.snake.length - 1; i++) {
-            const current = this.snake[i];
-            const next = this.snake[i + 1];
-            
-            const currentX = current.x * this.gridSize + this.gridSize / 2;
-            const currentY = current.y * this.gridSize + this.gridSize / 2;
-            const nextX = next.x * this.gridSize + this.gridSize / 2;
-            const nextY = next.y * this.gridSize + this.gridSize / 2;
-            
-            this.ctx.beginPath();
-            this.ctx.moveTo(currentX, currentY);
-            this.ctx.lineTo(nextX, nextY);
-            this.ctx.stroke();
-        }
-    }
+
     
     drawStartMessage() {
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
