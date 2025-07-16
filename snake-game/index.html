@@ -24,15 +24,37 @@
                     START GAME
                 </button>
                 <div class="snake-path-container">
-                    <div class="animated-snake">
-                        <div class="snake-segment head" data-segment="0"></div>
-                        <div class="snake-segment body" data-segment="1"></div>
-                        <div class="snake-segment body" data-segment="2"></div>
-                        <div class="snake-segment body" data-segment="3"></div>
-                        <div class="snake-segment body" data-segment="4"></div>
-                        <div class="snake-segment body" data-segment="5"></div>
-                        <div class="snake-segment tail" data-segment="6"></div>
-                    </div>
+                    <svg class="snake-svg" width="350" height="200" viewBox="0 0 350 200">
+                        <defs>
+                            <linearGradient id="snakeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#5DADE2;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#7FB3D3;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#85C1E9;stop-opacity:1" />
+                            </linearGradient>
+                            <filter id="snakeShadow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="rgba(46, 134, 193, 0.5)"/>
+                            </filter>
+                        </defs>
+                        
+                        <!-- Snake body path -->
+                        <path id="snakeBody" stroke="url(#snakeGradient)" stroke-width="16" 
+                              fill="none" stroke-linecap="round" stroke-linejoin="round" 
+                              filter="url(#snakeShadow)"/>
+                        
+                        <!-- Snake head -->
+                        <circle id="snakeHead" r="12" fill="url(#snakeGradient)" 
+                                filter="url(#snakeShadow)"/>
+                        
+                        <!-- Snake eyes -->
+                        <circle id="leftEye" r="2.5" fill="white"/>
+                        <circle id="rightEye" r="2.5" fill="white"/>
+                        <circle id="leftPupil" r="1.2" fill="black"/>
+                        <circle id="rightPupil" r="1.2" fill="black"/>
+                        
+                        <!-- Snake tongue (optional) -->
+                        <path id="snakeTongue" stroke="#FF4757" stroke-width="1.5" 
+                              fill="none" stroke-linecap="round"/>
+                    </svg>
                 </div>
             </div>
             

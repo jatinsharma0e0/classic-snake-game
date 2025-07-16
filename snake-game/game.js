@@ -472,10 +472,18 @@ class SnakeGame {
     }
     
     initStartScreenSnake() {
-        this.snakeSegments = document.querySelectorAll('.animated-snake .snake-segment');
-        this.snakePositions = [];
+        // Get SVG elements
+        this.snakeBody = document.getElementById('snakeBody');
+        this.snakeHead = document.getElementById('snakeHead');
+        this.leftEye = document.getElementById('leftEye');
+        this.rightEye = document.getElementById('rightEye');
+        this.leftPupil = document.getElementById('leftPupil');
+        this.rightPupil = document.getElementById('rightPupil');
+        this.snakeTongue = document.getElementById('snakeTongue');
+        
         this.snakeAnimationFrame = 0;
-        this.segmentSpacing = 12; // Distance between segments
+        this.bodyLength = 80; // Number of points to track for body
+        this.bodyPoints = [];
         
         // Button dimensions and position relative to container
         this.buttonWidth = 200;
@@ -488,8 +496,13 @@ class SnakeGame {
         this.buttonTop = (this.containerHeight - this.buttonHeight) / 2;
         
         // Create rectangular path around button with padding
-        this.pathPadding = 30;
+        this.pathPadding = 35;
         this.createRectangularPath();
+        
+        // Initialize body points
+        for (let i = 0; i < this.bodyLength; i++) {
+            this.bodyPoints.push({ x: this.path[0].x, y: this.path[0].y });
+        }
         
         // Start animation
         this.animateStartScreenSnake();
@@ -501,15 +514,15 @@ class SnakeGame {
         const right = this.buttonLeft + this.buttonWidth + this.pathPadding;
         const top = this.buttonTop - this.pathPadding;
         const bottom = this.buttonTop + this.buttonHeight + this.pathPadding;
-        const cornerRadius = 20;
+        const cornerRadius = 25;
         
         // Top side (left to right)
-        for (let x = left + cornerRadius; x <= right - cornerRadius; x += 2) {
+        for (let x = left + cornerRadius; x <= right - cornerRadius; x += 1.5) {
             this.path.push({ x, y: top });
         }
         
         // Top-right corner
-        for (let angle = -90; angle <= 0; angle += 3) {
+        for (let angle = -90; angle <= 0; angle += 2) {
             const rad = (angle * Math.PI) / 180;
             const x = right - cornerRadius + Math.cos(rad) * cornerRadius;
             const y = top + cornerRadius + Math.sin(rad) * cornerRadius;
@@ -517,12 +530,12 @@ class SnakeGame {
         }
         
         // Right side (top to bottom)
-        for (let y = top + cornerRadius; y <= bottom - cornerRadius; y += 2) {
+        for (let y = top + cornerRadius; y <= bottom - cornerRadius; y += 1.5) {
             this.path.push({ x: right, y });
         }
         
         // Bottom-right corner
-        for (let angle = 0; angle <= 90; angle += 3) {
+        for (let angle = 0; angle <= 90; angle += 2) {
             const rad = (angle * Math.PI) / 180;
             const x = right - cornerRadius + Math.cos(rad) * cornerRadius;
             const y = bottom - cornerRadius + Math.sin(rad) * cornerRadius;
@@ -530,12 +543,12 @@ class SnakeGame {
         }
         
         // Bottom side (right to left)
-        for (let x = right - cornerRadius; x >= left + cornerRadius; x -= 2) {
+        for (let x = right - cornerRadius; x >= left + cornerRadius; x -= 1.5) {
             this.path.push({ x, y: bottom });
         }
         
         // Bottom-left corner
-        for (let angle = 90; angle <= 180; angle += 3) {
+        for (let angle = 90; angle <= 180; angle += 2) {
             const rad = (angle * Math.PI) / 180;
             const x = left + cornerRadius + Math.cos(rad) * cornerRadius;
             const y = bottom - cornerRadius + Math.sin(rad) * cornerRadius;
@@ -543,12 +556,12 @@ class SnakeGame {
         }
         
         // Left side (bottom to top)
-        for (let y = bottom - cornerRadius; y >= top + cornerRadius; y -= 2) {
+        for (let y = bottom - cornerRadius; y >= top + cornerRadius; y -= 1.5) {
             this.path.push({ x: left, y });
         }
         
         // Top-left corner
-        for (let angle = 180; angle <= 270; angle += 3) {
+        for (let angle = 180; angle <= 270; angle += 2) {
             const rad = (angle * Math.PI) / 180;
             const x = left + cornerRadius + Math.cos(rad) * cornerRadius;
             const y = top + cornerRadius + Math.sin(rad) * cornerRadius;
@@ -559,39 +572,93 @@ class SnakeGame {
     animateStartScreenSnake() {
         if (!this.path || this.path.length === 0) return;
         
-        // Calculate positions for each segment
-        this.snakeSegments.forEach((segment, index) => {
-            const pathIndex = (this.snakeAnimationFrame - (index * this.segmentSpacing)) % this.path.length;
-            const adjustedIndex = pathIndex < 0 ? this.path.length + pathIndex : pathIndex;
-            const position = this.path[Math.floor(adjustedIndex)];
-            
-            if (position) {
-                // Add some undulation to body segments
-                let offsetY = 0;
-                if (index > 0) {
-                    offsetY = Math.sin((this.snakeAnimationFrame * 0.1) + (index * 0.5)) * 2;
-                }
-                
-                segment.style.left = (position.x - 9) + 'px'; // Center the segment
-                segment.style.top = (position.y - 9 + offsetY) + 'px';
-                
-                // Calculate rotation based on movement direction
-                if (index === 0 && this.path.length > 1) {
-                    const nextIndex = (Math.floor(adjustedIndex) + 1) % this.path.length;
-                    const nextPos = this.path[nextIndex];
-                    if (nextPos) {
-                        const angle = Math.atan2(nextPos.y - position.y, nextPos.x - position.x);
-                        segment.style.transform = `rotate(${angle}rad)`;
-                    }
-                }
-                
-                // Slightly change opacity for depth effect
-                const opacity = 0.9 + (index * 0.02);
-                segment.style.opacity = Math.min(opacity, 1);
-            }
-        });
+        // Get current head position
+        const headIndex = Math.floor(this.snakeAnimationFrame) % this.path.length;
+        const headPos = this.path[headIndex];
+        const nextHeadIndex = (headIndex + 1) % this.path.length;
+        const nextHeadPos = this.path[nextHeadIndex];
         
-        this.snakeAnimationFrame += 0.8; // Animation speed
+        // Add subtle undulation
+        const waveOffset = Math.sin(this.snakeAnimationFrame * 0.15) * 3;
+        const adjustedHeadPos = {
+            x: headPos.x,
+            y: headPos.y + waveOffset
+        };
+        
+        // Update body points (follow the head)
+        this.bodyPoints.unshift(adjustedHeadPos);
+        if (this.bodyPoints.length > this.bodyLength) {
+            this.bodyPoints.pop();
+        }
+        
+        // Create smooth body path with undulation
+        let pathData = `M ${this.bodyPoints[0].x} ${this.bodyPoints[0].y}`;
+        
+        for (let i = 1; i < this.bodyPoints.length - 2; i += 3) {
+            const p1 = this.bodyPoints[i];
+            const p2 = this.bodyPoints[i + 1];
+            const p3 = this.bodyPoints[i + 2];
+            
+            // Add subtle wave motion to body
+            const bodyWave = Math.sin((this.snakeAnimationFrame * 0.1) + (i * 0.2)) * 1.5;
+            
+            pathData += ` Q ${p1.x} ${p1.y + bodyWave} ${p2.x} ${p2.y + bodyWave}`;
+            if (p3) {
+                pathData += ` Q ${p2.x} ${p2.y + bodyWave} ${p3.x} ${p3.y + bodyWave}`;
+            }
+        }
+        
+        this.snakeBody.setAttribute('d', pathData);
+        
+        // Position and rotate head
+        this.snakeHead.setAttribute('cx', adjustedHeadPos.x);
+        this.snakeHead.setAttribute('cy', adjustedHeadPos.y);
+        
+        // Calculate head rotation
+        const angle = Math.atan2(nextHeadPos.y - headPos.y, nextHeadPos.x - headPos.x);
+        const headRotation = `rotate(${angle * 180 / Math.PI} ${adjustedHeadPos.x} ${adjustedHeadPos.y})`;
+        this.snakeHead.setAttribute('transform', headRotation);
+        
+        // Position eyes relative to head
+        const eyeOffsetX = Math.cos(angle) * 3;
+        const eyeOffsetY = Math.sin(angle) * 3;
+        const eyeSeparation = 4;
+        
+        // Eye positions (perpendicular to movement direction)
+        const perpX = -Math.sin(angle) * eyeSeparation;
+        const perpY = Math.cos(angle) * eyeSeparation;
+        
+        this.leftEye.setAttribute('cx', adjustedHeadPos.x + eyeOffsetX + perpX);
+        this.leftEye.setAttribute('cy', adjustedHeadPos.y + eyeOffsetY + perpY);
+        this.rightEye.setAttribute('cx', adjustedHeadPos.x + eyeOffsetX - perpX);
+        this.rightEye.setAttribute('cy', adjustedHeadPos.y + eyeOffsetY - perpY);
+        
+        // Position pupils
+        this.leftPupil.setAttribute('cx', adjustedHeadPos.x + eyeOffsetX + perpX);
+        this.leftPupil.setAttribute('cy', adjustedHeadPos.y + eyeOffsetY + perpY);
+        this.rightPupil.setAttribute('cx', adjustedHeadPos.x + eyeOffsetX - perpX);
+        this.rightPupil.setAttribute('cy', adjustedHeadPos.y + eyeOffsetY - perpY);
+        
+        // Animate tongue (flicks occasionally)
+        if (Math.floor(this.snakeAnimationFrame / 60) % 4 === 0) {
+            const tongueLength = 8;
+            const tongueX = adjustedHeadPos.x + Math.cos(angle) * (12 + tongueLength);
+            const tongueY = adjustedHeadPos.y + Math.sin(angle) * (12 + tongueLength);
+            const forkOffset = 2;
+            
+            const tongueData = `M ${adjustedHeadPos.x + Math.cos(angle) * 12} ${adjustedHeadPos.y + Math.sin(angle) * 12} 
+                              L ${tongueX} ${tongueY}
+                              M ${tongueX} ${tongueY}
+                              L ${tongueX + Math.cos(angle + 0.3) * forkOffset} ${tongueY + Math.sin(angle + 0.3) * forkOffset}
+                              M ${tongueX} ${tongueY}
+                              L ${tongueX + Math.cos(angle - 0.3) * forkOffset} ${tongueY + Math.sin(angle - 0.3) * forkOffset}`;
+            this.snakeTongue.setAttribute('d', tongueData);
+            this.snakeTongue.style.opacity = '1';
+        } else {
+            this.snakeTongue.style.opacity = '0';
+        }
+        
+        this.snakeAnimationFrame += 0.6; // Animation speed
         
         // Continue animation
         requestAnimationFrame(() => this.animateStartScreenSnake());
