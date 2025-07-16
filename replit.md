@@ -7,6 +7,21 @@ This is a full-stack web application built with React/TypeScript frontend and Ex
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+
+## Recent Changes
+
+### Migration Completed (July 16, 2025)
+- ✓ Successfully migrated project from Replit Agent to Replit environment
+- ✓ Fixed React application to redirect to Snake game as main landing page
+- ✓ Integrated custom apple image into Snake game
+- ✓ Server running properly with client/server separation
+- ✓ Snake game accessible and functional at /snake route
+
+### Current Status
+- Main application redirects to Snake game (/snake)
+- Snake game features custom apple image provided by user
+- Server running on port 5000 with proper routing
+- All dependencies installed and working
 Landing page preference: Direct access to snake game, no hub interface.
 
 ## System Architecture
