@@ -485,6 +485,8 @@ class SnakeGame {
         this.bodyLength = 120; // Number of points to track for body
         this.bodyPoints = [];
         this.pointSpacing = 2; // Distance between body tracking points
+        this.apples = []; // Store apple data
+        this.applesContainer = document.getElementById('applesContainer');
         
         // Button dimensions and position relative to container
         this.buttonWidth = 200;
@@ -509,6 +511,9 @@ class SnakeGame {
                 y: this.path[Math.floor(adjustedIndex)].y 
             });
         }
+        
+        // Create initial apples
+        this.createApples();
         
         // Start animation
         this.animateStartScreenSnake();
@@ -721,8 +726,146 @@ class SnakeGame {
         
         this.snakeAnimationFrame += 1.2; // Animation speed - increased for faster movement
         
+        // Check for apple collisions
+        this.checkAppleCollisions(adjustedHeadPos);
+        
         // Continue animation
         requestAnimationFrame(() => this.animateStartScreenSnake());
+    }
+    
+    createApples() {
+        // Place apples at strategic points along the path
+        const applePositions = [
+            { pathIndex: Math.floor(this.path.length * 0.2) },
+            { pathIndex: Math.floor(this.path.length * 0.4) },
+            { pathIndex: Math.floor(this.path.length * 0.6) },
+            { pathIndex: Math.floor(this.path.length * 0.8) }
+        ];
+        
+        applePositions.forEach((appleData, index) => {
+            const position = this.path[appleData.pathIndex];
+            if (position) {
+                const apple = this.createAppleElement(position.x, position.y, index);
+                this.apples.push({
+                    element: apple,
+                    x: position.x,
+                    y: position.y,
+                    eaten: false,
+                    id: index
+                });
+            }
+        });
+    }
+    
+    createAppleElement(x, y, id) {
+        // Create apple SVG group
+        const appleGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        appleGroup.setAttribute('id', `apple-${id}`);
+        appleGroup.setAttribute('transform', `translate(${x}, ${y})`);
+        
+        // Apple body (red circle)
+        const appleBody = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        appleBody.setAttribute('cx', '0');
+        appleBody.setAttribute('cy', '0');
+        appleBody.setAttribute('r', '8');
+        appleBody.setAttribute('fill', 'url(#appleGradient)');
+        appleBody.setAttribute('filter', 'url(#appleShadow)');
+        
+        // Apple stem
+        const appleStem = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        appleStem.setAttribute('x', '-1');
+        appleStem.setAttribute('y', '-10');
+        appleStem.setAttribute('width', '2');
+        appleStem.setAttribute('height', '4');
+        appleStem.setAttribute('fill', '#8B4513');
+        
+        // Apple leaf
+        const appleLeaf = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        appleLeaf.setAttribute('cx', '3');
+        appleLeaf.setAttribute('cy', '-8');
+        appleLeaf.setAttribute('rx', '3');
+        appleLeaf.setAttribute('ry', '2');
+        appleLeaf.setAttribute('fill', '#228B22');
+        appleLeaf.setAttribute('transform', 'rotate(30)');
+        
+        appleGroup.appendChild(appleBody);
+        appleGroup.appendChild(appleStem);
+        appleGroup.appendChild(appleLeaf);
+        
+        // Add gradients and filters if not already present
+        this.addAppleDefinitions();
+        
+        this.applesContainer.appendChild(appleGroup);
+        return appleGroup;
+    }
+    
+    addAppleDefinitions() {
+        const defs = document.querySelector('defs');
+        if (!document.getElementById('appleGradient')) {
+            const appleGradient = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
+            appleGradient.setAttribute('id', 'appleGradient');
+            appleGradient.innerHTML = `
+                <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:1" />
+                <stop offset="70%" style="stop-color:#DC143C;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#8B0000;stop-opacity:1" />
+            `;
+            defs.appendChild(appleGradient);
+        }
+        
+        if (!document.getElementById('appleShadow')) {
+            const appleShadow = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+            appleShadow.setAttribute('id', 'appleShadow');
+            appleShadow.innerHTML = `<feDropShadow dx="1" dy="1" stdDeviation="2" flood-color="rgba(0,0,0,0.4)"/>`;
+            defs.appendChild(appleShadow);
+        }
+    }
+    
+    checkAppleCollisions(headPos) {
+        this.apples.forEach(apple => {
+            if (!apple.eaten) {
+                const distance = Math.sqrt(
+                    Math.pow(headPos.x - apple.x, 2) + 
+                    Math.pow(headPos.y - apple.y, 2)
+                );
+                
+                if (distance < 15) { // Collision threshold
+                    this.eatApple(apple);
+                }
+            }
+        });
+    }
+    
+    eatApple(apple) {
+        apple.eaten = true;
+        
+        // Create eating animation
+        const appleElement = apple.element;
+        appleElement.style.transition = 'all 0.3s ease';
+        appleElement.style.transform = `translate(${apple.x}px, ${apple.y}px) scale(0)`;
+        appleElement.style.opacity = '0';
+        
+        // Remove apple after animation
+        setTimeout(() => {
+            if (appleElement.parentNode) {
+                appleElement.parentNode.removeChild(appleElement);
+            }
+            
+            // Respawn apple at a different location after delay
+            setTimeout(() => {
+                this.respawnApple(apple);
+            }, 2000);
+        }, 300);
+    }
+    
+    respawnApple(apple) {
+        // Choose a new random position along the path
+        const newIndex = Math.floor(Math.random() * this.path.length);
+        const newPosition = this.path[newIndex];
+        
+        apple.x = newPosition.x;
+        apple.y = newPosition.y;
+        apple.eaten = false;
+        apple.element = this.createAppleElement(newPosition.x, newPosition.y, apple.id);
     }
 }
 

@@ -159,6 +159,27 @@ body {
     z-index: 1;
 }
 
+.decorative-apple {
+    position: absolute;
+    font-size: 2rem;
+    animation: bobApple 3s ease-in-out infinite;
+    z-index: 1;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+}
+
+.decorative-apple:nth-child(odd) {
+    animation-delay: -1.5s;
+}
+
+.decorative-apple:nth-child(even) {
+    animation-delay: -0.5s;
+}
+
+@keyframes bobApple {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+}
+
 .best-score-display {
     font-size: 1.1rem;
     color: #ffd93d;
