@@ -103,14 +103,21 @@ body {
     font-family: 'Driftwood', 'Arial', sans-serif;
     font-size: 4rem;
     font-weight: bold;
-    color: #68d391;
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    color: #2E7D32;
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3), 0 0 8px rgba(46, 125, 50, 0.8);
     margin-bottom: 10px;
     animation: titleGlow 3s ease-in-out infinite alternate;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 20px;
+    background-image: url('assets/title-bg.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 20px 40px;
+    border-radius: 10px;
+    position: relative;
 }
 
 .snake-icon {
@@ -122,8 +129,8 @@ body {
 
 
 @keyframes titleGlow {
-    0% { text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 20px rgba(104, 211, 145, 0.5); }
-    100% { text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 30px rgba(104, 211, 145, 0.8); }
+    0% { text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3), 0 0 8px rgba(46, 125, 50, 0.8); }
+    100% { text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.4), 0 0 12px rgba(46, 125, 50, 1); }
 }
 
 .subtitle {
