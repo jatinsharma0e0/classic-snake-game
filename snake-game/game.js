@@ -500,9 +500,14 @@ class SnakeGame {
         this.pathPadding = 35;
         this.createRectangularPath();
         
-        // Initialize body points
+        // Initialize body points - pre-fill with positions along the path
         for (let i = 0; i < this.bodyLength; i++) {
-            this.bodyPoints.push({ x: this.path[0].x, y: this.path[0].y });
+            const pathIndex = (this.path.length - (i * this.pointSpacing)) % this.path.length;
+            const adjustedIndex = pathIndex < 0 ? this.path.length + pathIndex : pathIndex;
+            this.bodyPoints.push({ 
+                x: this.path[Math.floor(adjustedIndex)].x, 
+                y: this.path[Math.floor(adjustedIndex)].y 
+            });
         }
         
         // Start animation
@@ -660,26 +665,35 @@ class SnakeGame {
         this.rightPupil.setAttribute('cx', adjustedHeadPos.x + eyeOffsetX - perpX);
         this.rightPupil.setAttribute('cy', adjustedHeadPos.y + eyeOffsetY - perpY);
         
-        // Animate tongue (flicks occasionally)
-        if (Math.floor(this.snakeAnimationFrame / 60) % 4 === 0) {
+        // Animate tongue (flicks occasionally with jiggle)
+        if (Math.floor(this.snakeAnimationFrame / 40) % 3 === 0) {
             const tongueLength = 8;
-            const tongueX = adjustedHeadPos.x + Math.cos(angle) * (12 + tongueLength);
-            const tongueY = adjustedHeadPos.y + Math.sin(angle) * (12 + tongueLength);
+            
+            // Add jiggle motion to tongue
+            const jiggleX = Math.sin(this.snakeAnimationFrame * 0.8) * 1.5;
+            const jiggleY = Math.cos(this.snakeAnimationFrame * 1.2) * 1;
+            
+            const tongueX = adjustedHeadPos.x + Math.cos(angle) * (12 + tongueLength) + jiggleX;
+            const tongueY = adjustedHeadPos.y + Math.sin(angle) * (12 + tongueLength) + jiggleY;
             const forkOffset = 2;
+            
+            // Add jiggle to fork ends as well
+            const forkJiggle1 = Math.sin(this.snakeAnimationFrame * 1.5) * 0.8;
+            const forkJiggle2 = Math.cos(this.snakeAnimationFrame * 1.8) * 0.8;
             
             const tongueData = `M ${adjustedHeadPos.x + Math.cos(angle) * 12} ${adjustedHeadPos.y + Math.sin(angle) * 12} 
                               L ${tongueX} ${tongueY}
                               M ${tongueX} ${tongueY}
-                              L ${tongueX + Math.cos(angle + 0.3) * forkOffset} ${tongueY + Math.sin(angle + 0.3) * forkOffset}
+                              L ${tongueX + Math.cos(angle + 0.3) * forkOffset + forkJiggle1} ${tongueY + Math.sin(angle + 0.3) * forkOffset + forkJiggle1}
                               M ${tongueX} ${tongueY}
-                              L ${tongueX + Math.cos(angle - 0.3) * forkOffset} ${tongueY + Math.sin(angle - 0.3) * forkOffset}`;
+                              L ${tongueX + Math.cos(angle - 0.3) * forkOffset + forkJiggle2} ${tongueY + Math.sin(angle - 0.3) * forkOffset + forkJiggle2}`;
             this.snakeTongue.setAttribute('d', tongueData);
             this.snakeTongue.style.opacity = '1';
         } else {
             this.snakeTongue.style.opacity = '0';
         }
         
-        this.snakeAnimationFrame += 0.4; // Animation speed - slower for smoother motion
+        this.snakeAnimationFrame += 1.2; // Animation speed - increased for faster movement
         
         // Continue animation
         requestAnimationFrame(() => this.animateStartScreenSnake());
