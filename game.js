@@ -265,8 +265,8 @@ class SnakeGame {
         // Update high score display on start screen
         this.startScreenHighScore.textContent = this.highScore;
         
-        // Play calm background music for menu
-        this.audioManager.playBackgroundMusic();
+        // Set audio manager to start screen mode and play background music
+        this.audioManager.setScreen(true);
     }
     
     showGameScreen() {
@@ -299,9 +299,9 @@ class SnakeGame {
         this.food = this.generateFood();
         this.updateScoreDisplay();
         
-        // Play game start sound and stop background music for gameplay focus
+        // Set audio manager to game screen mode and play game start sound
+        this.audioManager.setScreen(false);
         this.audioManager.playSound('gameStart');
-        this.audioManager.stopBackgroundMusic();
     }
     
     handleKeyPress(e) {

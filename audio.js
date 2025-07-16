@@ -9,6 +9,7 @@ class AudioManager {
         this.masterVolume = 0.7;
         this.musicVolume = 0.3;
         this.sfxVolume = 0.5;
+        this.onStartScreen = true; // Track which screen we're on
         
         this.initializeAudio();
         this.createSounds();
@@ -307,9 +308,9 @@ class AudioManager {
         return buffer;
     }
     
-    // Play background music
+    // Play background music (only on start screen)
     playBackgroundMusic() {
-        if (!this.audioContext || this.isMuted) return;
+        if (!this.audioContext || this.isMuted || !this.onStartScreen) return;
         
         if (this.backgroundMusic) {
             this.backgroundMusic.stop();
@@ -358,10 +359,25 @@ class AudioManager {
         if (this.isMuted) {
             this.stopBackgroundMusic();
         } else {
-            this.playBackgroundMusic();
+            // Only play background music if we're on the start screen
+            if (this.onStartScreen) {
+                this.playBackgroundMusic();
+            }
         }
         
         return this.isMuted;
+    }
+    
+    // Set current screen (to control background music)
+    setScreen(isStartScreen) {
+        this.onStartScreen = isStartScreen;
+        if (!isStartScreen) {
+            // Stop background music when not on start screen
+            this.stopBackgroundMusic();
+        } else if (!this.isMuted) {
+            // Play background music when returning to start screen (if not muted)
+            this.playBackgroundMusic();
+        }
     }
     
     // Set volume levels
