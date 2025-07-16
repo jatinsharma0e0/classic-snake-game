@@ -306,7 +306,7 @@ class SnakeGame {
         this.ctx.shadowOffsetY = 0;
         
         // Eyes
-        const eyeSize = 3;
+        const eyeSize = 5;
         const eyeOffset = radius / 3;
         
         // Left eye
