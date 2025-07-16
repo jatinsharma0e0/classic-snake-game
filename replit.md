@@ -131,3 +131,5 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Implemented screen shake, red flash, and directional knockback based on collision type
 - Snake cannot start moving with left arrow key to prevent immediate self-collision
 - Snake pupils change to X X immediately upon death and remain visible throughout hit animation
+- Updated start screen with beautiful jungle background image for immersive experience
+- Enhanced text styling with better contrast and readability over new background
