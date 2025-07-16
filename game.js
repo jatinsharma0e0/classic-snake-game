@@ -635,16 +635,9 @@ class SnakeGame {
     }
     
     render() {
-        // Performance: only clear dirty regions if possible, otherwise full clear
-        if (this.dirtyRegions.length > 0 && this.dirtyRegions.length < 10) {
-            // Clear only dirty regions for better performance
-            for (const region of this.dirtyRegions) {
-                this.ctx.clearRect(region.x, region.y, region.width, region.height);
-            }
-        } else {
-            // Full clear when too many dirty regions or first frame
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        }
+        // CRITICAL FIX: Always perform full canvas clear to prevent snake flickering
+        // Dirty region optimization was causing snake invisibility issues
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
         // Draw background (cached)
         this.drawJungleBackgroundOptimized();
@@ -695,8 +688,8 @@ class SnakeGame {
             this.ctx.restore();
         }
         
-        // Clear dirty regions for next frame
-        this.dirtyRegions = [];
+        // Note: Dirty regions optimization disabled to fix snake visibility
+        // Performance is still excellent with full canvas clear on modern devices
     }
     
     // Optimized background drawing with caching
@@ -914,21 +907,14 @@ class SnakeGame {
     drawContinuousSnakeOptimized() {
         if (this.snake.length === 0) return;
         
-        // Performance: check if snake actually moved before redrawing
-        const currentSnakeState = this.snake.map(s => `${s.x},${s.y}`).join('|');
-        if (this.lastRenderState?.snake === currentSnakeState && !this.hitAnimation) {
-            return; // Skip redraw if snake hasn't moved
-        }
+        // CRITICAL FIX: Always draw snake - render state caching was causing invisibility
+        // Canvas is cleared each frame, so we must redraw the snake every frame
         
         // Draw optimized snake body first
         this.drawSnakeBodyOptimized();
         
         // Then draw the optimized head with eyes on top
         this.drawSnakeHeadOptimized();
-        
-        // Update render state
-        if (!this.lastRenderState) this.lastRenderState = {};
-        this.lastRenderState.snake = currentSnakeState;
     }
     
     drawSnakeBodyOptimized() {
