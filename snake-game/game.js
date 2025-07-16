@@ -26,7 +26,7 @@ class SnakeGame {
             { x: 5, y: 5 },   // Top-left area
             { x: 15, y: 15 }  // Bottom-right area
         ];
-        this.apples = [
+        this.gameApples = [
             { x: 5, y: 5, active: true, snakePassedThrough: false },
             { x: 15, y: 15, active: true, snakePassedThrough: false }
         ];
@@ -95,7 +95,7 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         this.score = 0;
-        this.apples = [
+        this.gameApples = [
             { x: 5, y: 5, active: true, snakePassedThrough: false },
             { x: 15, y: 15, active: true, snakePassedThrough: false }
         ];
@@ -177,7 +177,7 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         this.score = 0;
-        this.apples = [
+        this.gameApples = [
             { x: 5, y: 5, active: true, snakePassedThrough: false },
             { x: 15, y: 15, active: true, snakePassedThrough: false }
         ];
@@ -232,8 +232,8 @@ class SnakeGame {
         
         // Check apple collisions
         let appleEaten = false;
-        for (let i = 0; i < this.apples.length; i++) {
-            const apple = this.apples[i];
+        for (let i = 0; i < this.gameApples.length; i++) {
+            const apple = this.gameApples[i];
             if (apple.active && head.x === apple.x && head.y === apple.y) {
                 this.score += 10;
                 this.updateScoreDisplay();
@@ -251,7 +251,7 @@ class SnakeGame {
         }
         
         // Check if snake has passed through apple positions to enable respawning
-        this.apples.forEach(apple => {
+        this.gameApples.forEach(apple => {
             if (!apple.active && !apple.snakePassedThrough) {
                 // Check if any part of the snake is still on the apple position
                 const snakeOnApple = this.snake.some(segment => 
@@ -292,7 +292,7 @@ class SnakeGame {
         this.drawGrid();
         
         // Draw active apples
-        this.apples.forEach(apple => {
+        this.gameApples.forEach(apple => {
             if (apple.active) {
                 this.drawApple(apple.x * this.gridSize, apple.y * this.gridSize);
             }
