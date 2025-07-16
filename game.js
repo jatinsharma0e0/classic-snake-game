@@ -44,6 +44,10 @@ class SnakeGame {
         this.obstacles = [];
         this.obstacleImages = {};
         
+        // Background image
+        this.grassBg = new Image();
+        this.grassBg.src = 'assets/grass-bg.jpg';
+        
         // DOM elements
         this.startScreen = document.getElementById('startScreen');
         this.gameScreen = document.getElementById('gameScreen');
@@ -712,16 +716,21 @@ class SnakeGame {
     }
     
     drawJungleBackground() {
-        // Create jungle gradient background
-        const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
-        gradient.addColorStop(0, '#9ACD32');
-        gradient.addColorStop(0.25, '#7FFF00');
-        gradient.addColorStop(0.5, '#ADFF2F');
-        gradient.addColorStop(0.75, '#98FB98');
-        gradient.addColorStop(1, '#90EE90');
-        
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        // Draw grass background image if loaded
+        if (this.grassBg.complete) {
+            this.ctx.drawImage(this.grassBg, 0, 0, this.canvas.width, this.canvas.height);
+        } else {
+            // Fallback gradient background while image loads
+            const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+            gradient.addColorStop(0, '#9ACD32');
+            gradient.addColorStop(0.25, '#7FFF00');
+            gradient.addColorStop(0.5, '#ADFF2F');
+            gradient.addColorStop(0.75, '#98FB98');
+            gradient.addColorStop(1, '#90EE90');
+            
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
         
         // Add subtle texture pattern
         this.ctx.fillStyle = 'rgba(45, 80, 22, 0.05)';

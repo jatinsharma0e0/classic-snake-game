@@ -136,3 +136,5 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Removed animated grid elements (trees, vines, leaves) to showcase clean jungle background image
 - Added wiggle animation to snake's tongue for more dynamic and flexible appearance
 - Tongue now shows subtle side-to-side wiggle and vertical bobbing when extended
+- Added grass level background image to game canvas for enhanced visual environment
+- Replaced gradient background with detailed grass texture featuring white flowers and natural elements
