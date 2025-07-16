@@ -21,8 +21,15 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         
-        // Food properties
-        this.food = this.generateFood();
+        // Food properties - Fixed positions for two apples
+        this.fixedApplePositions = [
+            { x: 5, y: 5 },   // Top-left area
+            { x: 15, y: 15 }  // Bottom-right area
+        ];
+        this.apples = [
+            { x: 5, y: 5, active: true, snakePassedThrough: false },
+            { x: 15, y: 15, active: true, snakePassedThrough: false }
+        ];
         
         // DOM elements
         this.startScreen = document.getElementById('startScreen');
@@ -88,7 +95,10 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         this.score = 0;
-        this.food = this.generateFood();
+        this.apples = [
+            { x: 5, y: 5, active: true, snakePassedThrough: false },
+            { x: 15, y: 15, active: true, snakePassedThrough: false }
+        ];
         this.updateScoreDisplay();
     }
     
@@ -167,7 +177,10 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         this.score = 0;
-        this.food = this.generateFood();
+        this.apples = [
+            { x: 5, y: 5, active: true, snakePassedThrough: false },
+            { x: 15, y: 15, active: true, snakePassedThrough: false }
+        ];
         this.updateScoreDisplay();
     }
     
@@ -217,19 +230,43 @@ class SnakeGame {
         
         this.snake.unshift(head);
         
-        // Check food collision
-        if (head.x === this.food.x && head.y === this.food.y) {
-            this.score += 10;
-            this.updateScoreDisplay();
-            this.food = this.generateFood();
-            
-            // Update high score if needed
-            if (this.score > this.highScore) {
-                this.highScore = this.score;
-                this.saveHighScore();
+        // Check apple collisions
+        let appleEaten = false;
+        for (let i = 0; i < this.apples.length; i++) {
+            const apple = this.apples[i];
+            if (apple.active && head.x === apple.x && head.y === apple.y) {
+                this.score += 10;
+                this.updateScoreDisplay();
+                apple.active = false;
+                apple.snakePassedThrough = false;
+                appleEaten = true;
+                
+                // Update high score if needed
+                if (this.score > this.highScore) {
+                    this.highScore = this.score;
+                    this.saveHighScore();
+                }
+                break;
             }
-        } else {
-            // Remove tail if no food eaten
+        }
+        
+        // Check if snake has passed through apple positions to enable respawning
+        this.apples.forEach(apple => {
+            if (!apple.active && !apple.snakePassedThrough) {
+                // Check if any part of the snake is still on the apple position
+                const snakeOnApple = this.snake.some(segment => 
+                    segment.x === apple.x && segment.y === apple.y
+                );
+                
+                if (!snakeOnApple) {
+                    apple.snakePassedThrough = true;
+                    apple.active = true; // Respawn the apple
+                }
+            }
+        });
+        
+        if (!appleEaten) {
+            // Remove tail if no apple eaten
             this.snake.pop();
         }
         
@@ -254,8 +291,12 @@ class SnakeGame {
         // Draw grid (optional)
         this.drawGrid();
         
-        // Draw food (apple)
-        this.drawApple(this.food.x * this.gridSize, this.food.y * this.gridSize);
+        // Draw active apples
+        this.apples.forEach(apple => {
+            if (apple.active) {
+                this.drawApple(apple.x * this.gridSize, apple.y * this.gridSize);
+            }
+        });
         
         // Draw snake
         this.snake.forEach((segment, index) => {
