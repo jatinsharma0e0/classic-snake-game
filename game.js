@@ -66,6 +66,7 @@ class SnakeGame {
         this.backToMenuBtn = document.getElementById('backToMenuBtn');
         this.muteBtn = document.getElementById('muteBtn');
         this.homeMuteBtn = document.getElementById('homeMuteBtn');
+        this.tutorialOverlay = document.getElementById('tutorialOverlay');
         
         // Initialize game
         this.init();
@@ -100,12 +101,27 @@ class SnakeGame {
             this.audioManager.playSound('buttonClick');
             this.showStartScreen();
         });
-        this.muteBtn.addEventListener('click', () => {
+        // Mute button functionality for both buttons
+        const handleMuteToggle = () => {
             const isMuted = this.audioManager.toggleMute();
-            this.muteBtn.textContent = isMuted ? '🔇' : '🔊';
+            const muteIcon = isMuted ? '🔇' : '🔊';
+            this.muteBtn.textContent = muteIcon;
+            this.homeMuteBtn.textContent = muteIcon;
+            
             if (!isMuted) {
                 this.audioManager.playSound('buttonClick');
             }
+        };
+        
+        this.muteBtn.addEventListener('click', handleMuteToggle);
+        this.homeMuteBtn.addEventListener('click', handleMuteToggle);
+        
+        // Tutorial overlay dismissal
+        this.tutorialOverlay.addEventListener('click', () => {
+            this.tutorialOverlay.classList.add('fade-out');
+            setTimeout(() => {
+                this.tutorialOverlay.style.display = 'none';
+            }, 300);
         });
         
         // Start game loop
@@ -244,6 +260,10 @@ class SnakeGame {
         this.startScreen.classList.add('hidden');
         this.gameScreen.classList.remove('hidden');
         document.body.style.overflow = 'auto';
+        
+        // Show tutorial overlay
+        this.tutorialOverlay.style.display = 'flex';
+        this.tutorialOverlay.classList.remove('fade-out');
         
         // Reset and start the game
         this.gameRunning = true;

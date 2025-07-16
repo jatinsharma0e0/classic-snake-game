@@ -104,6 +104,16 @@
         
         <div class="game-area">
             <canvas id="gameCanvas" width="800" height="480"></canvas>
+            
+            <!-- Tutorial Overlay -->
+            <div id="tutorialOverlay" class="tutorial-overlay">
+                <div class="tutorial-content">
+                    <p>Use Arrow Keys or WASD to move</p>
+                    <p>Press ESC to return to menu</p>
+                    <p class="tutorial-hint">Click anywhere to dismiss</p>
+                </div>
+            </div>
+            
             <div id="gameOverScreen" class="game-over hidden">
                 <h2>Game Over!</h2>
                 <p>Your Score: <span id="finalScore">0</span></p>
@@ -111,11 +121,6 @@
                 <button id="restartBtn" class="restart-btn">Play Again</button>
                 <button id="backToMenuBtn" class="back-menu-btn">Back to Menu</button>
             </div>
-        </div>
-        
-        <div class="controls-info">
-            <p>Use Arrow Keys or WASD to move</p>
-            <p>Press ESC to return to menu</p>
         </div>
     </div>
 
