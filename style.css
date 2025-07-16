@@ -176,16 +176,16 @@ body {
     filter: drop-shadow(0 8px 25px rgba(139, 69, 19, 0.4));
 }
 
-.start-game-btn-image:hover {
+/* .start-game-btn-image:hover {
     transform: translateY(-5px) scale(1.05);
     filter: drop-shadow(0 15px 35px rgba(139, 69, 19, 0.6)) brightness(1.1);
-}
+} */
 
 .play-button-overlay {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -35%);
     width: 50px;
     height: 50px;
     z-index: 11;
@@ -195,7 +195,7 @@ body {
 }
 
 .start-button-container:hover .play-button-overlay {
-    transform: translate(-50%, -55%) scale(1.1);
+    transform: translate(-50%, -40%) scale(1.1);
 }
 
 .snake-path-container {
