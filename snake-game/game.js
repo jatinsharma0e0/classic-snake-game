@@ -554,7 +554,7 @@ class SnakeGame {
         }
         
         // Create initial apples
-        this.createApples();
+        // this.createApples(); // Disabled to prevent random apples on start screen
         
         // Start animation
         this.animateStartScreenSnake();
@@ -768,7 +768,7 @@ class SnakeGame {
         this.snakeAnimationFrame += 1.2; // Animation speed - increased for faster movement
         
         // Check for apple collisions
-        this.checkAppleCollisions(adjustedHeadPos);
+        // this.checkAppleCollisions(adjustedHeadPos); // Disabled to prevent random apples on start screen
         
         // Continue animation
         requestAnimationFrame(() => this.animateStartScreenSnake());
