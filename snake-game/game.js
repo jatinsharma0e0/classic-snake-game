@@ -603,38 +603,60 @@ class SnakeGame {
             y: interpolatedHead.y + irregularOffset
         };
         
-        // Update body points (follow the head's exact wavy path)
-        this.bodyPoints.unshift({ x: adjustedHeadPos.x, y: adjustedHeadPos.y });
-        if (this.bodyPoints.length > this.bodyLength) {
-            this.bodyPoints.pop();
-        }
-        
-        // Create smooth continuous body path with better curve handling
-        if (this.bodyPoints.length > 3) {
-            let pathData = `M ${this.bodyPoints[0].x} ${this.bodyPoints[0].y}`;
+        // Update body points with consistent spacing
+        if (this.bodyPoints.length === 0) {
+            this.bodyPoints.push({ x: adjustedHeadPos.x, y: adjustedHeadPos.y });
+        } else {
+            const lastPoint = this.bodyPoints[0];
+            const distance = Math.sqrt(
+                Math.pow(adjustedHeadPos.x - lastPoint.x, 2) + 
+                Math.pow(adjustedHeadPos.y - lastPoint.y, 2)
+            );
             
-            // Use catmull-rom style smooth curves for consistent thickness
-            for (let i = 1; i < this.bodyPoints.length - 1; i++) {
-                const p0 = this.bodyPoints[Math.max(0, i - 1)];
-                const p1 = this.bodyPoints[i];
-                const p2 = this.bodyPoints[Math.min(this.bodyPoints.length - 1, i + 1)];
-                
-                // Calculate smooth control points
-                const tension = 0.3;
-                const cp1x = p1.x + (p2.x - p0.x) * tension;
-                const cp1y = p1.y + (p2.y - p0.y) * tension;
-                
-                if (i === 1) {
-                    pathData += ` L ${p1.x} ${p1.y}`;
-                } else {
-                    pathData += ` S ${cp1x} ${cp1y} ${p1.x} ${p1.y}`;
+            // Only add new point if moved enough distance
+            if (distance >= this.pointSpacing) {
+                this.bodyPoints.unshift({ x: adjustedHeadPos.x, y: adjustedHeadPos.y });
+                if (this.bodyPoints.length > this.bodyLength) {
+                    this.bodyPoints.pop();
                 }
             }
+        }
+        
+        // Create smooth continuous body path ensuring visibility on straight segments
+        if (this.bodyPoints.length > 1) {
+            let pathData = `M ${this.bodyPoints[0].x} ${this.bodyPoints[0].y}`;
             
-            // Add the final point
-            if (this.bodyPoints.length > 1) {
-                const lastPoint = this.bodyPoints[this.bodyPoints.length - 1];
-                pathData += ` L ${lastPoint.x} ${lastPoint.y}`;
+            // For straight segments, use simple lines; for curves, use smooth curves
+            for (let i = 1; i < this.bodyPoints.length; i++) {
+                const current = this.bodyPoints[i];
+                
+                if (i < this.bodyPoints.length - 1) {
+                    // Check if this is a straight segment or curve
+                    const prev = this.bodyPoints[i - 1];
+                    const next = this.bodyPoints[i + 1];
+                    
+                    // Calculate if points are roughly collinear (straight line)
+                    const dx1 = current.x - prev.x;
+                    const dy1 = current.y - prev.y;
+                    const dx2 = next.x - current.x;
+                    const dy2 = next.y - current.y;
+                    
+                    // Cross product to check collinearity
+                    const crossProduct = Math.abs(dx1 * dy2 - dy1 * dx2);
+                    
+                    if (crossProduct < 5) { // Straight line threshold
+                        pathData += ` L ${current.x} ${current.y}`;
+                    } else {
+                        // Use quadratic curve for smooth turns
+                        const nextPoint = this.bodyPoints[i + 1];
+                        const controlX = current.x;
+                        const controlY = current.y;
+                        pathData += ` Q ${controlX} ${controlY} ${(current.x + nextPoint.x) / 2} ${(current.y + nextPoint.y) / 2}`;
+                        i++; // Skip next point as it's used in the curve
+                    }
+                } else {
+                    pathData += ` L ${current.x} ${current.y}`;
+                }
             }
             
             this.snakeBody.setAttribute('d', pathData);
