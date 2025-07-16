@@ -482,8 +482,9 @@ class SnakeGame {
         this.snakeTongue = document.getElementById('snakeTongue');
         
         this.snakeAnimationFrame = 0;
-        this.bodyLength = 80; // Number of points to track for body
+        this.bodyLength = 120; // Number of points to track for body
         this.bodyPoints = [];
+        this.pointSpacing = 2; // Distance between body tracking points
         
         // Button dimensions and position relative to container
         this.buttonWidth = 200;
@@ -517,12 +518,12 @@ class SnakeGame {
         const cornerRadius = 25;
         
         // Top side (left to right)
-        for (let x = left + cornerRadius; x <= right - cornerRadius; x += 1.5) {
+        for (let x = left + cornerRadius; x <= right - cornerRadius; x += 1) {
             this.path.push({ x, y: top });
         }
         
         // Top-right corner
-        for (let angle = -90; angle <= 0; angle += 2) {
+        for (let angle = -90; angle <= 0; angle += 1.5) {
             const rad = (angle * Math.PI) / 180;
             const x = right - cornerRadius + Math.cos(rad) * cornerRadius;
             const y = top + cornerRadius + Math.sin(rad) * cornerRadius;
@@ -530,12 +531,12 @@ class SnakeGame {
         }
         
         // Right side (top to bottom)
-        for (let y = top + cornerRadius; y <= bottom - cornerRadius; y += 1.5) {
+        for (let y = top + cornerRadius; y <= bottom - cornerRadius; y += 1) {
             this.path.push({ x: right, y });
         }
         
         // Bottom-right corner
-        for (let angle = 0; angle <= 90; angle += 2) {
+        for (let angle = 0; angle <= 90; angle += 1.5) {
             const rad = (angle * Math.PI) / 180;
             const x = right - cornerRadius + Math.cos(rad) * cornerRadius;
             const y = bottom - cornerRadius + Math.sin(rad) * cornerRadius;
@@ -543,12 +544,12 @@ class SnakeGame {
         }
         
         // Bottom side (right to left)
-        for (let x = right - cornerRadius; x >= left + cornerRadius; x -= 1.5) {
+        for (let x = right - cornerRadius; x >= left + cornerRadius; x -= 1) {
             this.path.push({ x, y: bottom });
         }
         
         // Bottom-left corner
-        for (let angle = 90; angle <= 180; angle += 2) {
+        for (let angle = 90; angle <= 180; angle += 1.5) {
             const rad = (angle * Math.PI) / 180;
             const x = left + cornerRadius + Math.cos(rad) * cornerRadius;
             const y = bottom - cornerRadius + Math.sin(rad) * cornerRadius;
@@ -556,12 +557,12 @@ class SnakeGame {
         }
         
         // Left side (bottom to top)
-        for (let y = bottom - cornerRadius; y >= top + cornerRadius; y -= 1.5) {
+        for (let y = bottom - cornerRadius; y >= top + cornerRadius; y -= 1) {
             this.path.push({ x: left, y });
         }
         
         // Top-left corner
-        for (let angle = 180; angle <= 270; angle += 2) {
+        for (let angle = 180; angle <= 270; angle += 1.5) {
             const rad = (angle * Math.PI) / 180;
             const x = left + cornerRadius + Math.cos(rad) * cornerRadius;
             const y = top + cornerRadius + Math.sin(rad) * cornerRadius;
@@ -572,43 +573,63 @@ class SnakeGame {
     animateStartScreenSnake() {
         if (!this.path || this.path.length === 0) return;
         
-        // Get current head position
-        const headIndex = Math.floor(this.snakeAnimationFrame) % this.path.length;
-        const headPos = this.path[headIndex];
+        // Get current head position with smooth interpolation
+        const rawIndex = this.snakeAnimationFrame % this.path.length;
+        const headIndex = Math.floor(rawIndex);
         const nextHeadIndex = (headIndex + 1) % this.path.length;
+        const t = rawIndex - headIndex; // interpolation factor
+        
+        const headPos = this.path[headIndex];
         const nextHeadPos = this.path[nextHeadIndex];
         
-        // Add subtle undulation
-        const waveOffset = Math.sin(this.snakeAnimationFrame * 0.15) * 3;
-        const adjustedHeadPos = {
-            x: headPos.x,
-            y: headPos.y + waveOffset
+        // Smooth interpolation between path points
+        const interpolatedHead = {
+            x: headPos.x + (nextHeadPos.x - headPos.x) * t,
+            y: headPos.y + (nextHeadPos.y - headPos.y) * t
         };
         
-        // Update body points (follow the head)
-        this.bodyPoints.unshift(adjustedHeadPos);
-        if (this.bodyPoints.length > this.bodyLength) {
-            this.bodyPoints.pop();
-        }
+        // Add subtle undulation to head
+        const waveOffset = Math.sin(this.snakeAnimationFrame * 0.15) * 2;
+        const adjustedHeadPos = {
+            x: interpolatedHead.x,
+            y: interpolatedHead.y + waveOffset
+        };
         
-        // Create smooth body path with undulation
-        let pathData = `M ${this.bodyPoints[0].x} ${this.bodyPoints[0].y}`;
-        
-        for (let i = 1; i < this.bodyPoints.length - 2; i += 3) {
-            const p1 = this.bodyPoints[i];
-            const p2 = this.bodyPoints[i + 1];
-            const p3 = this.bodyPoints[i + 2];
+        // Update body points (follow the head with proper spacing)
+        if (this.bodyPoints.length === 0 || 
+            Math.abs(this.bodyPoints[0].x - adjustedHeadPos.x) > this.pointSpacing || 
+            Math.abs(this.bodyPoints[0].y - adjustedHeadPos.y) > this.pointSpacing) {
             
-            // Add subtle wave motion to body
-            const bodyWave = Math.sin((this.snakeAnimationFrame * 0.1) + (i * 0.2)) * 1.5;
-            
-            pathData += ` Q ${p1.x} ${p1.y + bodyWave} ${p2.x} ${p2.y + bodyWave}`;
-            if (p3) {
-                pathData += ` Q ${p2.x} ${p2.y + bodyWave} ${p3.x} ${p3.y + bodyWave}`;
+            this.bodyPoints.unshift(adjustedHeadPos);
+            if (this.bodyPoints.length > this.bodyLength) {
+                this.bodyPoints.pop();
             }
         }
         
-        this.snakeBody.setAttribute('d', pathData);
+        // Create smooth continuous body path using cubic Bezier curves
+        if (this.bodyPoints.length > 3) {
+            let pathData = `M ${this.bodyPoints[0].x} ${this.bodyPoints[0].y}`;
+            
+            // Use smooth curves between points
+            for (let i = 1; i < this.bodyPoints.length - 2; i++) {
+                const current = this.bodyPoints[i];
+                const next = this.bodyPoints[i + 1];
+                const next2 = this.bodyPoints[i + 2];
+                
+                // Add wave motion to body points
+                const bodyWave = Math.sin((this.snakeAnimationFrame * 0.08) + (i * 0.3)) * 1.2;
+                
+                // Control points for smooth curves
+                const cp1x = current.x + (next.x - this.bodyPoints[i - 1].x) * 0.2;
+                const cp1y = current.y + (next.y - this.bodyPoints[i - 1].y) * 0.2 + bodyWave;
+                const cp2x = next.x - (next2.x - current.x) * 0.2;
+                const cp2y = next.y - (next2.y - current.y) * 0.2 + bodyWave;
+                
+                pathData += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${next.x} ${next.y + bodyWave}`;
+            }
+            
+            this.snakeBody.setAttribute('d', pathData);
+        }
         
         // Position and rotate head
         this.snakeHead.setAttribute('cx', adjustedHeadPos.x);
@@ -658,7 +679,7 @@ class SnakeGame {
             this.snakeTongue.style.opacity = '0';
         }
         
-        this.snakeAnimationFrame += 0.6; // Animation speed
+        this.snakeAnimationFrame += 0.4; // Animation speed - slower for smoother motion
         
         // Continue animation
         requestAnimationFrame(() => this.animateStartScreenSnake());
