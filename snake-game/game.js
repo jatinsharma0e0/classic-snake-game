@@ -251,45 +251,162 @@ class SnakeGame {
         // Draw grid (optional)
         this.drawGrid();
         
-        // Draw food
-        this.ctx.fillStyle = '#ff6b6b';
-        this.ctx.shadowColor = '#ff6b6b';
-        this.ctx.shadowBlur = 10;
-        this.ctx.fillRect(
-            this.food.x * this.gridSize + 2, 
-            this.food.y * this.gridSize + 2, 
-            this.gridSize - 4, 
-            this.gridSize - 4
-        );
-        this.ctx.shadowBlur = 0;
+        // Draw food (apple)
+        this.drawApple(this.food.x * this.gridSize, this.food.y * this.gridSize);
         
         // Draw snake
         this.snake.forEach((segment, index) => {
             if (index === 0) {
-                // Head
-                this.ctx.fillStyle = '#68d391';
-                this.ctx.shadowColor = '#68d391';
-                this.ctx.shadowBlur = 8;
+                // Head with eyes
+                this.drawSnakeHead(segment.x * this.gridSize, segment.y * this.gridSize);
             } else {
-                // Body
-                this.ctx.fillStyle = '#4fd1c7';
-                this.ctx.shadowColor = '#4fd1c7';
-                this.ctx.shadowBlur = 5;
+                // Body segments
+                this.drawSnakeBody(segment.x * this.gridSize, segment.y * this.gridSize);
             }
-            
-            this.ctx.fillRect(
-                segment.x * this.gridSize + 1, 
-                segment.y * this.gridSize + 1, 
-                this.gridSize - 2, 
-                this.gridSize - 2
-            );
-            this.ctx.shadowBlur = 0;
         });
         
         // Draw start message if game hasn't started
         if (!this.gameStarted) {
             this.drawStartMessage();
         }
+    }
+    
+    drawSnakeHead(x, y) {
+        const centerX = x + this.gridSize / 2;
+        const centerY = y + this.gridSize / 2;
+        const radius = this.gridSize / 2 - 1;
+        
+        // Main head body (blue gradient)
+        const gradient = this.ctx.createRadialGradient(
+            centerX - radius/3, centerY - radius/3, 0,
+            centerX, centerY, radius
+        );
+        gradient.addColorStop(0, '#5DADE2');
+        gradient.addColorStop(1, '#2E86C1');
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Shadow
+        this.ctx.shadowColor = 'rgba(46, 134, 193, 0.5)';
+        this.ctx.shadowBlur = 8;
+        this.ctx.shadowOffsetX = 2;
+        this.ctx.shadowOffsetY = 2;
+        this.ctx.fill();
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        
+        // Eyes
+        const eyeSize = 3;
+        const eyeOffset = radius / 3;
+        
+        // Left eye
+        this.ctx.fillStyle = 'white';
+        this.ctx.beginPath();
+        this.ctx.arc(centerX - eyeOffset, centerY - eyeOffset/2, eyeSize, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Right eye
+        this.ctx.beginPath();
+        this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Eye pupils
+        this.ctx.fillStyle = 'black';
+        this.ctx.beginPath();
+        this.ctx.arc(centerX - eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        this.ctx.beginPath();
+        this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Eye shine
+        this.ctx.fillStyle = 'white';
+        this.ctx.beginPath();
+        this.ctx.arc(centerX - eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        this.ctx.beginPath();
+        this.ctx.arc(centerX + eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
+        this.ctx.fill();
+    }
+    
+    drawSnakeBody(x, y) {
+        const centerX = x + this.gridSize / 2;
+        const centerY = y + this.gridSize / 2;
+        const radius = this.gridSize / 2 - 1;
+        
+        // Main body (lighter blue gradient)
+        const gradient = this.ctx.createRadialGradient(
+            centerX - radius/3, centerY - radius/3, 0,
+            centerX, centerY, radius
+        );
+        gradient.addColorStop(0, '#7FB3D3');
+        gradient.addColorStop(1, '#5499C7');
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Shadow
+        this.ctx.shadowColor = 'rgba(84, 153, 199, 0.4)';
+        this.ctx.shadowBlur = 6;
+        this.ctx.shadowOffsetX = 1;
+        this.ctx.shadowOffsetY = 1;
+        this.ctx.fill();
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+    }
+    
+    drawApple(x, y) {
+        const centerX = x + this.gridSize / 2;
+        const centerY = y + this.gridSize / 2;
+        const radius = this.gridSize / 2 - 2;
+        
+        // Apple body (red gradient)
+        const appleGradient = this.ctx.createRadialGradient(
+            centerX - radius/3, centerY - radius/3, 0,
+            centerX, centerY, radius
+        );
+        appleGradient.addColorStop(0, '#FF6B6B');
+        appleGradient.addColorStop(1, '#E74C3C');
+        
+        this.ctx.fillStyle = appleGradient;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY + 1, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Apple shadow
+        this.ctx.shadowColor = 'rgba(231, 76, 60, 0.5)';
+        this.ctx.shadowBlur = 8;
+        this.ctx.shadowOffsetX = 2;
+        this.ctx.shadowOffsetY = 2;
+        this.ctx.fill();
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        
+        // Apple stem (brown)
+        this.ctx.fillStyle = '#8B4513';
+        this.ctx.fillRect(centerX - 1, centerY - radius - 2, 2, 4);
+        
+        // Leaf (green)
+        this.ctx.fillStyle = '#27AE60';
+        this.ctx.beginPath();
+        this.ctx.ellipse(centerX + 3, centerY - radius, 3, 2, Math.PI / 4, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Apple highlight
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        this.ctx.beginPath();
+        this.ctx.arc(centerX - radius/3, centerY - radius/3, radius/3, 0, Math.PI * 2);
+        this.ctx.fill();
     }
     
     drawGrid() {
