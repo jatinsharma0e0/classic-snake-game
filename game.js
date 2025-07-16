@@ -6,7 +6,8 @@ class SnakeGame {
         
         // Game settings
         this.gridSize = 20;
-        this.tileCount = this.canvas.width / this.gridSize;
+        this.tileCountX = 40; // 40 blocks width
+        this.tileCountY = 24; // 24 blocks height
         
         // Game state
         this.gameRunning = false;
@@ -120,8 +121,8 @@ class SnakeGame {
                 let attempts = 0;
                 do {
                     position = {
-                        x: Math.floor(Math.random() * (this.tileCount - config.width)),
-                        y: Math.floor(Math.random() * (this.tileCount - config.height))
+                        x: Math.floor(Math.random() * (this.tileCountX - config.width)),
+                        y: Math.floor(Math.random() * (this.tileCountY - config.height))
                     };
                     attempts++;
                 } while (this.isObstacleConflicting(position, config) && attempts < 100);
@@ -322,8 +323,8 @@ class SnakeGame {
         // Keep generating until we find a position not occupied by snake or obstacles
         do {
             foodPosition = {
-                x: Math.floor(Math.random() * this.tileCount),
-                y: Math.floor(Math.random() * this.tileCount)
+                x: Math.floor(Math.random() * this.tileCountX),
+                y: Math.floor(Math.random() * this.tileCountY)
             };
         } while (this.snake.some(segment => 
             segment.x === foodPosition.x && segment.y === foodPosition.y
@@ -360,8 +361,8 @@ class SnakeGame {
         head.y += this.direction.y;
         
         // Check wall collision
-        if (head.x < 0 || head.x >= this.tileCount || 
-            head.y < 0 || head.y >= this.tileCount) {
+        if (head.x < 0 || head.x >= this.tileCountX || 
+            head.y < 0 || head.y >= this.tileCountY) {
             this.gameOver();
             return;
         }

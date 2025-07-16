@@ -126,3 +126,4 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Obstacles generate with specific counts: 3 big rocks (4-blocks), 4-5 medium rocks (2-blocks), 5-6 small rocks/obstacles
 - Obstacles cause game over on collision and are avoided by food generation
 - Doubled game area size from 400x400 to 800x800 pixels for expanded gameplay
+- Updated game area to 40 blocks width by 24 blocks height (800x480 pixels) with rectangular gameplay field
