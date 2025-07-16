@@ -24,6 +24,15 @@ class SnakeGame {
         // Food properties
         this.food = this.generateFood();
         
+        // Load apple image
+        this.appleImage = new Image();
+        this.appleImage.src = 'assets/apple.png';
+        this.appleImageLoaded = false;
+        
+        this.appleImage.onload = () => {
+            this.appleImageLoaded = true;
+        };
+        
         // DOM elements
         this.startScreen = document.getElementById('startScreen');
         this.gameScreen = document.getElementById('gameScreen');
