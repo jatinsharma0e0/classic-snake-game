@@ -273,39 +273,208 @@ class AudioManager {
         });
     }
     
-    // Create simple background music loop
+    // Create whimsical cartoon-style background music
     createBackgroundMusic() {
         if (!this.audioContext) return null;
         
-        const duration = 8; // 8-second loop
-        const buffer = this.audioContext.createBuffer(1, this.audioContext.sampleRate * duration, this.audioContext.sampleRate);
-        const data = buffer.getChannelData(0);
+        const duration = 32; // 32-second loop for variety
+        const buffer = this.audioContext.createBuffer(2, this.audioContext.sampleRate * duration, this.audioContext.sampleRate);
+        const leftData = buffer.getChannelData(0);
+        const rightData = buffer.getChannelData(1);
         
-        // Generate a simple, calming melody
-        const melody = [
-            { freq: 261.63, time: 0, duration: 1 },     // C4
-            { freq: 329.63, time: 1, duration: 1 },     // E4
-            { freq: 392.00, time: 2, duration: 1 },     // G4
-            { freq: 329.63, time: 3, duration: 1 },     // E4
-            { freq: 293.66, time: 4, duration: 1 },     // D4
-            { freq: 261.63, time: 5, duration: 1 },     // C4
-            { freq: 246.94, time: 6, duration: 1 },     // B3
-            { freq: 261.63, time: 7, duration: 1 },     // C4
+        // Whimsical melody in C major with cartoon-like progression
+        const mainMelody = [
+            // First phrase - bouncy and cheerful
+            { freq: 523.25, time: 0, duration: 0.5, instrument: 'marimba' },    // C5
+            { freq: 587.33, time: 0.5, duration: 0.5, instrument: 'marimba' },  // D5
+            { freq: 659.25, time: 1, duration: 1, instrument: 'marimba' },      // E5
+            { freq: 523.25, time: 2, duration: 0.5, instrument: 'marimba' },    // C5
+            { freq: 698.46, time: 2.5, duration: 1.5, instrument: 'marimba' },  // F5
+            
+            // Second phrase - playful skip
+            { freq: 659.25, time: 4, duration: 0.5, instrument: 'xylophone' },  // E5
+            { freq: 587.33, time: 4.5, duration: 0.5, instrument: 'xylophone' }, // D5
+            { freq: 523.25, time: 5, duration: 1, instrument: 'xylophone' },    // C5
+            { freq: 783.99, time: 6, duration: 0.5, instrument: 'xylophone' },  // G5
+            { freq: 698.46, time: 6.5, duration: 1.5, instrument: 'xylophone' }, // F5
+            
+            // Third phrase - gentle descent
+            { freq: 659.25, time: 8, duration: 0.75, instrument: 'marimba' },   // E5
+            { freq: 587.33, time: 8.75, duration: 0.75, instrument: 'marimba' }, // D5
+            { freq: 523.25, time: 9.5, duration: 0.5, instrument: 'marimba' },  // C5
+            { freq: 493.88, time: 10, duration: 1, instrument: 'marimba' },     // B4
+            { freq: 523.25, time: 11, duration: 1, instrument: 'marimba' },     // C5
+            
+            // Fourth phrase - uplifting conclusion
+            { freq: 659.25, time: 12, duration: 0.5, instrument: 'bell' },      // E5
+            { freq: 783.99, time: 12.5, duration: 0.5, instrument: 'bell' },    // G5
+            { freq: 1046.5, time: 13, duration: 1, instrument: 'bell' },        // C6
+            { freq: 783.99, time: 14, duration: 0.5, instrument: 'bell' },      // G5
+            { freq: 659.25, time: 14.5, duration: 1.5, instrument: 'bell' },    // E5
+            
+            // Repeat with variations (16-32 seconds)
+            { freq: 523.25, time: 16, duration: 0.5, instrument: 'pizzicato' }, // C5
+            { freq: 659.25, time: 16.5, duration: 0.5, instrument: 'pizzicato' }, // E5
+            { freq: 783.99, time: 17, duration: 1, instrument: 'pizzicato' },   // G5
+            { freq: 698.46, time: 18, duration: 0.5, instrument: 'pizzicato' }, // F5
+            { freq: 659.25, time: 18.5, duration: 1.5, instrument: 'pizzicato' }, // E5
+            
+            { freq: 587.33, time: 20, duration: 0.5, instrument: 'flute' },     // D5
+            { freq: 523.25, time: 20.5, duration: 0.5, instrument: 'flute' },   // C5
+            { freq: 493.88, time: 21, duration: 1, instrument: 'flute' },       // B4
+            { freq: 523.25, time: 22, duration: 0.5, instrument: 'flute' },     // C5
+            { freq: 587.33, time: 22.5, duration: 1.5, instrument: 'flute' },   // D5
+            
+            // Gentle ending
+            { freq: 659.25, time: 24, duration: 1, instrument: 'marimba' },     // E5
+            { freq: 587.33, time: 25, duration: 1, instrument: 'marimba' },     // D5
+            { freq: 523.25, time: 26, duration: 2, instrument: 'marimba' },     // C5
+            { freq: 392.00, time: 28, duration: 1, instrument: 'bass' },        // G4
+            { freq: 261.63, time: 29, duration: 3, instrument: 'bass' },        // C4
         ];
         
-        // Fill buffer with melody
-        for (let note of melody) {
-            const startSample = Math.floor(note.time * this.audioContext.sampleRate);
-            const endSample = Math.floor((note.time + note.duration) * this.audioContext.sampleRate);
-            
-            for (let i = startSample; i < endSample && i < data.length; i++) {
-                const t = (i - startSample) / this.audioContext.sampleRate;
-                const envelope = Math.sin(Math.PI * t / note.duration); // Simple envelope
-                data[i] += Math.sin(2 * Math.PI * note.freq * t) * envelope * 0.1;
+        // Bass line for harmonic support
+        const bassLine = [
+            { freq: 130.81, time: 0, duration: 2 },    // C3
+            { freq: 146.83, time: 2, duration: 2 },    // D3
+            { freq: 164.81, time: 4, duration: 2 },    // E3
+            { freq: 174.61, time: 6, duration: 2 },    // F3
+            { freq: 196.00, time: 8, duration: 2 },    // G3
+            { freq: 174.61, time: 10, duration: 2 },   // F3
+            { freq: 164.81, time: 12, duration: 2 },   // E3
+            { freq: 130.81, time: 14, duration: 2 },   // C3
+            // Repeat for second half
+            { freq: 130.81, time: 16, duration: 2 },   // C3
+            { freq: 146.83, time: 18, duration: 2 },   // D3
+            { freq: 164.81, time: 20, duration: 2 },   // E3
+            { freq: 174.61, time: 22, duration: 2 },   // F3
+            { freq: 196.00, time: 24, duration: 2 },   // G3
+            { freq: 174.61, time: 26, duration: 2 },   // F3
+            { freq: 164.81, time: 28, duration: 2 },   // E3
+            { freq: 130.81, time: 30, duration: 2 },   // C3
+        ];
+        
+        // Generate main melody with different instrument timbres
+        for (let note of mainMelody) {
+            this.addNoteToBuffer(leftData, rightData, note, this.audioContext.sampleRate);
+        }
+        
+        // Add bass line
+        for (let note of bassLine) {
+            const bassNote = { ...note, instrument: 'bass', freq: note.freq };
+            this.addNoteToBuffer(leftData, rightData, bassNote, this.audioContext.sampleRate, 0.3);
+        }
+        
+        // Add subtle percussion rhythm
+        for (let i = 0; i < duration; i += 0.5) {
+            if (i % 2 === 0) { // On beats
+                this.addPercussion(leftData, rightData, i, this.audioContext.sampleRate, 'soft');
             }
         }
         
         return buffer;
+    }
+    
+    // Helper function to add notes with different instrument timbres
+    addNoteToBuffer(leftData, rightData, note, sampleRate, volumeMultiplier = 1) {
+        const startSample = Math.floor(note.time * sampleRate);
+        const endSample = Math.floor((note.time + note.duration) * sampleRate);
+        const volume = 0.08 * volumeMultiplier;
+        
+        for (let i = startSample; i < endSample && i < leftData.length; i++) {
+            const t = (i - startSample) / sampleRate;
+            const envelope = this.createEnvelope(t, note.duration);
+            let signal = 0;
+            
+            switch (note.instrument) {
+                case 'marimba':
+                    // Warm, woody marimba sound
+                    signal = Math.sin(2 * Math.PI * note.freq * t) * 0.6 +
+                            Math.sin(2 * Math.PI * note.freq * 2 * t) * 0.2 +
+                            Math.sin(2 * Math.PI * note.freq * 3 * t) * 0.1;
+                    signal *= Math.exp(-t * 3); // Quick decay
+                    break;
+                    
+                case 'xylophone':
+                    // Bright, metallic xylophone
+                    signal = Math.sin(2 * Math.PI * note.freq * t) * 0.5 +
+                            Math.sin(2 * Math.PI * note.freq * 4 * t) * 0.3 +
+                            Math.sin(2 * Math.PI * note.freq * 6 * t) * 0.2;
+                    signal *= Math.exp(-t * 5); // Very quick decay
+                    break;
+                    
+                case 'bell':
+                    // Clear, ringing bell sound
+                    signal = Math.sin(2 * Math.PI * note.freq * t) * 0.7 +
+                            Math.sin(2 * Math.PI * note.freq * 2.1 * t) * 0.3;
+                    signal *= Math.exp(-t * 1.5); // Medium decay
+                    break;
+                    
+                case 'pizzicato':
+                    // Plucked string sound
+                    signal = Math.sin(2 * Math.PI * note.freq * t) * 0.8 +
+                            Math.sin(2 * Math.PI * note.freq * 2 * t) * 0.1;
+                    signal *= Math.exp(-t * 4); // Quick decay with slight sustain
+                    break;
+                    
+                case 'flute':
+                    // Soft, breathy flute
+                    signal = Math.sin(2 * Math.PI * note.freq * t) * 0.9 +
+                            Math.sin(2 * Math.PI * note.freq * 3 * t) * 0.1;
+                    // Add breath noise
+                    signal += (Math.random() - 0.5) * 0.02;
+                    break;
+                    
+                case 'bass':
+                    // Deep, warm bass
+                    signal = Math.sin(2 * Math.PI * note.freq * t) * 0.8 +
+                            Math.sin(2 * Math.PI * note.freq * 2 * t) * 0.2;
+                    signal *= Math.exp(-t * 0.5); // Long sustain
+                    break;
+            }
+            
+            signal *= envelope * volume;
+            
+            // Stereo spread
+            const pan = (note.instrument === 'bass') ? 0 : (Math.sin(note.freq / 100) * 0.3);
+            leftData[i] += signal * (1 - pan * 0.5);
+            rightData[i] += signal * (1 + pan * 0.5);
+        }
+    }
+    
+    // Create envelope for natural sound decay
+    createEnvelope(t, duration) {
+        const attackTime = Math.min(0.05, duration * 0.1);
+        const releaseTime = Math.min(0.3, duration * 0.4);
+        
+        if (t < attackTime) {
+            return t / attackTime; // Attack
+        } else if (t < duration - releaseTime) {
+            return 1; // Sustain
+        } else {
+            return (duration - t) / releaseTime; // Release
+        }
+    }
+    
+    // Add subtle percussion
+    addPercussion(leftData, rightData, time, sampleRate, type) {
+        const startSample = Math.floor(time * sampleRate);
+        const duration = 0.1;
+        const endSample = Math.floor((time + duration) * sampleRate);
+        
+        for (let i = startSample; i < endSample && i < leftData.length; i++) {
+            const t = (i - startSample) / sampleRate;
+            const envelope = Math.exp(-t * 20);
+            
+            let signal = 0;
+            if (type === 'soft') {
+                // Soft brush or shaker sound
+                signal = (Math.random() - 0.5) * envelope * 0.02;
+            }
+            
+            leftData[i] += signal;
+            rightData[i] += signal;
+        }
     }
     
     // Play background music (only on start screen)
