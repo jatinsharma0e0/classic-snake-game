@@ -609,23 +609,32 @@ class SnakeGame {
             this.bodyPoints.pop();
         }
         
-        // Create smooth continuous body path - body follows head's exact path
+        // Create smooth continuous body path with better curve handling
         if (this.bodyPoints.length > 3) {
             let pathData = `M ${this.bodyPoints[0].x} ${this.bodyPoints[0].y}`;
             
-            // Use smooth curves between the recorded head positions
-            for (let i = 1; i < this.bodyPoints.length - 2; i++) {
-                const current = this.bodyPoints[i];
-                const next = this.bodyPoints[i + 1];
-                const next2 = this.bodyPoints[i + 2];
+            // Use catmull-rom style smooth curves for consistent thickness
+            for (let i = 1; i < this.bodyPoints.length - 1; i++) {
+                const p0 = this.bodyPoints[Math.max(0, i - 1)];
+                const p1 = this.bodyPoints[i];
+                const p2 = this.bodyPoints[Math.min(this.bodyPoints.length - 1, i + 1)];
                 
-                // Control points for smooth curves (no additional wave motion)
-                const cp1x = current.x + (next.x - this.bodyPoints[i - 1].x) * 0.2;
-                const cp1y = current.y + (next.y - this.bodyPoints[i - 1].y) * 0.2;
-                const cp2x = next.x - (next2.x - current.x) * 0.2;
-                const cp2y = next.y - (next2.y - current.y) * 0.2;
+                // Calculate smooth control points
+                const tension = 0.3;
+                const cp1x = p1.x + (p2.x - p0.x) * tension;
+                const cp1y = p1.y + (p2.y - p0.y) * tension;
                 
-                pathData += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${next.x} ${next.y}`;
+                if (i === 1) {
+                    pathData += ` L ${p1.x} ${p1.y}`;
+                } else {
+                    pathData += ` S ${cp1x} ${cp1y} ${p1.x} ${p1.y}`;
+                }
+            }
+            
+            // Add the final point
+            if (this.bodyPoints.length > 1) {
+                const lastPoint = this.bodyPoints[this.bodyPoints.length - 1];
+                pathData += ` L ${lastPoint.x} ${lastPoint.y}`;
             }
             
             this.snakeBody.setAttribute('d', pathData);
