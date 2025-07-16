@@ -139,6 +139,9 @@ class SnakeGame {
     updateGame() {
         if (!this.gameRunning) return;
         
+        // Don't move if no direction is set (snake hasn't started moving)
+        if (this.direction.x === 0 && this.direction.y === 0) return;
+        
         // Move snake
         const head = { ...this.snake[0] };
         head.x += this.direction.x;
