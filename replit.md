@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack web application built with React/TypeScript frontend and Express.js backend. The project includes a complete Snake Game with jungle theme and is configured for 3D graphics with Three.js. The application has been successfully migrated from Replit Agent to Replit environment with proper security practices and client/server separation.
+This is a pure HTML5, CSS3, and JavaScript snake game with a jungle theme. The project has been simplified to contain only the essential files for a standalone web game, removing all React, Node.js, and framework dependencies. The game features an animated snake on the start screen with 2 fixed apples that appear/disappear based on snake position.
 
 ## User Preferences
 
@@ -12,27 +12,17 @@ Landing page preference: Direct access to snake game, no hub interface.
 
 ## System Architecture
 
-### Frontend Architecture
-- **Framework**: React 18 with TypeScript
-- **Build Tool**: Vite for fast development and building
-- **Styling**: Tailwind CSS with custom theme configuration
-- **UI Components**: Radix UI primitives with custom shadcn/ui components
-- **3D Graphics**: Three.js with React Three Fiber ecosystem (@react-three/fiber, @react-three/drei, @react-three/postprocessing)
-- **State Management**: Zustand for global state (game state, audio state)
-- **Data Fetching**: TanStack Query (React Query) for server state management
+### Core Files
+- **index.html**: Main HTML structure with start screen and game screen
+- **style.css**: Complete styling including jungle theme, animations, and responsive design
+- **game.js**: Pure JavaScript game logic with Snake class and animation systems
+- **serve.py**: Optional Python HTTP server for local development
 
-### Backend Architecture
-- **Framework**: Express.js with TypeScript
-- **Runtime**: Node.js with ESM modules
-- **Development**: tsx for TypeScript execution
-- **Build**: esbuild for production bundling
-- **Middleware**: Built-in Express middleware for JSON parsing and URL encoding
-
-### Database Layer
-- **ORM**: Drizzle ORM for type-safe database operations
-- **Database**: PostgreSQL (configured for Neon Database via @neondatabase/serverless)
-- **Migrations**: Drizzle Kit for schema management
-- **Schema Location**: `./shared/schema.ts` for shared types between frontend and backend
+### Game Features
+- **Start Screen**: Animated snake moving around start button with 2 fixed apples
+- **Game Logic**: Classic snake gameplay with collision detection and scoring
+- **Visual Design**: Jungle theme with decorative elements and smooth animations
+- **Responsive**: Works on desktop and mobile devices
 
 ## Key Components
 
@@ -104,10 +94,10 @@ The application is designed for real-time interactive experiences with 3D graphi
 
 ## Recent Changes
 
-**Migration Completed (January 16, 2025):**
-- Successfully migrated from Replit Agent to Replit environment
-- Fixed React application to redirect to Snake game as landing page
-- Adjusted decorative apple positioning to avoid overlap with snake emoji
-- Server running properly on port 5000 with client/server separation
-- Snake game accessible at root (/) and /snake routes
-- All security best practices implemented
+**Simplified to Pure HTML5/CSS/JS (January 16, 2025):**
+- Removed all React, Node.js, and framework dependencies
+- Cleaned up project to contain only essential game files
+- Implemented 2 fixed apples in start screen animation that hide when snake approaches
+- Game now runs as standalone HTML5 application
+- Updated start button from image to styled button element
+- Project structure simplified to 3 core files: index.html, style.css, game.js
