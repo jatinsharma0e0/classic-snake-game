@@ -802,31 +802,44 @@ class SnakeGame {
         const centerY = head.y * this.gridSize + this.gridSize / 2;
         const radius = this.gridSize * 0.4;
         
+        // Calculate rotation angle based on direction
+        let angle = 0;
+        if (this.direction.x === 1) angle = 0; // Right
+        else if (this.direction.x === -1) angle = Math.PI; // Left
+        else if (this.direction.y === 1) angle = Math.PI / 2; // Down
+        else if (this.direction.y === -1) angle = -Math.PI / 2; // Up
+        
+        // Save context for rotation
+        this.ctx.save();
+        this.ctx.translate(centerX, centerY);
+        this.ctx.rotate(angle);
+        
         // Head circle (same as body color)
         this.ctx.fillStyle = '#4169E1';
         this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Head highlight
         this.ctx.fillStyle = '#6495ED';
         this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius * 0.7, 0, Math.PI * 2);
+        this.ctx.arc(0, 0, radius * 0.7, 0, Math.PI * 2);
         this.ctx.fill();
         
-        // Eyes
+        // Eyes positioned at front of head (like in the images)
         const eyeSize = 4;
-        const eyeOffset = radius * 0.6;
+        const eyeOffsetX = radius * 0.3; // Forward position on head
+        const eyeOffsetY = radius * 0.4; // Vertical separation
         
         // Left eye (white background)
         this.ctx.fillStyle = 'white';
         this.ctx.beginPath();
-        this.ctx.arc(centerX - eyeOffset, centerY - eyeOffset/2, eyeSize, 0, Math.PI * 2);
+        this.ctx.arc(eyeOffsetX, -eyeOffsetY, eyeSize, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Right eye (white background)
         this.ctx.beginPath();
-        this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize, 0, Math.PI * 2);
+        this.ctx.arc(eyeOffsetX, eyeOffsetY, eyeSize, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Eye pupils - show X X when dead, normal pupils when alive
@@ -837,75 +850,77 @@ class SnakeGame {
             
             // Left eye X
             this.ctx.beginPath();
-            this.ctx.moveTo(centerX - eyeOffset - 2, centerY - eyeOffset/2 - 2);
-            this.ctx.lineTo(centerX - eyeOffset + 2, centerY - eyeOffset/2 + 2);
-            this.ctx.moveTo(centerX - eyeOffset + 2, centerY - eyeOffset/2 - 2);
-            this.ctx.lineTo(centerX - eyeOffset - 2, centerY - eyeOffset/2 + 2);
+            this.ctx.moveTo(eyeOffsetX - 2, -eyeOffsetY - 2);
+            this.ctx.lineTo(eyeOffsetX + 2, -eyeOffsetY + 2);
+            this.ctx.moveTo(eyeOffsetX + 2, -eyeOffsetY - 2);
+            this.ctx.lineTo(eyeOffsetX - 2, -eyeOffsetY + 2);
             this.ctx.stroke();
             
             // Right eye X
             this.ctx.beginPath();
-            this.ctx.moveTo(centerX + eyeOffset - 2, centerY - eyeOffset/2 - 2);
-            this.ctx.lineTo(centerX + eyeOffset + 2, centerY - eyeOffset/2 + 2);
-            this.ctx.moveTo(centerX + eyeOffset + 2, centerY - eyeOffset/2 - 2);
-            this.ctx.lineTo(centerX + eyeOffset - 2, centerY - eyeOffset/2 + 2);
+            this.ctx.moveTo(eyeOffsetX - 2, eyeOffsetY - 2);
+            this.ctx.lineTo(eyeOffsetX + 2, eyeOffsetY + 2);
+            this.ctx.moveTo(eyeOffsetX + 2, eyeOffsetY - 2);
+            this.ctx.lineTo(eyeOffsetX - 2, eyeOffsetY + 2);
             this.ctx.stroke();
         } else {
             // Normal pupils
             this.ctx.fillStyle = 'black';
             this.ctx.beginPath();
-            this.ctx.arc(centerX - eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffsetX, -eyeOffsetY, eyeSize/2, 0, Math.PI * 2);
             this.ctx.fill();
             
             this.ctx.beginPath();
-            this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffsetX, eyeOffsetY, eyeSize/2, 0, Math.PI * 2);
             this.ctx.fill();
             
             // Eye shine
             this.ctx.fillStyle = 'white';
             this.ctx.beginPath();
-            this.ctx.arc(centerX - eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffsetX + 1, -eyeOffsetY - 1, 1, 0, Math.PI * 2);
             this.ctx.fill();
             
             this.ctx.beginPath();
-            this.ctx.arc(centerX + eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffsetX + 1, eyeOffsetY - 1, 1, 0, Math.PI * 2);
             this.ctx.fill();
         }
         
-        // Mouth (open if near food)
+        // Mouth positioned at front tip of head
+        const mouthX = radius * 0.8;
+        
         if (this.mouthOpen) {
             // Create a more visible open mouth
             this.ctx.fillStyle = '#8B0000';
             this.ctx.beginPath();
-            this.ctx.arc(centerX, centerY + radius/2, 6, 0, Math.PI, false);
+            this.ctx.arc(mouthX, 0, 6, Math.PI/2, -Math.PI/2, false);
             this.ctx.fill();
             
             // Add mouth interior shadow
             this.ctx.fillStyle = '#4B0000';
             this.ctx.beginPath();
-            this.ctx.arc(centerX, centerY + radius/2, 4, 0, Math.PI, false);
+            this.ctx.arc(mouthX, 0, 4, Math.PI/2, -Math.PI/2, false);
             this.ctx.fill();
             
             // Add teeth/fangs
             this.ctx.fillStyle = 'white';
             this.ctx.beginPath();
-            this.ctx.moveTo(centerX - 4, centerY + radius/2);
-            this.ctx.lineTo(centerX - 3, centerY + radius/2 + 3);
-            this.ctx.lineTo(centerX - 2, centerY + radius/2);
+            this.ctx.moveTo(mouthX, -4);
+            this.ctx.lineTo(mouthX + 3, -3);
+            this.ctx.lineTo(mouthX, -2);
             this.ctx.fill();
             
             this.ctx.beginPath();
-            this.ctx.moveTo(centerX + 4, centerY + radius/2);
-            this.ctx.lineTo(centerX + 3, centerY + radius/2 + 3);
-            this.ctx.lineTo(centerX + 2, centerY + radius/2);
+            this.ctx.moveTo(mouthX, 4);
+            this.ctx.lineTo(mouthX + 3, 3);
+            this.ctx.lineTo(mouthX, 2);
             this.ctx.fill();
         } else {
             // Closed mouth - just a small line
             this.ctx.strokeStyle = '#000';
             this.ctx.lineWidth = 1;
             this.ctx.beginPath();
-            this.ctx.moveTo(centerX - 3, centerY + radius/2);
-            this.ctx.lineTo(centerX + 3, centerY + radius/2);
+            this.ctx.moveTo(mouthX, -3);
+            this.ctx.lineTo(mouthX, 3);
             this.ctx.stroke();
         }
         
@@ -928,18 +943,21 @@ class SnakeGame {
             this.ctx.lineWidth = 2;
             this.ctx.beginPath();
             
-            // Main tongue body with wiggle
-            this.ctx.moveTo(centerX, centerY + radius/2);
-            this.ctx.lineTo(centerX + wiggleOffset, centerY + radius/2 + 8 + bobOffset);
+            // Main tongue body with wiggle extending from mouth
+            this.ctx.moveTo(mouthX, 0);
+            this.ctx.lineTo(mouthX + 8 + bobOffset, wiggleOffset);
             
             // Forked tongue tip with wiggle
-            this.ctx.moveTo(centerX + wiggleOffset, centerY + radius/2 + 8 + bobOffset);
-            this.ctx.lineTo(centerX - 2 + wiggleOffset, centerY + radius/2 + 10 + bobOffset);
-            this.ctx.moveTo(centerX + wiggleOffset, centerY + radius/2 + 8 + bobOffset);
-            this.ctx.lineTo(centerX + 2 + wiggleOffset, centerY + radius/2 + 10 + bobOffset);
+            this.ctx.moveTo(mouthX + 8 + bobOffset, wiggleOffset);
+            this.ctx.lineTo(mouthX + 10 + bobOffset, -2 + wiggleOffset);
+            this.ctx.moveTo(mouthX + 8 + bobOffset, wiggleOffset);
+            this.ctx.lineTo(mouthX + 10 + bobOffset, 2 + wiggleOffset);
             
             this.ctx.stroke();
         }
+        
+        // Restore context
+        this.ctx.restore();
     }
     
 
