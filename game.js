@@ -117,12 +117,14 @@ class SnakeGame {
         this.homeMuteBtn.addEventListener('click', handleMuteToggle);
         
         // Tutorial overlay dismissal
-        this.tutorialOverlay.addEventListener('click', () => {
+        const dismissTutorial = () => {
             this.tutorialOverlay.classList.add('fade-out');
             setTimeout(() => {
                 this.tutorialOverlay.style.display = 'none';
             }, 300);
-        });
+        };
+        
+        this.tutorialOverlay.addEventListener('click', dismissTutorial);
         
         // Start game loop
         this.gameLoop();
@@ -293,6 +295,14 @@ class SnakeGame {
         // Prevent default behavior for game keys
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'Escape'].includes(e.code)) {
             e.preventDefault();
+        }
+        
+        // Dismiss tutorial overlay on any key press except ESC
+        if (e.code !== 'Escape' && this.tutorialOverlay && this.tutorialOverlay.style.display !== 'none' && !this.tutorialOverlay.classList.contains('fade-out')) {
+            this.tutorialOverlay.classList.add('fade-out');
+            setTimeout(() => {
+                this.tutorialOverlay.style.display = 'none';
+            }, 300);
         }
         
         // ESC to return to menu
