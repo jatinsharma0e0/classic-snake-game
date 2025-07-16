@@ -64,28 +64,29 @@ body {
 }
 
 .game-title {
-    font-family: 'Driftwood', 'Driftwood', Driftwood;
-    font-size: 4rem;
-    /* font-weight: bold; */
+    font-family: 'Driftwood', Arial, sans-serif;
+    font-size: 3rem;
     color: #2D4A1F;
     text-shadow:
         0 2px 0 rgba(139, 69, 19, 0.8),
         0 -2px 0 rgba(0, 0, 0, 0.6),
         2px 2px 4px rgba(0, 0, 0, 0.7),
         0 0 10px rgba(255, 255, 255, 0.3);
-    margin: 20px 30px 50px 30px;
+    margin: 10px 0 20px 0;
     animation: titleGlow 3s ease-in-out infinite alternate;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
     background-image: url('assets/title-bg.png');
-    background-size: 100% 100%;
+    background-size: 100% 140%;
     background-repeat: no-repeat;
     background-position: center;
-    padding: 70px 60px;
-    border-radius: 10px;
+    padding: 30px 40px;
+    border-radius: 15px;
+    min-height: 100px;
     position: relative;
+    overflow: hidden;
 }
 
 .snake-icon {
