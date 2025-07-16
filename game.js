@@ -21,6 +21,13 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         
+        // Enhanced snake animation properties
+        this.snakeSegments = [];
+        this.tongueOut = false;
+        this.tongueTimer = 0;
+        this.mouthOpen = false;
+        this.lastTongueTime = 0;
+        
         // Food properties - Normal random generation for gameplay
         this.food = this.generateFood();
         
@@ -220,6 +227,24 @@ class SnakeGame {
         
         this.snake.unshift(head);
         
+        // Check if snake is near food (within 1 block)
+        const distanceToFood = Math.abs(head.x - this.food.x) + Math.abs(head.y - this.food.y);
+        this.mouthOpen = distanceToFood <= 1;
+        
+        // Random tongue animation
+        if (Date.now() - this.lastTongueTime > 2000 + Math.random() * 3000) {
+            this.tongueOut = true;
+            this.tongueTimer = 300; // Show tongue for 300ms
+            this.lastTongueTime = Date.now();
+        }
+        
+        if (this.tongueOut) {
+            this.tongueTimer -= 16; // Assuming 60fps
+            if (this.tongueTimer <= 0) {
+                this.tongueOut = false;
+            }
+        }
+        
         // Check food collision
         if (head.x === this.food.x && head.y === this.food.y) {
             this.score += 10;
@@ -250,26 +275,14 @@ class SnakeGame {
     }
     
     render() {
-        // Clear canvas
-        this.ctx.fillStyle = '#2d3748';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Draw grid (optional)
-        this.drawGrid();
+        // Clear canvas with jungle background
+        this.drawJungleBackground();
         
         // Draw food
         this.drawApple(this.food.x * this.gridSize, this.food.y * this.gridSize);
         
-        // Draw snake
-        this.snake.forEach((segment, index) => {
-            if (index === 0) {
-                // Head with eyes
-                this.drawSnakeHead(segment.x * this.gridSize, segment.y * this.gridSize);
-            } else {
-                // Body segments
-                this.drawSnakeBody(segment.x * this.gridSize, segment.y * this.gridSize);
-            }
-        });
+        // Draw continuous snake
+        this.drawContinuousSnake();
         
         // Draw start message if game hasn't started
         if (!this.gameStarted) {
@@ -415,21 +428,213 @@ class SnakeGame {
         this.ctx.fill();
     }
     
-    drawGrid() {
-        this.ctx.strokeStyle = '#4a5568';
-        this.ctx.lineWidth = 0.5;
+    drawJungleBackground() {
+        // Create jungle gradient background
+        const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+        gradient.addColorStop(0, '#9ACD32');
+        gradient.addColorStop(0.25, '#7FFF00');
+        gradient.addColorStop(0.5, '#ADFF2F');
+        gradient.addColorStop(0.75, '#98FB98');
+        gradient.addColorStop(1, '#90EE90');
         
-        for (let i = 0; i <= this.tileCount; i++) {
-            // Vertical lines
-            this.ctx.beginPath();
-            this.ctx.moveTo(i * this.gridSize, 0);
-            this.ctx.lineTo(i * this.gridSize, this.canvas.height);
-            this.ctx.stroke();
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Add subtle texture pattern
+        this.ctx.fillStyle = 'rgba(45, 80, 22, 0.05)';
+        for (let i = 0; i < this.canvas.width; i += 40) {
+            for (let j = 0; j < this.canvas.height; j += 40) {
+                this.ctx.fillRect(i, j, 20, 20);
+            }
+        }
+    }
+    
+    drawContinuousSnake() {
+        if (this.snake.length === 0) return;
+        
+        // Draw snake body as continuous segments
+        for (let i = this.snake.length - 1; i >= 0; i--) {
+            const segment = this.snake[i];
+            const x = segment.x * this.gridSize;
+            const y = segment.y * this.gridSize;
             
-            // Horizontal lines
+            if (i === 0) {
+                // Draw head
+                this.drawEnhancedSnakeHead(x, y);
+            } else if (i === this.snake.length - 1) {
+                // Draw tail
+                this.drawSnakeTail(x, y);
+            } else {
+                // Draw body segment
+                this.drawEnhancedSnakeBody(x, y, i);
+            }
+        }
+        
+        // Connect segments with smooth curves
+        this.connectSnakeSegments();
+    }
+    
+    drawEnhancedSnakeHead(x, y) {
+        const centerX = x + this.gridSize / 2;
+        const centerY = y + this.gridSize / 2;
+        const radius = this.gridSize / 2 - 1;
+        
+        // Main head body (blue gradient)
+        const gradient = this.ctx.createRadialGradient(
+            centerX - radius/3, centerY - radius/3, 0,
+            centerX, centerY, radius
+        );
+        gradient.addColorStop(0, '#5DADE2');
+        gradient.addColorStop(1, '#2E86C1');
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Head outline
+        this.ctx.strokeStyle = '#1B4F72';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+        
+        // Eyes
+        const eyeSize = 6;
+        const eyeOffset = radius / 3;
+        
+        // Left eye
+        this.ctx.fillStyle = 'white';
+        this.ctx.beginPath();
+        this.ctx.arc(centerX - eyeOffset, centerY - eyeOffset/2, eyeSize, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Right eye
+        this.ctx.beginPath();
+        this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Eye pupils
+        this.ctx.fillStyle = 'black';
+        this.ctx.beginPath();
+        this.ctx.arc(centerX - eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        this.ctx.beginPath();
+        this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Eye shine
+        this.ctx.fillStyle = 'white';
+        this.ctx.beginPath();
+        this.ctx.arc(centerX - eyeOffset + 2, centerY - eyeOffset/2 - 2, 2, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        this.ctx.beginPath();
+        this.ctx.arc(centerX + eyeOffset + 2, centerY - eyeOffset/2 - 2, 2, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Mouth (open if near food)
+        if (this.mouthOpen) {
+            this.ctx.fillStyle = '#8B0000';
             this.ctx.beginPath();
-            this.ctx.moveTo(0, i * this.gridSize);
-            this.ctx.lineTo(this.canvas.width, i * this.gridSize);
+            this.ctx.arc(centerX, centerY + eyeOffset/2, 3, 0, Math.PI, false);
+            this.ctx.fill();
+        }
+        
+        // Tongue (if extended)
+        if (this.tongueOut) {
+            this.ctx.strokeStyle = '#FF0000';
+            this.ctx.lineWidth = 2;
+            this.ctx.beginPath();
+            this.ctx.moveTo(centerX, centerY + eyeOffset/2);
+            this.ctx.lineTo(centerX, centerY + eyeOffset/2 + 8);
+            this.ctx.moveTo(centerX, centerY + eyeOffset/2 + 8);
+            this.ctx.lineTo(centerX - 2, centerY + eyeOffset/2 + 10);
+            this.ctx.moveTo(centerX, centerY + eyeOffset/2 + 8);
+            this.ctx.lineTo(centerX + 2, centerY + eyeOffset/2 + 10);
+            this.ctx.stroke();
+        }
+    }
+    
+    drawEnhancedSnakeBody(x, y, index) {
+        const centerX = x + this.gridSize / 2;
+        const centerY = y + this.gridSize / 2;
+        const radius = this.gridSize / 2 - 1;
+        
+        // Body gradient (lighter blue)
+        const gradient = this.ctx.createRadialGradient(
+            centerX - radius/3, centerY - radius/3, 0,
+            centerX, centerY, radius
+        );
+        gradient.addColorStop(0, '#7FB3D3');
+        gradient.addColorStop(1, '#5499C7');
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Body outline
+        this.ctx.strokeStyle = '#2E4B6B';
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
+        
+        // Body spots (every 2nd segment)
+        if (index % 2 === 0) {
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            this.ctx.beginPath();
+            this.ctx.arc(centerX + radius/3, centerY - radius/3, 2, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            this.ctx.beginPath();
+            this.ctx.arc(centerX - radius/3, centerY + radius/3, 2, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+    }
+    
+    drawSnakeTail(x, y) {
+        const centerX = x + this.gridSize / 2;
+        const centerY = y + this.gridSize / 2;
+        const radius = this.gridSize / 2 - 2;
+        
+        // Tail gradient (even lighter blue)
+        const gradient = this.ctx.createRadialGradient(
+            centerX - radius/3, centerY - radius/3, 0,
+            centerX, centerY, radius
+        );
+        gradient.addColorStop(0, '#AED6F1');
+        gradient.addColorStop(1, '#7FB3D3');
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Tail outline
+        this.ctx.strokeStyle = '#5499C7';
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
+    }
+    
+    connectSnakeSegments() {
+        if (this.snake.length < 2) return;
+        
+        this.ctx.strokeStyle = '#5499C7';
+        this.ctx.lineWidth = this.gridSize - 4;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        
+        for (let i = 0; i < this.snake.length - 1; i++) {
+            const current = this.snake[i];
+            const next = this.snake[i + 1];
+            
+            const currentX = current.x * this.gridSize + this.gridSize / 2;
+            const currentY = current.y * this.gridSize + this.gridSize / 2;
+            const nextX = next.x * this.gridSize + this.gridSize / 2;
+            const nextY = next.y * this.gridSize + this.gridSize / 2;
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(currentX, currentY);
+            this.ctx.lineTo(nextX, nextY);
             this.ctx.stroke();
         }
     }
