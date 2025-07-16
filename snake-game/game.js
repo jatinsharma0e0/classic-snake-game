@@ -39,6 +39,9 @@ class SnakeGame {
         
         // Initialize game
         this.init();
+        
+        // Initialize snake animation for start screen
+        this.initStartScreenSnake();
     }
     
     init() {
@@ -466,6 +469,132 @@ class SnakeGame {
         setTimeout(() => {
             requestAnimationFrame(() => this.gameLoop());
         }, 120); // Game speed - lower number = faster game
+    }
+    
+    initStartScreenSnake() {
+        this.snakeSegments = document.querySelectorAll('.animated-snake .snake-segment');
+        this.snakePositions = [];
+        this.snakeAnimationFrame = 0;
+        this.segmentSpacing = 12; // Distance between segments
+        
+        // Button dimensions and position relative to container
+        this.buttonWidth = 200;
+        this.buttonHeight = 60;
+        this.containerWidth = 350;
+        this.containerHeight = 200;
+        
+        // Calculate button position (centered in container)
+        this.buttonLeft = (this.containerWidth - this.buttonWidth) / 2;
+        this.buttonTop = (this.containerHeight - this.buttonHeight) / 2;
+        
+        // Create rectangular path around button with padding
+        this.pathPadding = 30;
+        this.createRectangularPath();
+        
+        // Start animation
+        this.animateStartScreenSnake();
+    }
+    
+    createRectangularPath() {
+        this.path = [];
+        const left = this.buttonLeft - this.pathPadding;
+        const right = this.buttonLeft + this.buttonWidth + this.pathPadding;
+        const top = this.buttonTop - this.pathPadding;
+        const bottom = this.buttonTop + this.buttonHeight + this.pathPadding;
+        const cornerRadius = 20;
+        
+        // Top side (left to right)
+        for (let x = left + cornerRadius; x <= right - cornerRadius; x += 2) {
+            this.path.push({ x, y: top });
+        }
+        
+        // Top-right corner
+        for (let angle = -90; angle <= 0; angle += 3) {
+            const rad = (angle * Math.PI) / 180;
+            const x = right - cornerRadius + Math.cos(rad) * cornerRadius;
+            const y = top + cornerRadius + Math.sin(rad) * cornerRadius;
+            this.path.push({ x, y });
+        }
+        
+        // Right side (top to bottom)
+        for (let y = top + cornerRadius; y <= bottom - cornerRadius; y += 2) {
+            this.path.push({ x: right, y });
+        }
+        
+        // Bottom-right corner
+        for (let angle = 0; angle <= 90; angle += 3) {
+            const rad = (angle * Math.PI) / 180;
+            const x = right - cornerRadius + Math.cos(rad) * cornerRadius;
+            const y = bottom - cornerRadius + Math.sin(rad) * cornerRadius;
+            this.path.push({ x, y });
+        }
+        
+        // Bottom side (right to left)
+        for (let x = right - cornerRadius; x >= left + cornerRadius; x -= 2) {
+            this.path.push({ x, y: bottom });
+        }
+        
+        // Bottom-left corner
+        for (let angle = 90; angle <= 180; angle += 3) {
+            const rad = (angle * Math.PI) / 180;
+            const x = left + cornerRadius + Math.cos(rad) * cornerRadius;
+            const y = bottom - cornerRadius + Math.sin(rad) * cornerRadius;
+            this.path.push({ x, y });
+        }
+        
+        // Left side (bottom to top)
+        for (let y = bottom - cornerRadius; y >= top + cornerRadius; y -= 2) {
+            this.path.push({ x: left, y });
+        }
+        
+        // Top-left corner
+        for (let angle = 180; angle <= 270; angle += 3) {
+            const rad = (angle * Math.PI) / 180;
+            const x = left + cornerRadius + Math.cos(rad) * cornerRadius;
+            const y = top + cornerRadius + Math.sin(rad) * cornerRadius;
+            this.path.push({ x, y });
+        }
+    }
+    
+    animateStartScreenSnake() {
+        if (!this.path || this.path.length === 0) return;
+        
+        // Calculate positions for each segment
+        this.snakeSegments.forEach((segment, index) => {
+            const pathIndex = (this.snakeAnimationFrame - (index * this.segmentSpacing)) % this.path.length;
+            const adjustedIndex = pathIndex < 0 ? this.path.length + pathIndex : pathIndex;
+            const position = this.path[Math.floor(adjustedIndex)];
+            
+            if (position) {
+                // Add some undulation to body segments
+                let offsetY = 0;
+                if (index > 0) {
+                    offsetY = Math.sin((this.snakeAnimationFrame * 0.1) + (index * 0.5)) * 2;
+                }
+                
+                segment.style.left = (position.x - 9) + 'px'; // Center the segment
+                segment.style.top = (position.y - 9 + offsetY) + 'px';
+                
+                // Calculate rotation based on movement direction
+                if (index === 0 && this.path.length > 1) {
+                    const nextIndex = (Math.floor(adjustedIndex) + 1) % this.path.length;
+                    const nextPos = this.path[nextIndex];
+                    if (nextPos) {
+                        const angle = Math.atan2(nextPos.y - position.y, nextPos.x - position.x);
+                        segment.style.transform = `rotate(${angle}rad)`;
+                    }
+                }
+                
+                // Slightly change opacity for depth effect
+                const opacity = 0.9 + (index * 0.02);
+                segment.style.opacity = Math.min(opacity, 1);
+            }
+        });
+        
+        this.snakeAnimationFrame += 0.8; // Animation speed
+        
+        // Continue animation
+        requestAnimationFrame(() => this.animateStartScreenSnake());
     }
 }
 

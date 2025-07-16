@@ -116,8 +116,8 @@ body {
 .start-button-container {
     position: relative;
     margin: 40px auto;
-    width: 250px;
-    height: 250px;
+    width: 350px;
+    height: 200px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -130,12 +130,14 @@ body {
     padding: 20px 40px;
     font-size: 1.4rem;
     font-weight: bold;
-    border-radius: 50px;
+    border-radius: 25px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 10px 25px rgba(104, 211, 145, 0.4);
     z-index: 10;
     position: relative;
+    width: 200px;
+    height: 60px;
 }
 
 .start-game-btn:hover {
@@ -144,28 +146,37 @@ body {
     background: linear-gradient(135deg, #4fd1c7, #68d391);
 }
 
-.revolving-snake {
+.snake-path-container {
     position: absolute;
-    width: 200px;
-    height: 200px;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.animated-snake {
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .snake-segment {
     position: absolute;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: linear-gradient(135deg, #7FB3D3 0%, #5499C7 100%);
-    box-shadow: 0 0 10px rgba(84, 153, 199, 0.6), inset -2px -2px 4px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.3);
+    box-shadow: 0 0 8px rgba(84, 153, 199, 0.6), inset -2px -2px 3px rgba(0,0,0,0.2), inset 2px 2px 3px rgba(255,255,255,0.3);
+    transform-origin: center;
 }
 
 .snake-segment.head {
     background: linear-gradient(135deg, #5DADE2 0%, #2E86C1 100%);
-    width: 24px;
-    height: 24px;
-    box-shadow: 0 0 15px rgba(46, 134, 193, 0.8), inset -2px -2px 4px rgba(0,0,0,0.3), inset 2px 2px 4px rgba(255,255,255,0.4);
-    position: relative;
-    animation: snakeHead 6s linear infinite;
+    width: 22px;
+    height: 22px;
+    box-shadow: 0 0 12px rgba(46, 134, 193, 0.8), inset -2px -2px 4px rgba(0,0,0,0.3), inset 2px 2px 4px rgba(255,255,255,0.4);
+    z-index: 5;
 }
 
 .snake-segment.head::before {
@@ -175,9 +186,9 @@ body {
     height: 3px;
     background: white;
     border-radius: 50%;
-    top: 6px;
-    left: 6px;
-    box-shadow: 6px 0 0 white;
+    top: 5px;
+    left: 5px;
+    box-shadow: 8px 0 0 white;
 }
 
 .snake-segment.head::after {
@@ -187,210 +198,19 @@ body {
     height: 1.5px;
     background: black;
     border-radius: 50%;
-    top: 7px;
-    left: 7px;
-    box-shadow: 6px 0 0 black;
-}
-
-.snake-segment.body:nth-child(2) {
-    animation: snakeBody1 6s linear infinite;
-}
-
-.snake-segment.body:nth-child(3) {
-    animation: snakeBody2 6s linear infinite;
-}
-
-.snake-segment.body:nth-child(4) {
-    animation: snakeBody3 6s linear infinite;
+    top: 6px;
+    left: 6px;
+    box-shadow: 8px 0 0 black;
 }
 
 .snake-segment.tail {
     background: linear-gradient(135deg, #85C1E9 0%, #7FB3D3 100%);
-    width: 16px;
-    height: 16px;
-    box-shadow: 0 0 8px rgba(127, 179, 211, 0.5), inset -1px -1px 2px rgba(0,0,0,0.2), inset 1px 1px 2px rgba(255,255,255,0.3);
-    animation: snakeTail 6s linear infinite;
+    width: 14px;
+    height: 14px;
+    box-shadow: 0 0 6px rgba(127, 179, 211, 0.5), inset -1px -1px 2px rgba(0,0,0,0.2), inset 1px 1px 2px rgba(255,255,255,0.3);
 }
 
-@keyframes snakeHead {
-    0% { 
-        top: -100px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    25% { 
-        top: 50%; 
-        left: 100px; 
-        transform: translateX(-50%) translateY(-50%) rotate(90deg); 
-    }
-    50% { 
-        top: 100px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(180deg); 
-    }
-    75% { 
-        top: 50%; 
-        left: -100px; 
-        transform: translateX(-50%) translateY(-50%) rotate(270deg); 
-    }
-    100% { 
-        top: -100px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(360deg); 
-    }
-}
-
-@keyframes snakeBody1 {
-    0% { 
-        top: -80px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    6.25% { 
-        top: -100px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    31.25% { 
-        top: 50%; 
-        left: 100px; 
-        transform: translateX(-50%) translateY(-50%) rotate(90deg); 
-    }
-    56.25% { 
-        top: 100px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(180deg); 
-    }
-    81.25% { 
-        top: 50%; 
-        left: -100px; 
-        transform: translateX(-50%) translateY(-50%) rotate(270deg); 
-    }
-    100% { 
-        top: -80px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(360deg); 
-    }
-}
-
-@keyframes snakeBody2 {
-    0% { 
-        top: -60px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    12.5% { 
-        top: -80px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    18.75% { 
-        top: -100px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    43.75% { 
-        top: 50%; 
-        left: 100px; 
-        transform: translateX(-50%) translateY(-50%) rotate(90deg); 
-    }
-    68.75% { 
-        top: 100px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(180deg); 
-    }
-    93.75% { 
-        top: 50%; 
-        left: -100px; 
-        transform: translateX(-50%) translateY(-50%) rotate(270deg); 
-    }
-    100% { 
-        top: -60px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(360deg); 
-    }
-}
-
-@keyframes snakeBody3 {
-    0% { 
-        top: -40px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    18.75% { 
-        top: -60px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    25% { 
-        top: -80px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    31.25% { 
-        top: -100px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    56.25% { 
-        top: 50%; 
-        left: 100px; 
-        transform: translateX(-50%) translateY(-50%) rotate(90deg); 
-    }
-    81.25% { 
-        top: 100px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(180deg); 
-    }
-    100% { 
-        top: -40px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(360deg); 
-    }
-}
-
-@keyframes snakeTail {
-    0% { 
-        top: -20px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    25% { 
-        top: -40px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    31.25% { 
-        top: -60px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    37.5% { 
-        top: -80px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    43.75% { 
-        top: -100px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(0deg); 
-    }
-    68.75% { 
-        top: 50%; 
-        left: 100px; 
-        transform: translateX(-50%) translateY(-50%) rotate(90deg); 
-    }
-    93.75% { 
-        top: 100px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(180deg); 
-    }
-    100% { 
-        top: -20px; 
-        left: 50%; 
-        transform: translateX(-50%) rotate(360deg); 
-    }
-}
+/* Snake will be animated via JavaScript for smooth rectangular path movement */
 
 .best-score-display {
     font-size: 1.1rem;
