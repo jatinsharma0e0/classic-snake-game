@@ -65,6 +65,7 @@ class SnakeGame {
         this.restartBtn = document.getElementById('restartBtn');
         this.backToMenuBtn = document.getElementById('backToMenuBtn');
         this.muteBtn = document.getElementById('muteBtn');
+        this.homeMuteBtn = document.getElementById('homeMuteBtn');
         
         // Initialize game
         this.init();
