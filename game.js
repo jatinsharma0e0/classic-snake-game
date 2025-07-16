@@ -27,6 +27,7 @@ class SnakeGame {
         this.tongueTimer = 0;
         this.mouthOpen = false;
         this.lastTongueTime = 0;
+        this.nextTongueTime = 5000 + Math.random() * 4000; // Random interval 5-9 seconds
         
         // Food properties - Normal random generation for gameplay
         this.food = this.generateFood();
@@ -237,10 +238,12 @@ class SnakeGame {
         // }
         
         // Random tongue animation (only when not eating)
-        if (!this.mouthOpen && Date.now() - this.lastTongueTime > 7000) {
+        // Random interval between 5-9 seconds (5000-9000ms)
+        if (!this.mouthOpen && Date.now() - this.lastTongueTime > this.nextTongueTime) {
             this.tongueOut = true;
             this.tongueTimer = 200; // Show tongue for 200ms
             this.lastTongueTime = Date.now();
+            this.nextTongueTime = 5000 + Math.random() * 4000; // Set next random interval
         }
         
         if (this.tongueOut) {
