@@ -238,12 +238,12 @@ class SnakeGame {
         // }
         
         // Random tongue animation (only when not eating)
-        // Random interval between 5-9 seconds (5000-9000ms)
+        // Random interval between 10-15 seconds (10000-15000ms)
         if (!this.mouthOpen && Date.now() - this.lastTongueTime > this.nextTongueTime) {
             this.tongueOut = true;
             this.tongueTimer = 200; // Show tongue for 200ms
             this.lastTongueTime = Date.now();
-            this.nextTongueTime = 5000 + Math.random() * 4000; // Set next random interval
+            this.nextTongueTime = 10000 + Math.random() * 5000; // Set next random interval
         }
         
         if (this.tongueOut) {
