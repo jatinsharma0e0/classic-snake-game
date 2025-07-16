@@ -3,7 +3,7 @@ import http.server
 import socketserver
 import os
 
-PORT = 8000
+PORT = 5000
 
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -11,6 +11,6 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
 os.chdir('.')
-with socketserver.TCPServer(("", PORT), MyHTTPRequestHandler) as httpd:
-    print(f"Serving at http://localhost:{PORT}")
+with socketserver.TCPServer(("0.0.0.0", PORT), MyHTTPRequestHandler) as httpd:
+    print(f"Serving at http://0.0.0.0:{PORT}")
     httpd.serve_forever()
