@@ -479,7 +479,7 @@ body {
 
     #gameCanvas {
         width: 100%;
-        max-width: 350px;
+        max-width: 700px;
         height: auto;
     }
 
