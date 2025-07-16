@@ -124,33 +124,82 @@ body {
 }
 
 .start-game-btn {
-    background: linear-gradient(135deg, #8B4513 0%, #D2691E 25%, #CD853F 50%, #DEB887 75%, #F4A460 100%);
-    border: 3px solid #654321;
+    background: linear-gradient(45deg, #8B4513 0%, #A0522D 15%, #CD853F 30%, #D2691E 45%, #DEB887 60%, #F4A460 75%, #DDBF94 90%, #CD853F 100%);
+    border: none;
     color: #2F1B14;
-    padding: 20px 40px;
-    font-size: 1.5rem;
+    padding: 0;
+    font-size: 1.4rem;
     font-weight: bold;
-    border-radius: 30px;
     cursor: pointer;
     transition: all 0.3s ease;
-    text-shadow: 0 1px 2px rgba(255,255,255,0.4), 0 2px 4px rgba(139,69,19,0.3);
+    text-shadow: 0 1px 2px rgba(255,255,255,0.6), 0 2px 4px rgba(139,69,19,0.4);
     box-shadow: 0 8px 25px rgba(139, 69, 19, 0.4), 
-                inset 0 2px 0 rgba(255,255,255,0.3),
-                inset 0 -2px 0 rgba(101,67,33,0.5);
+                inset 0 3px 0 rgba(255,255,255,0.3),
+                inset 0 -3px 0 rgba(101,67,33,0.6);
     z-index: 10;
     position: relative;
     width: 200px;
     height: 60px;
     letter-spacing: 1px;
     text-transform: uppercase;
+    border-radius: 50px;
+    overflow: hidden;
+    
+    /* Wood grain texture effect */
+    background-image: 
+        repeating-linear-gradient(90deg, 
+            rgba(139,69,19,0.15) 0px, 
+            rgba(139,69,19,0.15) 1px, 
+            transparent 1px, 
+            transparent 6px),
+        repeating-linear-gradient(0deg, 
+            rgba(101,67,33,0.1) 0px, 
+            rgba(101,67,33,0.1) 2px, 
+            transparent 2px, 
+            transparent 12px),
+        radial-gradient(ellipse at 20% 50%, rgba(101,67,33,0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 50%, rgba(139,69,19,0.2) 0%, transparent 50%);
+}
+
+.start-game-btn::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 30px;
+    width: 16px;
+    height: 20px;
+    background: linear-gradient(45deg, #228B22 0%, #32CD32 50%, #90EE90 100%);
+    border-radius: 50% 0 50% 50%;
+    transform: rotate(-20deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 11;
+}
+
+.start-game-btn::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 40px;
+    width: 12px;
+    height: 16px;
+    background: linear-gradient(45deg, #228B22 0%, #32CD32 50%, #90EE90 100%);
+    border-radius: 50% 0 50% 50%;
+    transform: rotate(10deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 11;
 }
 
 .start-game-btn:hover {
     transform: translateY(-3px);
-    background: linear-gradient(135deg, #A0522D 0%, #E8802D 25%, #DAA520 50%, #F5DEB3 75%, #FFB347 100%);
+    background: linear-gradient(45deg, #A0522D 0%, #B8621A 15%, #DAA520 30%, #E8802D 45%, #F5DEB3 60%, #FFB347 75%, #F0E68C 90%, #DAA520 100%);
     box-shadow: 0 12px 30px rgba(139, 69, 19, 0.6), 
-                inset 0 2px 0 rgba(255,255,255,0.4),
-                inset 0 -2px 0 rgba(101,67,33,0.6);
+                inset 0 3px 0 rgba(255,255,255,0.4),
+                inset 0 -3px 0 rgba(101,67,33,0.7);
+}
+
+.start-game-btn:hover::before,
+.start-game-btn:hover::after {
+    transform: translateY(-1px) rotate(-20deg);
 }
 
 .snake-path-container {
