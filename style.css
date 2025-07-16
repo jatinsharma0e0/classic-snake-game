@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'Driftwood';
+    src: url('assets/fonts/driftwood.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -93,6 +100,7 @@ body {
 }
 
 .game-title {
+    font-family: 'Driftwood', 'Arial', sans-serif;
     font-size: 4rem;
     font-weight: bold;
     color: #68d391;
