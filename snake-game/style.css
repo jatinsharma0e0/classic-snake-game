@@ -148,7 +148,6 @@ body {
     position: absolute;
     width: 200px;
     height: 200px;
-    animation: revolve 4s linear infinite;
 }
 
 .snake-segment {
@@ -164,11 +163,9 @@ body {
     background: linear-gradient(135deg, #5DADE2 0%, #2E86C1 100%);
     width: 24px;
     height: 24px;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
     box-shadow: 0 0 15px rgba(46, 134, 193, 0.8), inset -2px -2px 4px rgba(0,0,0,0.3), inset 2px 2px 4px rgba(255,255,255,0.4);
     position: relative;
+    animation: snakeHead 6s linear infinite;
 }
 
 .snake-segment.head::before {
@@ -196,36 +193,203 @@ body {
 }
 
 .snake-segment.body:nth-child(2) {
-    top: -80px;
-    left: 50%;
-    transform: translateX(-50%);
+    animation: snakeBody1 6s linear infinite;
 }
 
 .snake-segment.body:nth-child(3) {
-    top: -60px;
-    left: 50%;
-    transform: translateX(-50%);
+    animation: snakeBody2 6s linear infinite;
 }
 
 .snake-segment.body:nth-child(4) {
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%);
+    animation: snakeBody3 6s linear infinite;
 }
 
 .snake-segment.tail {
     background: linear-gradient(135deg, #85C1E9 0%, #7FB3D3 100%);
     width: 16px;
     height: 16px;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
     box-shadow: 0 0 8px rgba(127, 179, 211, 0.5), inset -1px -1px 2px rgba(0,0,0,0.2), inset 1px 1px 2px rgba(255,255,255,0.3);
+    animation: snakeTail 6s linear infinite;
 }
 
-@keyframes revolve {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+@keyframes snakeHead {
+    0% { 
+        top: -100px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    25% { 
+        top: 50%; 
+        left: 100px; 
+        transform: translateX(-50%) translateY(-50%) rotate(90deg); 
+    }
+    50% { 
+        top: 100px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(180deg); 
+    }
+    75% { 
+        top: 50%; 
+        left: -100px; 
+        transform: translateX(-50%) translateY(-50%) rotate(270deg); 
+    }
+    100% { 
+        top: -100px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(360deg); 
+    }
+}
+
+@keyframes snakeBody1 {
+    0% { 
+        top: -80px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    6.25% { 
+        top: -100px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    31.25% { 
+        top: 50%; 
+        left: 100px; 
+        transform: translateX(-50%) translateY(-50%) rotate(90deg); 
+    }
+    56.25% { 
+        top: 100px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(180deg); 
+    }
+    81.25% { 
+        top: 50%; 
+        left: -100px; 
+        transform: translateX(-50%) translateY(-50%) rotate(270deg); 
+    }
+    100% { 
+        top: -80px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(360deg); 
+    }
+}
+
+@keyframes snakeBody2 {
+    0% { 
+        top: -60px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    12.5% { 
+        top: -80px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    18.75% { 
+        top: -100px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    43.75% { 
+        top: 50%; 
+        left: 100px; 
+        transform: translateX(-50%) translateY(-50%) rotate(90deg); 
+    }
+    68.75% { 
+        top: 100px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(180deg); 
+    }
+    93.75% { 
+        top: 50%; 
+        left: -100px; 
+        transform: translateX(-50%) translateY(-50%) rotate(270deg); 
+    }
+    100% { 
+        top: -60px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(360deg); 
+    }
+}
+
+@keyframes snakeBody3 {
+    0% { 
+        top: -40px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    18.75% { 
+        top: -60px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    25% { 
+        top: -80px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    31.25% { 
+        top: -100px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    56.25% { 
+        top: 50%; 
+        left: 100px; 
+        transform: translateX(-50%) translateY(-50%) rotate(90deg); 
+    }
+    81.25% { 
+        top: 100px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(180deg); 
+    }
+    100% { 
+        top: -40px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(360deg); 
+    }
+}
+
+@keyframes snakeTail {
+    0% { 
+        top: -20px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    25% { 
+        top: -40px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    31.25% { 
+        top: -60px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    37.5% { 
+        top: -80px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    43.75% { 
+        top: -100px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    68.75% { 
+        top: 50%; 
+        left: 100px; 
+        transform: translateX(-50%) translateY(-50%) rotate(90deg); 
+    }
+    93.75% { 
+        top: 100px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(180deg); 
+    }
+    100% { 
+        top: -20px; 
+        left: 50%; 
+        transform: translateX(-50%) rotate(360deg); 
+    }
 }
 
 .best-score-display {
