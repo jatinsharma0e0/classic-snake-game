@@ -685,9 +685,9 @@ class SnakeGame {
         this.snakeHead.setAttribute('transform', headRotation);
         
         // Position eyes relative to head
-        const eyeOffsetX = Math.cos(angle) * 4;
-        const eyeOffsetY = Math.sin(angle) * 4;
-        const eyeSeparation = 6;
+        const eyeOffsetX = Math.cos(angle) * 3;
+        const eyeOffsetY = Math.sin(angle) * 3;
+        const eyeSeparation = 4;
         
         // Eye positions (perpendicular to movement direction)
         const perpX = -Math.sin(angle) * eyeSeparation;
@@ -762,32 +762,16 @@ class SnakeGame {
         // Clear existing spots
         this.bodySpots.innerHTML = '';
         
-        // Create simple horizontal bands/stripes pattern
-        for (let i = 0; i < this.bodyPoints.length - 1; i++) {
-            // Create bands every 12 body points for clean separation
-            if (i % 12 === 0 && i < this.bodyPoints.length - 12) {
-                const band = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                const startPoint = this.bodyPoints[i];
-                const endPoint = this.bodyPoints[Math.min(i + 12, this.bodyPoints.length - 1)];
-                
-                // Calculate band dimensions
-                const centerX = (startPoint.x + endPoint.x) / 2;
-                const centerY = (startPoint.y + endPoint.y) / 2;
-                const width = Math.sqrt(Math.pow(endPoint.x - startPoint.x, 2) + Math.pow(endPoint.y - startPoint.y, 2)) || 20;
-                const height = 16;
-                
-                // Calculate rotation angle for the band
-                const angle = Math.atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x) * 180 / Math.PI;
-                
-                band.setAttribute('x', centerX - width/2);
-                band.setAttribute('y', centerY - height/2);
-                band.setAttribute('width', width);
-                band.setAttribute('height', height);
-                band.setAttribute('fill', '#A5D6A7');
-                band.setAttribute('opacity', '0.8');
-                band.setAttribute('rx', '3');
-                band.setAttribute('transform', `rotate(${angle} ${centerX} ${centerY})`);
-                this.bodySpots.appendChild(band);
+        // Add orange spots along the snake body
+        for (let i = 5; i < this.bodyPoints.length; i += 8) {
+            if (i < this.bodyPoints.length) {
+                const spot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                spot.setAttribute('cx', this.bodyPoints[i].x);
+                spot.setAttribute('cy', this.bodyPoints[i].y);
+                spot.setAttribute('r', Math.random() * 2 + 1.5);
+                spot.setAttribute('fill', '#FF9800');
+                spot.setAttribute('opacity', '0.8');
+                this.bodySpots.appendChild(spot);
             }
         }
     }
