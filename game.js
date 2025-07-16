@@ -35,6 +35,7 @@ class SnakeGame {
         this.mouthOpen = false;
         this.lastTongueTime = 0;
         this.nextTongueTime = 5000 + Math.random() * 4000; // Random interval 5-9 seconds
+        this.tongueWiggleTimer = 0;
         
         // Food properties - Normal random generation for gameplay
         this.food = this.generateFood();
@@ -416,6 +417,7 @@ class SnakeGame {
             this.tongueTimer -= 16; // Assuming 60fps
             if (this.tongueTimer <= 0) {
                 this.tongueOut = false;
+                this.tongueWiggleTimer = 0; // Reset wiggle timer when tongue retracts
             }
         }
         
@@ -908,15 +910,33 @@ class SnakeGame {
         
         // Tongue (if extended and mouth is closed)
         if (this.tongueOut && !this.mouthOpen) {
+            // Update wiggle animation
+            this.tongueWiggleTimer += 16; // Assuming 60fps
+            
+            // Create wiggle effect - subtle side-to-side movement
+            const wiggleFrequency = 0.008; // Speed of wiggle
+            const wiggleAmplitude = 1.5; // How far it wiggles
+            const wiggleOffset = Math.sin(this.tongueWiggleTimer * wiggleFrequency) * wiggleAmplitude;
+            
+            // Create slight vertical bobbing
+            const bobFrequency = 0.006;
+            const bobAmplitude = 0.5;
+            const bobOffset = Math.sin(this.tongueWiggleTimer * bobFrequency) * bobAmplitude;
+            
             this.ctx.strokeStyle = '#FF0000';
             this.ctx.lineWidth = 2;
             this.ctx.beginPath();
+            
+            // Main tongue body with wiggle
             this.ctx.moveTo(centerX, centerY + radius/2);
-            this.ctx.lineTo(centerX, centerY + radius/2 + 8);
-            this.ctx.moveTo(centerX, centerY + radius/2 + 8);
-            this.ctx.lineTo(centerX - 2, centerY + radius/2 + 10);
-            this.ctx.moveTo(centerX, centerY + radius/2 + 8);
-            this.ctx.lineTo(centerX + 2, centerY + radius/2 + 10);
+            this.ctx.lineTo(centerX + wiggleOffset, centerY + radius/2 + 8 + bobOffset);
+            
+            // Forked tongue tip with wiggle
+            this.ctx.moveTo(centerX + wiggleOffset, centerY + radius/2 + 8 + bobOffset);
+            this.ctx.lineTo(centerX - 2 + wiggleOffset, centerY + radius/2 + 10 + bobOffset);
+            this.ctx.moveTo(centerX + wiggleOffset, centerY + radius/2 + 8 + bobOffset);
+            this.ctx.lineTo(centerX + 2 + wiggleOffset, centerY + radius/2 + 10 + bobOffset);
+            
             this.ctx.stroke();
         }
     }

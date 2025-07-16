@@ -134,3 +134,5 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Updated start screen with beautiful jungle background image for immersive experience
 - Enhanced text styling with better contrast and readability over new background
 - Removed animated grid elements (trees, vines, leaves) to showcase clean jungle background image
+- Added wiggle animation to snake's tongue for more dynamic and flexible appearance
+- Tongue now shows subtle side-to-side wiggle and vertical bobbing when extended
