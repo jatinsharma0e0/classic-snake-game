@@ -258,6 +258,9 @@ class SnakeGame {
         
         const newDirection = { ...this.direction };
         
+        // Check if snake has started moving (not stationary)
+        const hasStartedMoving = this.lastDirection.x !== 0 || this.lastDirection.y !== 0;
+        
         // Handle movement keys
         switch (e.code) {
             case 'ArrowUp':
@@ -276,6 +279,10 @@ class SnakeGame {
                 break;
             case 'ArrowLeft':
             case 'KeyA':
+                // Don't allow left arrow to start the game (would cause immediate collision)
+                if (!hasStartedMoving) {
+                    return; // Ignore left arrow when snake hasn't started moving
+                }
                 if (this.lastDirection.x !== 1) { // Prevent reverse direction
                     newDirection.x = -1;
                     newDirection.y = 0;
