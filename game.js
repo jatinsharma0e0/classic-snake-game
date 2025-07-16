@@ -48,6 +48,10 @@ class SnakeGame {
         this.grassBg = new Image();
         this.grassBg.src = 'assets/grass-bg.webp';
         
+        // Audio system
+        this.audioManager = new AudioManager();
+        this.moveCounter = 0; // For subtle movement sounds
+        
         // DOM elements
         this.startScreen = document.getElementById('startScreen');
         this.gameScreen = document.getElementById('gameScreen');
@@ -60,6 +64,7 @@ class SnakeGame {
         this.bestScoreElement = document.getElementById('bestScore');
         this.restartBtn = document.getElementById('restartBtn');
         this.backToMenuBtn = document.getElementById('backToMenuBtn');
+        this.muteBtn = document.getElementById('muteBtn');
         
         // Initialize game
         this.init();
@@ -81,9 +86,26 @@ class SnakeGame {
         
         // Event listeners
         document.addEventListener('keydown', (e) => this.handleKeyPress(e));
-        this.startGameBtn.addEventListener('click', () => this.showGameScreen());
-        this.restartBtn.addEventListener('click', () => this.restartGame());
-        this.backToMenuBtn.addEventListener('click', () => this.showStartScreen());
+        this.startGameBtn.addEventListener('click', () => {
+            this.audioManager.resumeAudioContext(); // Initialize audio on first interaction
+            this.audioManager.playSound('buttonClick');
+            this.showGameScreen();
+        });
+        this.restartBtn.addEventListener('click', () => {
+            this.audioManager.playSound('buttonClick');
+            this.restartGame();
+        });
+        this.backToMenuBtn.addEventListener('click', () => {
+            this.audioManager.playSound('buttonClick');
+            this.showStartScreen();
+        });
+        this.muteBtn.addEventListener('click', () => {
+            const isMuted = this.audioManager.toggleMute();
+            this.muteBtn.textContent = isMuted ? '🔇' : '🔊';
+            if (!isMuted) {
+                this.audioManager.playSound('buttonClick');
+            }
+        });
         
         // Start game loop
         this.gameLoop();
@@ -212,6 +234,9 @@ class SnakeGame {
         
         // Update high score display on start screen
         this.startScreenHighScore.textContent = this.highScore;
+        
+        // Play calm background music for menu
+        this.audioManager.playBackgroundMusic();
     }
     
     showGameScreen() {
@@ -237,6 +262,10 @@ class SnakeGame {
         this.generateObstacles();
         this.food = this.generateFood();
         this.updateScoreDisplay();
+        
+        // Play game start sound and stop background music for gameplay focus
+        this.audioManager.playSound('gameStart');
+        this.audioManager.stopBackgroundMusic();
     }
     
     handleKeyPress(e) {
@@ -381,23 +410,32 @@ class SnakeGame {
         // Check wall collision
         if (head.x < 0 || head.x >= this.tileCountX || 
             head.y < 0 || head.y >= this.tileCountY) {
+            this.audioManager.playSound('collision');
             this.gameOver();
             return;
         }
         
         // Check self collision
         if (this.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+            this.audioManager.playSound('collision');
             this.gameOver();
             return;
         }
         
         // Check obstacle collision
         if (this.checkObstacleCollision(head)) {
+            this.audioManager.playSound('collision');
             this.gameOver();
             return;
         }
         
         this.snake.unshift(head);
+        
+        // Play subtle movement sound occasionally
+        this.moveCounter++;
+        if (this.moveCounter % 10 === 0) { // Every 10th move
+            this.audioManager.playSound('snakeMove');
+        }
         
         // Check if snake is near food (within 1 block)
         const distanceToFood = Math.abs(head.x - this.food.x) + Math.abs(head.y - this.food.y);
@@ -415,6 +453,9 @@ class SnakeGame {
             this.tongueTimer = 50; // Show tongue for 100ms (increased for better visibility)
             this.lastTongueTime = Date.now();
             this.nextTongueTime = 10000 + Math.random() * 5000; // Set next random interval (10-15 seconds)
+            
+            // Play tongue flick sound
+            this.audioManager.playSound('tongueFlick');
         }
         
         if (this.tongueOut) {
@@ -430,6 +471,9 @@ class SnakeGame {
             this.score += 10;
             this.updateScoreDisplay();
             this.food = this.generateFood();
+            
+            // Play eating sound
+            this.audioManager.playSound('eatFood');
             
             // Update high score if needed
             if (this.score > this.highScore) {
@@ -474,6 +518,9 @@ class SnakeGame {
         // Mark snake as dead (for X X eyes)
         this.isDead = true;
         
+        // Play hit impact sound
+        this.audioManager.playSound('hitImpact');
+        
         // Start hit animation
         this.hitAnimation = true;
         this.hitAnimationTimer = 0;
@@ -504,6 +551,9 @@ class SnakeGame {
             this.finalScoreElement.textContent = this.score;
             this.bestScoreElement.textContent = this.highScore;
             this.gameOverScreen.classList.remove('hidden');
+            
+            // Play game over sound
+            this.audioManager.playSound('gameOver');
         }, 1000);
     }
     
