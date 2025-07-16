@@ -127,3 +127,6 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Obstacles cause game over on collision and are avoided by food generation
 - Doubled game area size from 400x400 to 800x800 pixels for expanded gameplay
 - Updated game area to 40 blocks width by 24 blocks height (800x480 pixels) with rectangular gameplay field
+- Added hit animation with knockback effect and 1-second delay before Game Over screen
+- Implemented screen shake, red flash, and directional knockback based on collision type
+- Snake cannot start moving with left arrow key to prevent immediate self-collision

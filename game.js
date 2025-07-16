@@ -14,6 +14,9 @@ class SnakeGame {
         this.gameStarted = false;
         this.score = 0;
         this.highScore = this.getHighScore();
+        this.hitAnimation = false;
+        this.hitAnimationTimer = 0;
+        this.knockbackOffset = { x: 0, y: 0 };
         
         // Snake properties - Start with 3 blocks
         this.snake = [
@@ -458,14 +461,70 @@ class SnakeGame {
     
     gameOver() {
         this.gameRunning = false;
-        this.finalScoreElement.textContent = this.score;
-        this.bestScoreElement.textContent = this.highScore;
-        this.gameOverScreen.classList.remove('hidden');
+        
+        // Start hit animation
+        this.hitAnimation = true;
+        this.hitAnimationTimer = 0;
+        
+        // Calculate knockback direction based on collision type
+        const head = this.snake[0];
+        this.knockbackOffset = { x: 0, y: 0 };
+        
+        // Check what was hit for knockback direction
+        if (head.x < 0) {
+            this.knockbackOffset.x = 3; // Hit left wall, knockback right
+        } else if (head.x >= this.tileCountX) {
+            this.knockbackOffset.x = -3; // Hit right wall, knockback left
+        } else if (head.y < 0) {
+            this.knockbackOffset.y = 3; // Hit top wall, knockback down
+        } else if (head.y >= this.tileCountY) {
+            this.knockbackOffset.y = -3; // Hit bottom wall, knockback up
+        } else {
+            // Hit obstacle or self - random knockback
+            this.knockbackOffset.x = (Math.random() - 0.5) * 6;
+            this.knockbackOffset.y = (Math.random() - 0.5) * 6;
+        }
+        
+        // Show game over screen after animation delay
+        setTimeout(() => {
+            this.hitAnimation = false;
+            this.knockbackOffset = { x: 0, y: 0 };
+            this.finalScoreElement.textContent = this.score;
+            this.bestScoreElement.textContent = this.highScore;
+            this.gameOverScreen.classList.remove('hidden');
+        }, 1000);
     }
     
     render() {
         // Clear canvas with jungle background
         this.drawJungleBackground();
+        
+        // Apply hit animation effects
+        if (this.hitAnimation) {
+            this.ctx.save();
+            
+            // Update hit animation timer
+            this.hitAnimationTimer += 16; // Assuming 60fps
+            
+            // Create shake effect
+            const shakeIntensity = Math.max(0, 1 - this.hitAnimationTimer / 1000);
+            const shakeX = (Math.random() - 0.5) * 10 * shakeIntensity;
+            const shakeY = (Math.random() - 0.5) * 10 * shakeIntensity;
+            
+            // Apply knockback and shake
+            this.ctx.translate(
+                this.knockbackOffset.x * shakeIntensity + shakeX,
+                this.knockbackOffset.y * shakeIntensity + shakeY
+            );
+            
+            // Flash effect
+            const flashIntensity = Math.sin(this.hitAnimationTimer * 0.02) * 0.5 + 0.5;
+            this.ctx.globalAlpha = 0.7 + flashIntensity * 0.3;
+            
+            // Red tint overlay
+            this.ctx.fillStyle = `rgba(255, 0, 0, ${0.3 * shakeIntensity})`;
+            this.ctx.fillRect(-20, -20, this.canvas.width + 40, this.canvas.height + 40);
+        }
         
         // Draw obstacles
         this.drawObstacles();
@@ -479,6 +538,11 @@ class SnakeGame {
         // Draw start message if game hasn't started
         if (!this.gameStarted) {
             this.drawStartMessage();
+        }
+        
+        // Restore canvas state if hit animation was applied
+        if (this.hitAnimation) {
+            this.ctx.restore();
         }
     }
     
@@ -861,7 +925,12 @@ class SnakeGame {
     }
     
     gameLoop() {
-        this.updateGame();
+        // Update game logic only if not in hit animation
+        if (!this.hitAnimation) {
+            this.updateGame();
+        }
+        
+        // Always render (for hit animation effects)
         this.render();
         
         // Continue game loop
