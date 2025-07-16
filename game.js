@@ -92,38 +92,49 @@ class SnakeGame {
     generateObstacles() {
         this.obstacles = [];
         
-        // Generate 3-5 random obstacles
-        const numObstacles = 3 + Math.floor(Math.random() * 3);
+        // Define obstacle counts and types
+        const obstacleConfig = [
+            { type: '4-blocks-rock', width: 2, height: 2, count: 3 },
+            { type: '2-blocks-rock', width: 2, height: 1, count: 4 + Math.floor(Math.random() * 2) }, // 4-5
+            { type: '1-block-rock', width: 1, height: 1, count: Math.floor(Math.random() * 4) + 2 }, // 2-5
+            { type: '1-block-obstacle', width: 1, height: 1, count: Math.floor(Math.random() * 4) + 2 } // 2-5
+        ];
         
-        for (let i = 0; i < numObstacles; i++) {
-            const obstacleTypes = [
-                { type: '1-block-rock', width: 1, height: 1 },
-                { type: '2-blocks-rock', width: 2, height: 1 },
-                { type: '4-blocks-rock', width: 2, height: 2 },
-                { type: '1-block-obstacle', width: 1, height: 1 }
-            ];
-            
-            const obstacle = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
-            
-            // Find a valid position that doesn't conflict with snake or food
-            let position;
-            let attempts = 0;
-            do {
-                position = {
-                    x: Math.floor(Math.random() * (this.tileCount - obstacle.width)),
-                    y: Math.floor(Math.random() * (this.tileCount - obstacle.height))
-                };
-                attempts++;
-            } while (this.isObstacleConflicting(position, obstacle) && attempts < 100);
-            
-            if (attempts < 100) {
-                this.obstacles.push({
-                    x: position.x,
-                    y: position.y,
-                    type: obstacle.type,
-                    width: obstacle.width,
-                    height: obstacle.height
-                });
+        // Ensure small obstacles total 5-6
+        const totalSmall = obstacleConfig[2].count + obstacleConfig[3].count;
+        if (totalSmall < 5) {
+            const difference = 5 - totalSmall;
+            obstacleConfig[2].count += Math.floor(difference / 2);
+            obstacleConfig[3].count += Math.ceil(difference / 2);
+        } else if (totalSmall > 6) {
+            const difference = totalSmall - 6;
+            obstacleConfig[2].count -= Math.floor(difference / 2);
+            obstacleConfig[3].count -= Math.ceil(difference / 2);
+        }
+        
+        // Generate obstacles based on configuration
+        for (let config of obstacleConfig) {
+            for (let i = 0; i < config.count; i++) {
+                // Find a valid position that doesn't conflict with snake or food
+                let position;
+                let attempts = 0;
+                do {
+                    position = {
+                        x: Math.floor(Math.random() * (this.tileCount - config.width)),
+                        y: Math.floor(Math.random() * (this.tileCount - config.height))
+                    };
+                    attempts++;
+                } while (this.isObstacleConflicting(position, config) && attempts < 100);
+                
+                if (attempts < 100) {
+                    this.obstacles.push({
+                        x: position.x,
+                        y: position.y,
+                        type: config.type,
+                        width: config.width,
+                        height: config.height
+                    });
+                }
             }
         }
     }

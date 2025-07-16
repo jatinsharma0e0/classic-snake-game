@@ -123,5 +123,5 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Added smooth connections between snake segments for fluid movement
 - Snake now starts with 3 blocks minimum body length for better gameplay
 - Added obstacle system with 4 types: 1-block-rock, 2-blocks-rock, 4-blocks-rock, 1-block-obstacle
-- Obstacles generate randomly (3-5 per game) and cause game over on collision
-- Food generation avoids obstacles and snake positions
+- Obstacles generate with specific counts: 3 big rocks (4-blocks), 4-5 medium rocks (2-blocks), 5-6 small rocks/obstacles
+- Obstacles cause game over on collision and are avoided by food generation
