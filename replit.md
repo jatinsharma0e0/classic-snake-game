@@ -133,3 +133,4 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Snake pupils change to X X immediately upon death and remain visible throughout hit animation
 - Updated start screen with beautiful jungle background image for immersive experience
 - Enhanced text styling with better contrast and readability over new background
+- Removed animated grid elements (trees, vines, leaves) to showcase clean jungle background image
