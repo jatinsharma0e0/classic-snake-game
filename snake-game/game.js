@@ -25,36 +25,87 @@ class SnakeGame {
         this.food = this.generateFood();
         
         // DOM elements
+        this.startScreen = document.getElementById('startScreen');
+        this.gameScreen = document.getElementById('gameScreen');
+        this.startGameBtn = document.getElementById('startGameBtn');
+        this.startScreenHighScore = document.getElementById('startScreenHighScore');
         this.scoreElement = document.getElementById('score');
         this.highScoreElement = document.getElementById('highScore');
         this.gameOverScreen = document.getElementById('gameOverScreen');
         this.finalScoreElement = document.getElementById('finalScore');
         this.bestScoreElement = document.getElementById('bestScore');
         this.restartBtn = document.getElementById('restartBtn');
+        this.backToMenuBtn = document.getElementById('backToMenuBtn');
         
         // Initialize game
         this.init();
     }
     
     init() {
-        // Update score display
+        // Show start screen initially
+        this.showStartScreen();
+        
+        // Update score displays
         this.updateScoreDisplay();
+        this.startScreenHighScore.textContent = this.highScore;
         
         // Event listeners
         document.addEventListener('keydown', (e) => this.handleKeyPress(e));
+        this.startGameBtn.addEventListener('click', () => this.showGameScreen());
         this.restartBtn.addEventListener('click', () => this.restartGame());
+        this.backToMenuBtn.addEventListener('click', () => this.showStartScreen());
         
         // Start game loop
         this.gameLoop();
     }
     
+    showStartScreen() {
+        this.startScreen.classList.remove('hidden');
+        this.gameScreen.classList.add('hidden');
+        this.gameRunning = false;
+        this.gameStarted = false;
+        document.body.style.overflow = 'hidden';
+        
+        // Update high score display on start screen
+        this.startScreenHighScore.textContent = this.highScore;
+    }
+    
+    showGameScreen() {
+        this.startScreen.classList.add('hidden');
+        this.gameScreen.classList.remove('hidden');
+        document.body.style.overflow = 'auto';
+        
+        // Reset and start the game
+        this.gameRunning = true;
+        this.gameStarted = true;
+        this.gameOverScreen.classList.add('hidden');
+        
+        // Reset game state
+        this.snake = [{ x: 10, y: 10 }];
+        this.direction = { x: 0, y: 0 };
+        this.lastDirection = { x: 0, y: 0 };
+        this.score = 0;
+        this.food = this.generateFood();
+        this.updateScoreDisplay();
+    }
+    
     handleKeyPress(e) {
         // Prevent default behavior for game keys
-        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space'].includes(e.code)) {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'Escape'].includes(e.code)) {
             e.preventDefault();
         }
         
-        // Start game or restart with Space
+        // ESC to return to menu
+        if (e.code === 'Escape') {
+            this.showStartScreen();
+            return;
+        }
+        
+        // Start game or restart with Space (only when on game screen)
+        if (e.code === 'Space' && !this.startScreen.classList.contains('hidden')) {
+            return; // Space does nothing on start screen
+        }
+        
         if (e.code === 'Space') {
             if (!this.gameStarted || !this.gameRunning) {
                 this.startGame();
@@ -62,8 +113,8 @@ class SnakeGame {
             return;
         }
         
-        // Don't process movement if game is not running
-        if (!this.gameRunning) return;
+        // Don't process movement if game is not running or on start screen
+        if (!this.gameRunning || !this.startScreen.classList.contains('hidden')) return;
         
         const newDirection = { ...this.direction };
         
@@ -103,6 +154,7 @@ class SnakeGame {
     }
     
     startGame() {
+        // This method is only called when Space is pressed on game screen
         this.gameRunning = true;
         this.gameStarted = true;
         this.gameOverScreen.classList.add('hidden');

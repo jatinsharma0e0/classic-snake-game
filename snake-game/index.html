@@ -7,7 +7,39 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
+    <!-- Start Screen -->
+    <div id="startScreen" class="start-screen">
+        <div class="jungle-background">
+            <div class="trees"></div>
+            <div class="vines"></div>
+            <div class="leaves"></div>
+        </div>
+        
+        <div class="start-content">
+            <h1 class="game-title">🐍 JUNGLE SNAKE</h1>
+            <div class="subtitle">Adventure awaits in the wild!</div>
+            
+            <div class="start-button-container">
+                <button id="startGameBtn" class="start-game-btn">
+                    START GAME
+                </button>
+                <div class="revolving-snake">
+                    <div class="snake-segment head"></div>
+                    <div class="snake-segment body"></div>
+                    <div class="snake-segment body"></div>
+                    <div class="snake-segment body"></div>
+                    <div class="snake-segment tail"></div>
+                </div>
+            </div>
+            
+            <div class="best-score-display">
+                Best Score: <span id="startScreenHighScore">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="game-container hidden">
         <div class="game-header">
             <h1>Snake Game</h1>
             <div class="score-container">
@@ -23,12 +55,13 @@
                 <p>Your Score: <span id="finalScore">0</span></p>
                 <p class="best-score">Best Score: <span id="bestScore">0</span></p>
                 <button id="restartBtn" class="restart-btn">Play Again</button>
+                <button id="backToMenuBtn" class="back-menu-btn">Back to Menu</button>
             </div>
         </div>
         
         <div class="controls-info">
             <p>Use Arrow Keys or WASD to move</p>
-            <p>Press Space to start/restart</p>
+            <p>Press ESC to return to menu</p>
         </div>
     </div>
 
