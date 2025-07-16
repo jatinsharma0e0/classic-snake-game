@@ -1,13 +1,28 @@
 class SnakeGame {
     constructor() {
-        // Canvas setup
+        // Canvas setup with performance optimizations
         this.canvas = document.getElementById('gameCanvas');
-        this.ctx = this.canvas.getContext('2d');
+        this.ctx = this.canvas.getContext('2d', {
+            alpha: false,              // Disable transparency for better performance
+            desynchronized: true,      // Allow async rendering
+            powerPreference: 'high-performance'
+        });
         
         // Game settings
         this.gridSize = 20;
         this.tileCountX = 40; // 40 blocks width
         this.tileCountY = 24; // 24 blocks height
+        
+        // Performance optimization settings
+        this.targetFPS = 60;
+        this.frameDuration = 1000 / this.targetFPS;
+        this.lastFrameTime = 0;
+        this.deltaTime = 0;
+        this.gameSpeed = 120; // Base game speed in ms
+        this.lastGameUpdate = 0;
+        this.frameCount = 0;
+        this.fpsBuffer = [];
+        this.maxFpsBufferSize = 30;
         
         // Game state
         this.gameRunning = false;
@@ -18,6 +33,13 @@ class SnakeGame {
         this.hitAnimationTimer = 0;
         this.knockbackOffset = { x: 0, y: 0 };
         this.isDead = false;
+        
+        // Performance caching
+        this.imageCache = new Map();
+        this.gradientCache = new Map();
+        this.pathCache = new Map();
+        this.dirtyRegions = [];
+        this.lastRenderState = null;
         
         // Snake properties - Start with 3 blocks
         this.snake = [
@@ -138,8 +160,12 @@ class SnakeGame {
         // Setup interaction restrictions
         this.setupInteractionRestrictions();
         
-        // Start game loop
-        this.gameLoop();
+        // Setup optimized performance features
+        this.setupOptimizedKeyboardHandling();
+        this.preloadOptimizedAssets();
+        
+        // Start optimized game loop
+        requestAnimationFrame((time) => this.gameLoop(time));
     }
     
     loadObstacleImages() {
@@ -609,15 +635,26 @@ class SnakeGame {
     }
     
     render() {
-        // Clear canvas with jungle background
-        this.drawJungleBackground();
+        // Performance: only clear dirty regions if possible, otherwise full clear
+        if (this.dirtyRegions.length > 0 && this.dirtyRegions.length < 10) {
+            // Clear only dirty regions for better performance
+            for (const region of this.dirtyRegions) {
+                this.ctx.clearRect(region.x, region.y, region.width, region.height);
+            }
+        } else {
+            // Full clear when too many dirty regions or first frame
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        
+        // Draw background (cached)
+        this.drawJungleBackgroundOptimized();
         
         // Apply hit animation effects
         if (this.hitAnimation) {
             this.ctx.save();
             
-            // Update hit animation timer
-            this.hitAnimationTimer += 16; // Assuming 60fps
+            // Update hit animation timer with delta time
+            this.hitAnimationTimer += this.deltaTime;
             
             // Create shake effect
             const shakeIntensity = Math.max(0, 1 - this.hitAnimationTimer / 1000);
@@ -630,7 +667,7 @@ class SnakeGame {
                 this.knockbackOffset.y * shakeIntensity + shakeY
             );
             
-            // Flash effect
+            // Flash effect (optimized)
             const flashIntensity = Math.sin(this.hitAnimationTimer * 0.02) * 0.5 + 0.5;
             this.ctx.globalAlpha = 0.7 + flashIntensity * 0.3;
             
@@ -639,14 +676,14 @@ class SnakeGame {
             this.ctx.fillRect(-20, -20, this.canvas.width + 40, this.canvas.height + 40);
         }
         
-        // Draw obstacles
-        this.drawObstacles();
+        // Draw obstacles (optimized)
+        this.drawObstaclesOptimized();
         
-        // Draw food
-        this.drawApple(this.food.x * this.gridSize, this.food.y * this.gridSize);
+        // Draw food (optimized)
+        this.drawAppleOptimized(this.food.x * this.gridSize, this.food.y * this.gridSize);
         
-        // Draw continuous snake
-        this.drawContinuousSnake();
+        // Draw continuous snake (optimized)
+        this.drawContinuousSnakeOptimized();
         
         // Draw start message if game hasn't started
         if (!this.gameStarted) {
@@ -657,23 +694,57 @@ class SnakeGame {
         if (this.hitAnimation) {
             this.ctx.restore();
         }
+        
+        // Clear dirty regions for next frame
+        this.dirtyRegions = [];
     }
     
-    drawObstacles() {
+    // Optimized background drawing with caching
+    drawJungleBackgroundOptimized() {
+        if (this.grassBg.complete) {
+            // Cache pattern if not exists
+            if (!this.imageCache.has('backgroundPattern')) {
+                const pattern = this.ctx.createPattern(this.grassBg, 'no-repeat');
+                this.imageCache.set('backgroundPattern', pattern);
+            }
+            
+            this.ctx.drawImage(this.grassBg, 0, 0, this.canvas.width, this.canvas.height);
+        } else {
+            // Use cached gradient for fallback
+            if (!this.gradientCache.has('backgroundGradient')) {
+                const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+                gradient.addColorStop(0, '#9ACD32');
+                gradient.addColorStop(0.25, '#7FFF00');
+                gradient.addColorStop(0.5, '#ADFF2F');
+                gradient.addColorStop(0.75, '#98FB98');
+                gradient.addColorStop(1, '#90EE90');
+                this.gradientCache.set('backgroundGradient', gradient);
+            }
+            
+            this.ctx.fillStyle = this.gradientCache.get('backgroundGradient');
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    }
+    
+    drawObstaclesOptimized() {
         if (!this.obstacles || !Array.isArray(this.obstacles)) {
             return;
         }
         
+        // Performance: batch draw operations
         for (let obstacle of this.obstacles) {
             const img = this.obstacleImages[obstacle.type];
             if (img && img.complete) {
-                this.ctx.drawImage(
-                    img,
-                    obstacle.x * this.gridSize,
-                    obstacle.y * this.gridSize,
-                    obstacle.width * this.gridSize,
-                    obstacle.height * this.gridSize
-                );
+                // Simple frustum culling - only draw if on screen
+                const x = obstacle.x * this.gridSize;
+                const y = obstacle.y * this.gridSize;
+                const width = obstacle.width * this.gridSize;
+                const height = obstacle.height * this.gridSize;
+                
+                if (x + width >= 0 && x <= this.canvas.width && 
+                    y + height >= 0 && y <= this.canvas.height) {
+                    this.ctx.drawImage(img, x, y, width, height);
+                }
             }
         }
     }
@@ -771,49 +842,55 @@ class SnakeGame {
         this.ctx.shadowOffsetY = 0;
     }
     
-    drawApple(x, y) {
+    drawAppleOptimized(x, y) {
         const centerX = x + this.gridSize / 2;
         const centerY = y + this.gridSize / 2;
         const radius = this.gridSize / 2 - 2;
         
-        // Apple body (red gradient)
-        const appleGradient = this.ctx.createRadialGradient(
-            centerX - radius/3, centerY - radius/3, 0,
-            centerX, centerY, radius
-        );
-        appleGradient.addColorStop(0, '#FF6B6B');
-        appleGradient.addColorStop(1, '#E74C3C');
+        // Cache apple gradient for reuse
+        const gradientKey = `apple_${radius}`;
+        if (!this.gradientCache.has(gradientKey)) {
+            const appleGradient = this.ctx.createRadialGradient(
+                -radius/3, -radius/3, 0, 0, 0, radius
+            );
+            appleGradient.addColorStop(0, '#FF6B6B');
+            appleGradient.addColorStop(1, '#E74C3C');
+            this.gradientCache.set(gradientKey, appleGradient);
+        }
         
-        this.ctx.fillStyle = appleGradient;
+        // Performance: reduce canvas state changes
+        this.ctx.save();
+        this.ctx.translate(centerX, centerY);
+        
+        // Apple body
+        this.ctx.fillStyle = this.gradientCache.get(gradientKey);
         this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY + 1, radius, 0, Math.PI * 2);
+        this.ctx.arc(0, 1, radius, 0, Math.PI * 2);
         this.ctx.fill();
         
-        // Apple shadow
-        this.ctx.shadowColor = 'rgba(231, 76, 60, 0.5)';
-        this.ctx.shadowBlur = 8;
-        this.ctx.shadowOffsetX = 2;
-        this.ctx.shadowOffsetY = 2;
+        // Simplified shadow (no blur for performance)
+        this.ctx.fillStyle = 'rgba(231, 76, 60, 0.3)';
+        this.ctx.beginPath();
+        this.ctx.arc(2, 3, radius, 0, Math.PI * 2);
         this.ctx.fill();
-        this.ctx.shadowBlur = 0;
-        this.ctx.shadowOffsetX = 0;
-        this.ctx.shadowOffsetY = 0;
         
-        // Apple stem (brown)
+        // Apple stem
         this.ctx.fillStyle = '#8B4513';
-        this.ctx.fillRect(centerX - 1, centerY - radius - 2, 2, 4);
+        this.ctx.fillRect(-1, -radius - 2, 2, 4);
         
-        // Leaf (green)
+        // Leaf
         this.ctx.fillStyle = '#27AE60';
         this.ctx.beginPath();
-        this.ctx.ellipse(centerX + 3, centerY - radius, 3, 2, Math.PI / 4, 0, Math.PI * 2);
+        this.ctx.ellipse(3, -radius, 3, 2, Math.PI / 4, 0, Math.PI * 2);
         this.ctx.fill();
         
         // Apple highlight
         this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
         this.ctx.beginPath();
-        this.ctx.arc(centerX - radius/3, centerY - radius/3, radius/3, 0, Math.PI * 2);
+        this.ctx.arc(-radius/3, -radius/3, radius/3, 0, Math.PI * 2);
         this.ctx.fill();
+        
+        this.ctx.restore();
     }
     
     drawJungleBackground() {
@@ -834,14 +911,138 @@ class SnakeGame {
         }
     }
     
-    drawContinuousSnake() {
+    drawContinuousSnakeOptimized() {
         if (this.snake.length === 0) return;
         
-        // Draw continuous snake body first
-        this.drawSnakeBody();
+        // Performance: check if snake actually moved before redrawing
+        const currentSnakeState = this.snake.map(s => `${s.x},${s.y}`).join('|');
+        if (this.lastRenderState?.snake === currentSnakeState && !this.hitAnimation) {
+            return; // Skip redraw if snake hasn't moved
+        }
         
-        // Then draw the head with eyes on top
-        this.drawSnakeHead();
+        // Draw optimized snake body first
+        this.drawSnakeBodyOptimized();
+        
+        // Then draw the optimized head with eyes on top
+        this.drawSnakeHeadOptimized();
+        
+        // Update render state
+        if (!this.lastRenderState) this.lastRenderState = {};
+        this.lastRenderState.snake = currentSnakeState;
+    }
+    
+    drawSnakeBodyOptimized() {
+        if (this.snake.length === 0) return;
+        
+        const bodyWidth = this.gridSize * 0.8;
+        
+        // Cache snake body gradient
+        if (!this.gradientCache.has('snakeBody')) {
+            const gradient = this.ctx.createLinearGradient(0, 0, 0, bodyWidth);
+            gradient.addColorStop(0, '#6495ED');
+            gradient.addColorStop(0.5, '#4169E1');
+            gradient.addColorStop(1, '#1E3A8A');
+            this.gradientCache.set('snakeBody', gradient);
+        }
+        
+        // Performance: create single path for entire snake
+        this.ctx.beginPath();
+        
+        for (let i = 0; i < this.snake.length; i++) {
+            const segment = this.snake[i];
+            const x = segment.x * this.gridSize + this.gridSize / 2;
+            const y = segment.y * this.gridSize + this.gridSize / 2;
+            
+            if (i === 0) {
+                this.ctx.moveTo(x, y);
+            } else {
+                this.ctx.lineTo(x, y);
+            }
+        }
+        
+        // Single stroke for entire body
+        this.ctx.strokeStyle = this.gradientCache.get('snakeBody');
+        this.ctx.lineWidth = bodyWidth;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        this.ctx.stroke();
+    }
+    
+    drawSnakeHeadOptimized() {
+        if (this.snake.length === 0) return;
+        
+        const head = this.snake[0];
+        const centerX = head.x * this.gridSize + this.gridSize / 2;
+        const centerY = head.y * this.gridSize + this.gridSize / 2;
+        const radius = this.gridSize * 0.4;
+        
+        // Calculate rotation angle based on direction
+        let angle = 0;
+        if (this.direction.x === 1) angle = 0; // Right
+        else if (this.direction.x === -1) angle = Math.PI; // Left
+        else if (this.direction.y === 1) angle = Math.PI / 2; // Down
+        else if (this.direction.y === -1) angle = -Math.PI / 2; // Up
+        
+        // Cache head gradient
+        if (!this.gradientCache.has('snakeHead')) {
+            const gradient = this.ctx.createRadialGradient(-radius/3, -radius/3, 0, 0, 0, radius);
+            gradient.addColorStop(0, '#6495ED');
+            gradient.addColorStop(1, '#4169E1');
+            this.gradientCache.set('snakeHead', gradient);
+        }
+        
+        // Performance: save/restore only when needed
+        this.ctx.save();
+        this.ctx.translate(centerX, centerY);
+        this.ctx.rotate(angle);
+        
+        // Head circle
+        this.ctx.fillStyle = this.gradientCache.get('snakeHead');
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Draw eyes efficiently (solid colors only for performance)
+        const eyeOffset = radius * 0.4;
+        const eyeSize = radius * 0.25;
+        
+        // White eyes
+        this.ctx.fillStyle = 'white';
+        this.ctx.beginPath();
+        this.ctx.arc(eyeOffset, -eyeOffset * 0.5, eyeSize, 0, Math.PI * 2);
+        this.ctx.arc(-eyeOffset, -eyeOffset * 0.5, eyeSize, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Pupils (check for death state)
+        this.ctx.fillStyle = 'black';
+        this.ctx.beginPath();
+        if (this.isDead) {
+            // Draw X X for dead eyes (performance optimized)
+            const pupilSize = eyeSize * 0.6;
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = 'black';
+            
+            // Left eye X
+            this.ctx.moveTo(-eyeOffset - pupilSize/2, -eyeOffset * 0.5 - pupilSize/2);
+            this.ctx.lineTo(-eyeOffset + pupilSize/2, -eyeOffset * 0.5 + pupilSize/2);
+            this.ctx.moveTo(-eyeOffset + pupilSize/2, -eyeOffset * 0.5 - pupilSize/2);
+            this.ctx.lineTo(-eyeOffset - pupilSize/2, -eyeOffset * 0.5 + pupilSize/2);
+            
+            // Right eye X
+            this.ctx.moveTo(eyeOffset - pupilSize/2, -eyeOffset * 0.5 - pupilSize/2);
+            this.ctx.lineTo(eyeOffset + pupilSize/2, -eyeOffset * 0.5 + pupilSize/2);
+            this.ctx.moveTo(eyeOffset + pupilSize/2, -eyeOffset * 0.5 - pupilSize/2);
+            this.ctx.lineTo(eyeOffset - pupilSize/2, -eyeOffset * 0.5 + pupilSize/2);
+            
+            this.ctx.stroke();
+        } else {
+            // Normal pupils
+            this.ctx.arc(eyeOffset, -eyeOffset * 0.5, eyeSize * 0.4, 0, Math.PI * 2);
+            this.ctx.arc(-eyeOffset, -eyeOffset * 0.5, eyeSize * 0.4, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        
+        this.ctx.restore();
     }
     
     drawSnakeBody() {
@@ -1094,19 +1295,67 @@ class SnakeGame {
         this.updateScoreDisplay();
     }
     
-    gameLoop() {
-        // Update game logic only if not in hit animation
-        if (!this.hitAnimation) {
-            this.updateGame();
+    gameLoop(currentTime) {
+        // Initialize timing on first frame
+        if (!this.lastFrameTime) {
+            this.lastFrameTime = currentTime;
+            this.lastGameUpdate = currentTime;
         }
         
-        // Always render (for hit animation effects)
-        this.render();
+        // Calculate delta time
+        this.deltaTime = currentTime - this.lastFrameTime;
+        this.lastFrameTime = currentTime;
         
-        // Continue game loop
-        setTimeout(() => {
-            requestAnimationFrame(() => this.gameLoop());
-        }, 120); // Game speed - lower number = faster game
+        // FPS monitoring for adaptive performance
+        this.updateFPS(this.deltaTime);
+        
+        // Adaptive frame rate - reduce update frequency on low-end devices
+        const adaptiveFrameDuration = this.getAdaptiveFrameDuration();
+        
+        if (this.deltaTime >= adaptiveFrameDuration) {
+            // Update game logic at fixed intervals
+            if (currentTime - this.lastGameUpdate >= this.gameSpeed) {
+                if (!this.hitAnimation) {
+                    this.updateGame();
+                }
+                this.lastGameUpdate = currentTime;
+            }
+            
+            // Always render for smooth animations
+            this.render();
+            this.frameCount++;
+        }
+        
+        // Continue game loop using RAF for optimal timing
+        requestAnimationFrame((time) => this.gameLoop(time));
+    }
+    
+    updateFPS(deltaTime) {
+        const fps = 1000 / deltaTime;
+        this.fpsBuffer.push(fps);
+        
+        if (this.fpsBuffer.length > this.maxFpsBufferSize) {
+            this.fpsBuffer.shift();
+        }
+    }
+    
+    getAverageFPS() {
+        if (this.fpsBuffer.length === 0) return 60;
+        const sum = this.fpsBuffer.reduce((a, b) => a + b, 0);
+        return sum / this.fpsBuffer.length;
+    }
+    
+    getAdaptiveFrameDuration() {
+        const avgFPS = this.getAverageFPS();
+        
+        // If FPS is consistently low, reduce update frequency
+        if (avgFPS < 30) {
+            return this.frameDuration * 2; // 30 FPS
+        } else if (avgFPS < 45) {
+            return this.frameDuration * 1.33; // 45 FPS
+        }
+        
+        return this.frameDuration; // Target 60 FPS
     }
     
     setupInteractionRestrictions() {
@@ -1674,6 +1923,84 @@ class SnakeGame {
         apple.y = newPosition.y;
         apple.eaten = false;
         apple.element = this.createAppleElement(newPosition.x, newPosition.y, apple.id);
+    }
+    
+    // Performance optimization methods
+    setupOptimizedKeyboardHandling() {
+        // Throttle key presses to prevent spam and improve performance
+        let lastKeyTime = 0;
+        const keyThrottleDelay = 50; // Minimum time between key presses
+        
+        const throttledKeyHandler = (e) => {
+            const now = performance.now();
+            if (now - lastKeyTime < keyThrottleDelay) {
+                return; // Ignore rapid key presses
+            }
+            lastKeyTime = now;
+            this.handleKeyPress(e);
+        };
+        
+        document.addEventListener('keydown', throttledKeyHandler, { passive: false });
+    }
+    
+    preloadOptimizedAssets() {
+        // Pre-create commonly used gradients for performance
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Create and cache common gradients
+        const radius = this.gridSize / 2;
+        
+        // Apple gradient
+        const appleGradient = tempCtx.createRadialGradient(-radius/3, -radius/3, 0, 0, 0, radius);
+        appleGradient.addColorStop(0, '#FF6B6B');
+        appleGradient.addColorStop(1, '#E74C3C');
+        this.gradientCache.set(`apple_${radius-2}`, appleGradient);
+        
+        // Snake body gradient
+        const bodyGradient = tempCtx.createLinearGradient(0, 0, 0, this.gridSize * 0.8);
+        bodyGradient.addColorStop(0, '#6495ED');
+        bodyGradient.addColorStop(0.5, '#4169E1');
+        bodyGradient.addColorStop(1, '#1E3A8A');
+        this.gradientCache.set('snakeBody', bodyGradient);
+        
+        // Snake head gradient
+        const headRadius = this.gridSize * 0.4;
+        const headGradient = tempCtx.createRadialGradient(-headRadius/3, -headRadius/3, 0, 0, 0, headRadius);
+        headGradient.addColorStop(0, '#6495ED');
+        headGradient.addColorStop(1, '#4169E1');
+        this.gradientCache.set('snakeHead', headGradient);
+        
+        // Background gradient
+        const bgGradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+        bgGradient.addColorStop(0, '#9ACD32');
+        bgGradient.addColorStop(0.25, '#7FFF00');
+        bgGradient.addColorStop(0.5, '#ADFF2F');
+        bgGradient.addColorStop(0.75, '#98FB98');
+        bgGradient.addColorStop(1, '#90EE90');
+        this.gradientCache.set('backgroundGradient', bgGradient);
+    }
+    
+    // Object pooling for better memory management
+    initializeObjectPools() {
+        this.particlePool = [];
+        this.pathPool = [];
+        
+        // Pre-allocate objects to avoid garbage collection during gameplay
+        for (let i = 0; i < 100; i++) {
+            this.particlePool.push({ x: 0, y: 0, active: false });
+            this.pathPool.push({ x: 0, y: 0 });
+        }
+    }
+    
+    // Add dirty region tracking for optimized rendering
+    addDirtyRegion(x, y, width, height) {
+        this.dirtyRegions.push({
+            x: Math.max(0, x - 5), // Add small padding
+            y: Math.max(0, y - 5),
+            width: Math.min(this.canvas.width, width + 10),
+            height: Math.min(this.canvas.height, height + 10)
+        });
     }
 }
 

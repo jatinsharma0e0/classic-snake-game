@@ -48,6 +48,12 @@ html {
     -moz-user-drag: none;
     -o-user-drag: none;
     user-drag: none;
+    
+    /* Performance optimizations */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 body {

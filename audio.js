@@ -1,4 +1,4 @@
-// Audio System for Snake Game
+// Audio System for Snake Game - Performance Optimized
 class AudioManager {
     constructor() {
         this.audioContext = null;
@@ -10,6 +10,13 @@ class AudioManager {
         this.musicVolume = 0.3;
         this.sfxVolume = 0.5;
         this.onStartScreen = true; // Track which screen we're on
+        
+        // Performance optimizations
+        this.soundCooldowns = new Map();
+        this.maxConcurrentSounds = 6; // Limit for mobile performance
+        this.activeSources = [];
+        this.audioPool = new Map(); // Reuse audio nodes
+        this.lastPlayTime = new Map(); // Prevent audio spam
         
         this.initializeAudio();
         this.createSounds();
