@@ -227,9 +227,10 @@ class SnakeGame {
         
         this.snake.unshift(head);
         
-        // Check if snake is near food (within 1 block)
+        // Check if snake is near food (within 1 block) and facing towards it
         const distanceToFood = Math.abs(head.x - this.food.x) + Math.abs(head.y - this.food.y);
-        this.mouthOpen = distanceToFood <= 1;
+        const facingFood = this.isFacingFood(head, this.food);
+        this.mouthOpen = distanceToFood <= 1 && facingFood;
         
         // Random tongue animation
         if (Date.now() - this.lastTongueTime > 2000 + Math.random() * 3000) {
@@ -265,6 +266,27 @@ class SnakeGame {
         if (this.direction.x !== 0 || this.direction.y !== 0) {
             this.lastDirection = { ...this.direction };
         }
+    }
+    
+    isFacingFood(head, food) {
+        // Check if the snake is moving towards the food
+        const dx = food.x - head.x;
+        const dy = food.y - head.y;
+        
+        // If food is directly adjacent, consider it as facing
+        if (Math.abs(dx) <= 1 && Math.abs(dy) <= 1) {
+            return true;
+        }
+        
+        // Check if current direction aligns with food direction
+        if (this.direction.x !== 0) {
+            return (this.direction.x > 0 && dx > 0) || (this.direction.x < 0 && dx < 0);
+        }
+        if (this.direction.y !== 0) {
+            return (this.direction.y > 0 && dy > 0) || (this.direction.y < 0 && dy < 0);
+        }
+        
+        return false;
     }
     
     gameOver() {
@@ -567,9 +589,30 @@ class SnakeGame {
         
         // Mouth (open if near food)
         if (this.mouthOpen) {
+            // Create a more visible open mouth
             this.ctx.fillStyle = '#8B0000';
             this.ctx.beginPath();
-            this.ctx.arc(centerX, centerY + eyeOffset/2, 2, 0, Math.PI, false);
+            this.ctx.arc(centerX, centerY + eyeOffset/2, 4, 0, Math.PI, false);
+            this.ctx.fill();
+            
+            // Add mouth interior shadow
+            this.ctx.fillStyle = '#4B0000';
+            this.ctx.beginPath();
+            this.ctx.arc(centerX, centerY + eyeOffset/2, 3, 0, Math.PI, false);
+            this.ctx.fill();
+            
+            // Add teeth/fangs
+            this.ctx.fillStyle = 'white';
+            this.ctx.beginPath();
+            this.ctx.moveTo(centerX - 3, centerY + eyeOffset/2);
+            this.ctx.lineTo(centerX - 2, centerY + eyeOffset/2 + 2);
+            this.ctx.lineTo(centerX - 1, centerY + eyeOffset/2);
+            this.ctx.fill();
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(centerX + 3, centerY + eyeOffset/2);
+            this.ctx.lineTo(centerX + 2, centerY + eyeOffset/2 + 2);
+            this.ctx.lineTo(centerX + 1, centerY + eyeOffset/2);
             this.ctx.fill();
         }
         
