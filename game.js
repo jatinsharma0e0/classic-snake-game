@@ -237,7 +237,7 @@ class SnakeGame {
         // }
         
         // Random tongue animation (only when not eating)
-        if (!this.mouthOpen && Date.now() - this.lastTongueTime > 3000 + Math.random() * 5000) {
+        if (!this.mouthOpen && Date.now() - this.lastTongueTime > 7000) {
             this.tongueOut = true;
             this.tongueTimer = 200; // Show tongue for 200ms
             this.lastTongueTime = Date.now();

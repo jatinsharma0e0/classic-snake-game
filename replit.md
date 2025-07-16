@@ -112,3 +112,12 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Replaced snake emoji with custom snake icon image (snake-icon.png)
 - Added animated snake icon with wiggle effect in title
 - Updated title layout to flex display for proper icon alignment
+
+**Enhanced Game Features (July 16, 2025):**
+- Enhanced game screen with jungle-themed green gradient background
+- Replaced circular snake segments with continuous blue snake body
+- Added distinct snake head with white eyes and black pupils
+- Implemented mouth opening animation when within 1 block of food
+- Added red tongue animation that appears every 7 seconds when not eating
+- Snake mouth opens with visible teeth and fangs when approaching food
+- Added smooth connections between snake segments for fluid movement
