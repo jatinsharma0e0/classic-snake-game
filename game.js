@@ -231,15 +231,15 @@ class SnakeGame {
         const distanceToFood = Math.abs(head.x - this.food.x) + Math.abs(head.y - this.food.y);
         this.mouthOpen = distanceToFood <= 1;
         
-        // Debug logging
-        if (this.mouthOpen) {
-            console.log('Mouth is open! Distance to food:', distanceToFood, 'Head:', head, 'Food:', this.food);
-        }
+        // Remove debug logging
+        // if (this.mouthOpen) {
+        //     console.log('Mouth is open! Distance to food:', distanceToFood, 'Head:', head, 'Food:', this.food);
+        // }
         
-        // Random tongue animation
-        if (Date.now() - this.lastTongueTime > 2000 + Math.random() * 3000) {
+        // Random tongue animation (only when not eating)
+        if (!this.mouthOpen && Date.now() - this.lastTongueTime > 3000 + Math.random() * 5000) {
             this.tongueOut = true;
-            this.tongueTimer = 300; // Show tongue for 300ms
+            this.tongueTimer = 200; // Show tongue for 200ms
             this.lastTongueTime = Date.now();
         }
         
@@ -628,17 +628,17 @@ class SnakeGame {
             this.ctx.stroke();
         }
         
-        // Tongue (if extended)
-        if (this.tongueOut) {
+        // Tongue (if extended and mouth is closed)
+        if (this.tongueOut && !this.mouthOpen) {
             this.ctx.strokeStyle = '#FF0000';
             this.ctx.lineWidth = 2;
             this.ctx.beginPath();
-            this.ctx.moveTo(centerX, centerY + eyeOffset/2);
-            this.ctx.lineTo(centerX, centerY + eyeOffset/2 + 6);
-            this.ctx.moveTo(centerX, centerY + eyeOffset/2 + 6);
-            this.ctx.lineTo(centerX - 2, centerY + eyeOffset/2 + 8);
-            this.ctx.moveTo(centerX, centerY + eyeOffset/2 + 6);
-            this.ctx.lineTo(centerX + 2, centerY + eyeOffset/2 + 8);
+            this.ctx.moveTo(centerX, centerY + radius/2);
+            this.ctx.lineTo(centerX, centerY + radius/2 + 8);
+            this.ctx.moveTo(centerX, centerY + radius/2 + 8);
+            this.ctx.lineTo(centerX - 2, centerY + radius/2 + 10);
+            this.ctx.moveTo(centerX, centerY + radius/2 + 8);
+            this.ctx.lineTo(centerX + 2, centerY + radius/2 + 10);
             this.ctx.stroke();
         }
     }
