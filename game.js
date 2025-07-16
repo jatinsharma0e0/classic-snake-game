@@ -409,12 +409,12 @@ class SnakeGame {
         // }
         
         // Random tongue animation (only when not eating)
-        // Random interval between 10-15 seconds (10000-15000ms)
+        // Random interval between 5-8 seconds for more frequent tongue flicks
         if (!this.mouthOpen && Date.now() - this.lastTongueTime > this.nextTongueTime) {
             this.tongueOut = true;
-            this.tongueTimer = 200; // Show tongue for 200ms
+            this.tongueTimer = 500; // Show tongue for 500ms (increased for better visibility)
             this.lastTongueTime = Date.now();
-            this.nextTongueTime = 10000 + Math.random() * 5000; // Set next random interval
+            this.nextTongueTime = 5000 + Math.random() * 3000; // Set next random interval (5-8 seconds)
         }
         
         if (this.tongueOut) {
@@ -926,18 +926,18 @@ class SnakeGame {
         
         // Tongue (if extended and mouth is closed)
         if (this.tongueOut && !this.mouthOpen) {
-            // Update wiggle animation
-            this.tongueWiggleTimer += 16; // Assuming 60fps
+            // Update wiggle animation with current time for consistent animation
+            const currentTime = Date.now();
             
-            // Create wiggle effect - subtle side-to-side movement
-            const wiggleFrequency = 0.008; // Speed of wiggle
-            const wiggleAmplitude = 1.5; // How far it wiggles
-            const wiggleOffset = Math.sin(this.tongueWiggleTimer * wiggleFrequency) * wiggleAmplitude;
+            // Create wiggle effect - more noticeable side-to-side movement
+            const wiggleFrequency = 0.01; // Speed of wiggle
+            const wiggleAmplitude = 3; // How far it wiggles (increased for visibility)
+            const wiggleOffset = Math.sin(currentTime * wiggleFrequency) * wiggleAmplitude;
             
             // Create slight vertical bobbing
-            const bobFrequency = 0.006;
-            const bobAmplitude = 0.5;
-            const bobOffset = Math.sin(this.tongueWiggleTimer * bobFrequency) * bobAmplitude;
+            const bobFrequency = 0.008;
+            const bobAmplitude = 1.5; // Increased for visibility
+            const bobOffset = Math.sin(currentTime * bobFrequency) * bobAmplitude;
             
             this.ctx.strokeStyle = '#FF0000';
             this.ctx.lineWidth = 2;

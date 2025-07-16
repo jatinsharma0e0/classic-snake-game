@@ -143,3 +143,5 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Added directional rotation so head features rotate with snake movement direction
 - Eyes now positioned at front of head with proper vertical separation
 - Mouth and tongue positioned at front tip of head for realistic appearance
+- Enhanced tongue wiggle animation with increased amplitude and visibility
+- Increased tongue display duration and frequency for better visual feedback
