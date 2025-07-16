@@ -93,15 +93,16 @@ class SnakeGame {
         this.gameStarted = true;
         this.gameOverScreen.classList.add('hidden');
         
-        // Reset game state
-        this.snake = [{ x: 10, y: 10 }];
+        // Reset game state - Start with 3 blocks
+        this.snake = [
+            { x: 10, y: 10 },
+            { x: 9, y: 10 },
+            { x: 8, y: 10 }
+        ];
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         this.score = 0;
-        this.gameApples = [
-            { x: 5, y: 5, active: true, snakePassedThrough: false },
-            { x: 15, y: 15, active: true, snakePassedThrough: false }
-        ];
+        this.food = this.generateFood();
         this.updateScoreDisplay();
     }
     
