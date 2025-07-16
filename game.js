@@ -28,6 +28,13 @@ class SnakeGame {
         this.mouthOpen = false;
         this.lastTongueTime = 0;
         
+        // Smooth movement properties
+        this.smoothSnake = [];
+        this.moveProgress = 0;
+        this.gameSpeed = 150; // milliseconds between moves
+        this.lastMoveTime = 0;
+        this.interpolationFactor = 0;
+        
         // Food properties - Normal random generation for gameplay
         this.food = this.generateFood();
         
@@ -100,6 +107,11 @@ class SnakeGame {
             { x: 15, y: 15, active: true, snakePassedThrough: false }
         ];
         this.updateScoreDisplay();
+        
+        // Reset smooth movement
+        this.smoothSnake = this.snake.map(segment => ({ ...segment }));
+        this.moveProgress = 0;
+        this.lastMoveTime = Date.now();
     }
     
     handleKeyPress(e) {
@@ -207,35 +219,73 @@ class SnakeGame {
         // Don't move if no direction is set (snake hasn't started moving)
         if (this.direction.x === 0 && this.direction.y === 0) return;
         
-        // Move snake
-        const head = { ...this.snake[0] };
-        head.x += this.direction.x;
-        head.y += this.direction.y;
+        const currentTime = Date.now();
         
-        // Check wall collision
-        if (head.x < 0 || head.x >= this.tileCount || 
-            head.y < 0 || head.y >= this.tileCount) {
-            this.gameOver();
-            return;
+        // Check if it's time to move
+        if (currentTime - this.lastMoveTime >= this.gameSpeed) {
+            // Move snake
+            const head = { ...this.snake[0] };
+            head.x += this.direction.x;
+            head.y += this.direction.y;
+            
+            // Check wall collision
+            if (head.x < 0 || head.x >= this.tileCount || 
+                head.y < 0 || head.y >= this.tileCount) {
+                this.gameOver();
+                return;
+            }
+            
+            // Check self collision
+            if (this.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                this.gameOver();
+                return;
+            }
+            
+            this.snake.unshift(head);
+            
+            // Check food collision
+            if (head.x === this.food.x && head.y === this.food.y) {
+                this.score += 10;
+                this.updateScoreDisplay();
+                this.food = this.generateFood();
+                
+                // Update high score if needed
+                if (this.score > this.highScore) {
+                    this.highScore = this.score;
+                    this.saveHighScore();
+                }
+            } else {
+                // Remove tail if no food eaten
+                this.snake.pop();
+            }
+            
+            // Update last direction for reverse prevention
+            if (this.direction.x !== 0 || this.direction.y !== 0) {
+                this.lastDirection = { ...this.direction };
+            }
+            
+            // Reset movement timing
+            this.lastMoveTime = currentTime;
+            this.moveProgress = 0;
         }
         
-        // Check self collision
-        if (this.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-            this.gameOver();
-            return;
-        }
+        // Calculate smooth interpolation
+        this.moveProgress = (currentTime - this.lastMoveTime) / this.gameSpeed;
+        this.moveProgress = Math.min(this.moveProgress, 1);
         
-        this.snake.unshift(head);
+        // Update smooth snake positions
+        this.updateSmoothSnake();
         
         // Check if snake is near food (within 1 block)
+        const head = this.snake[0];
         const distanceToFood = Math.abs(head.x - this.food.x) + Math.abs(head.y - this.food.y);
         this.mouthOpen = distanceToFood <= 1;
         
         // Random tongue animation
-        if (Date.now() - this.lastTongueTime > 2000 + Math.random() * 3000) {
+        if (currentTime - this.lastTongueTime > 2000 + Math.random() * 3000) {
             this.tongueOut = true;
             this.tongueTimer = 300; // Show tongue for 300ms
-            this.lastTongueTime = Date.now();
+            this.lastTongueTime = currentTime;
         }
         
         if (this.tongueOut) {
@@ -244,26 +294,35 @@ class SnakeGame {
                 this.tongueOut = false;
             }
         }
+    }
+    
+    updateSmoothSnake() {
+        this.smoothSnake = [];
         
-        // Check food collision
-        if (head.x === this.food.x && head.y === this.food.y) {
-            this.score += 10;
-            this.updateScoreDisplay();
-            this.food = this.generateFood();
+        for (let i = 0; i < this.snake.length; i++) {
+            const current = this.snake[i];
+            let smoothX = current.x;
+            let smoothY = current.y;
             
-            // Update high score if needed
-            if (this.score > this.highScore) {
-                this.highScore = this.score;
-                this.saveHighScore();
+            // Interpolate between previous and current position
+            if (i === 0 && this.direction.x !== 0 || this.direction.y !== 0) {
+                // Head interpolation
+                const prevX = current.x - this.direction.x;
+                const prevY = current.y - this.direction.y;
+                
+                smoothX = prevX + (current.x - prevX) * this.moveProgress;
+                smoothY = prevY + (current.y - prevY) * this.moveProgress;
+            } else if (i > 0) {
+                // Body segment interpolation
+                const next = this.snake[i - 1];
+                const prevX = next.x;
+                const prevY = next.y;
+                
+                smoothX = prevX + (current.x - prevX) * (1 - this.moveProgress);
+                smoothY = prevY + (current.y - prevY) * (1 - this.moveProgress);
             }
-        } else {
-            // Remove tail if no food eaten
-            this.snake.pop();
-        }
-        
-        // Update last direction for reverse prevention
-        if (this.direction.x !== 0 || this.direction.y !== 0) {
-            this.lastDirection = { ...this.direction };
+            
+            this.smoothSnake.push({ x: smoothX, y: smoothY });
         }
     }
     
@@ -460,16 +519,15 @@ class SnakeGame {
     }
     
     drawSnakeBody() {
-        if (this.snake.length === 0) return;
+        if (this.smoothSnake.length === 0) return;
         
         const bodyWidth = this.gridSize * 0.8;
-        const bodyHeight = this.gridSize * 0.6;
         
-        // Create path for snake body
+        // Create path for snake body using smooth positions
         this.ctx.beginPath();
         
-        for (let i = 0; i < this.snake.length; i++) {
-            const segment = this.snake[i];
+        for (let i = 0; i < this.smoothSnake.length; i++) {
+            const segment = this.smoothSnake[i];
             const x = segment.x * this.gridSize + this.gridSize / 2;
             const y = segment.y * this.gridSize + this.gridSize / 2;
             
@@ -491,8 +549,8 @@ class SnakeGame {
         
         // Add inner body highlight
         this.ctx.beginPath();
-        for (let i = 0; i < this.snake.length; i++) {
-            const segment = this.snake[i];
+        for (let i = 0; i < this.smoothSnake.length; i++) {
+            const segment = this.smoothSnake[i];
             const x = segment.x * this.gridSize + this.gridSize / 2;
             const y = segment.y * this.gridSize + this.gridSize / 2;
             
@@ -511,9 +569,9 @@ class SnakeGame {
     }
     
     drawSnakeHead() {
-        if (this.snake.length === 0) return;
+        if (this.smoothSnake.length === 0) return;
         
-        const head = this.snake[0];
+        const head = this.smoothSnake[0];
         const centerX = head.x * this.gridSize + this.gridSize / 2;
         const centerY = head.y * this.gridSize + this.gridSize / 2;
         const radius = this.gridSize * 0.4;
