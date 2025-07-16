@@ -41,7 +41,7 @@ body {
     overflow: hidden;
     z-index: 1;
     /* Add subtle overlay for better text readability */
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .start-content {
@@ -49,9 +49,9 @@ body {
     z-index: 2;
     text-align: center;
     padding: 40px;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.3);
     border-radius: 20px;
-    backdrop-filter: blur(15px);
+    backdrop-filter: blur(10px);
     border: 2px solid rgba(104, 211, 145, 0.4);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
@@ -112,8 +112,8 @@ body {
     color: #90EE90;
     margin-bottom: 40px;
     font-style: italic;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-    background: rgba(0, 0, 0, 0.3);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.4);
     padding: 10px 20px;
     border-radius: 15px;
     display: inline-block;
