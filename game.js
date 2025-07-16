@@ -227,10 +227,14 @@ class SnakeGame {
         
         this.snake.unshift(head);
         
-        // Check if snake is near food (within 1 block) and facing towards it
+        // Check if snake is near food (within 1 block)
         const distanceToFood = Math.abs(head.x - this.food.x) + Math.abs(head.y - this.food.y);
-        const facingFood = this.isFacingFood(head, this.food);
-        this.mouthOpen = distanceToFood <= 1 && facingFood;
+        this.mouthOpen = distanceToFood <= 1;
+        
+        // Debug logging
+        if (this.mouthOpen) {
+            console.log('Mouth is open! Distance to food:', distanceToFood, 'Head:', head, 'Food:', this.food);
+        }
         
         // Random tongue animation
         if (Date.now() - this.lastTongueTime > 2000 + Math.random() * 3000) {
@@ -592,28 +596,36 @@ class SnakeGame {
             // Create a more visible open mouth
             this.ctx.fillStyle = '#8B0000';
             this.ctx.beginPath();
-            this.ctx.arc(centerX, centerY + eyeOffset/2, 4, 0, Math.PI, false);
+            this.ctx.arc(centerX, centerY + radius/2, 6, 0, Math.PI, false);
             this.ctx.fill();
             
             // Add mouth interior shadow
             this.ctx.fillStyle = '#4B0000';
             this.ctx.beginPath();
-            this.ctx.arc(centerX, centerY + eyeOffset/2, 3, 0, Math.PI, false);
+            this.ctx.arc(centerX, centerY + radius/2, 4, 0, Math.PI, false);
             this.ctx.fill();
             
             // Add teeth/fangs
             this.ctx.fillStyle = 'white';
             this.ctx.beginPath();
-            this.ctx.moveTo(centerX - 3, centerY + eyeOffset/2);
-            this.ctx.lineTo(centerX - 2, centerY + eyeOffset/2 + 2);
-            this.ctx.lineTo(centerX - 1, centerY + eyeOffset/2);
+            this.ctx.moveTo(centerX - 4, centerY + radius/2);
+            this.ctx.lineTo(centerX - 3, centerY + radius/2 + 3);
+            this.ctx.lineTo(centerX - 2, centerY + radius/2);
             this.ctx.fill();
             
             this.ctx.beginPath();
-            this.ctx.moveTo(centerX + 3, centerY + eyeOffset/2);
-            this.ctx.lineTo(centerX + 2, centerY + eyeOffset/2 + 2);
-            this.ctx.lineTo(centerX + 1, centerY + eyeOffset/2);
+            this.ctx.moveTo(centerX + 4, centerY + radius/2);
+            this.ctx.lineTo(centerX + 3, centerY + radius/2 + 3);
+            this.ctx.lineTo(centerX + 2, centerY + radius/2);
             this.ctx.fill();
+        } else {
+            // Closed mouth - just a small line
+            this.ctx.strokeStyle = '#000';
+            this.ctx.lineWidth = 1;
+            this.ctx.beginPath();
+            this.ctx.moveTo(centerX - 3, centerY + radius/2);
+            this.ctx.lineTo(centerX + 3, centerY + radius/2);
+            this.ctx.stroke();
         }
         
         // Tongue (if extended)
