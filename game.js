@@ -249,7 +249,6 @@ class SnakeGame {
         this.gameScreen.classList.add('hidden');
         this.gameRunning = false;
         this.gameStarted = false;
-        document.body.style.overflow = 'hidden';
         
         // Update high score display on start screen
         this.startScreenHighScore.textContent = this.highScore;
@@ -261,7 +260,6 @@ class SnakeGame {
     showGameScreen() {
         this.startScreen.classList.add('hidden');
         this.gameScreen.classList.remove('hidden');
-        document.body.style.overflow = 'auto';
         
         // Show tutorial overlay
         this.tutorialOverlay.style.display = 'flex';
