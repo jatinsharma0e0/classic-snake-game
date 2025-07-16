@@ -21,15 +21,8 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         
-        // Food properties - Fixed positions for two apples
-        this.fixedApplePositions = [
-            { x: 5, y: 5 },   // Top-left area
-            { x: 15, y: 15 }  // Bottom-right area
-        ];
-        this.gameApples = [
-            { x: 5, y: 5, active: true, snakePassedThrough: false },
-            { x: 15, y: 15, active: true, snakePassedThrough: false }
-        ];
+        // Food properties - Normal random generation for gameplay
+        this.food = this.generateFood();
         
         // DOM elements
         this.startScreen = document.getElementById('startScreen');
@@ -177,10 +170,7 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         this.score = 0;
-        this.gameApples = [
-            { x: 5, y: 5, active: true, snakePassedThrough: false },
-            { x: 15, y: 15, active: true, snakePassedThrough: false }
-        ];
+        this.food = this.generateFood();
         this.updateScoreDisplay();
     }
     
@@ -230,43 +220,19 @@ class SnakeGame {
         
         this.snake.unshift(head);
         
-        // Check apple collisions
-        let appleEaten = false;
-        for (let i = 0; i < this.gameApples.length; i++) {
-            const apple = this.gameApples[i];
-            if (apple.active && head.x === apple.x && head.y === apple.y) {
-                this.score += 10;
-                this.updateScoreDisplay();
-                apple.active = false;
-                apple.snakePassedThrough = false;
-                appleEaten = true;
-                
-                // Update high score if needed
-                if (this.score > this.highScore) {
-                    this.highScore = this.score;
-                    this.saveHighScore();
-                }
-                break;
+        // Check food collision
+        if (head.x === this.food.x && head.y === this.food.y) {
+            this.score += 10;
+            this.updateScoreDisplay();
+            this.food = this.generateFood();
+            
+            // Update high score if needed
+            if (this.score > this.highScore) {
+                this.highScore = this.score;
+                this.saveHighScore();
             }
-        }
-        
-        // Check if snake has passed through apple positions to enable respawning
-        this.gameApples.forEach(apple => {
-            if (!apple.active && !apple.snakePassedThrough) {
-                // Check if any part of the snake is still on the apple position
-                const snakeOnApple = this.snake.some(segment => 
-                    segment.x === apple.x && segment.y === apple.y
-                );
-                
-                if (!snakeOnApple) {
-                    apple.snakePassedThrough = true;
-                    apple.active = true; // Respawn the apple
-                }
-            }
-        });
-        
-        if (!appleEaten) {
-            // Remove tail if no apple eaten
+        } else {
+            // Remove tail if no food eaten
             this.snake.pop();
         }
         
@@ -291,12 +257,8 @@ class SnakeGame {
         // Draw grid (optional)
         this.drawGrid();
         
-        // Draw active apples
-        this.gameApples.forEach(apple => {
-            if (apple.active) {
-                this.drawApple(apple.x * this.gridSize, apple.y * this.gridSize);
-            }
-        });
+        // Draw food
+        this.drawApple(this.food.x * this.gridSize, this.food.y * this.gridSize);
         
         // Draw snake
         this.snake.forEach((segment, index) => {
@@ -553,8 +515,8 @@ class SnakeGame {
             });
         }
         
-        // Create initial apples
-        // this.createApples(); // Disabled to prevent random apples on start screen
+        // Create fixed apples for start screen animation
+        this.createFixedApples();
         
         // Start animation
         this.animateStartScreenSnake();
@@ -767,20 +729,18 @@ class SnakeGame {
         
         this.snakeAnimationFrame += 1.2; // Animation speed - increased for faster movement
         
-        // Check for apple collisions
-        // this.checkAppleCollisions(adjustedHeadPos); // Disabled to prevent random apples on start screen
+        // Check for apple collisions and update visibility
+        this.updateAppleVisibility();
         
         // Continue animation
         requestAnimationFrame(() => this.animateStartScreenSnake());
     }
     
-    createApples() {
-        // Place apples at strategic points along the path
+    createFixedApples() {
+        // Create only 2 apples at fixed positions along the path
         const applePositions = [
-            { pathIndex: Math.floor(this.path.length * 0.2) },
-            { pathIndex: Math.floor(this.path.length * 0.4) },
-            { pathIndex: Math.floor(this.path.length * 0.6) },
-            { pathIndex: Math.floor(this.path.length * 0.8) }
+            { pathIndex: Math.floor(this.path.length * 0.25) }, // First quarter
+            { pathIndex: Math.floor(this.path.length * 0.75) }  // Third quarter
         ];
         
         applePositions.forEach((appleData, index) => {
@@ -792,8 +752,33 @@ class SnakeGame {
                     x: position.x,
                     y: position.y,
                     eaten: false,
-                    id: index
+                    id: index,
+                    visible: true
                 });
+            }
+        });
+    }
+    
+    updateAppleVisibility() {
+        this.apples.forEach(apple => {
+            if (apple.eaten) return;
+            
+            // Check if any part of the snake is near this apple position
+            const snakeNearApple = this.bodyPoints.some(point => {
+                const distance = Math.sqrt(
+                    Math.pow(point.x - apple.x, 2) + 
+                    Math.pow(point.y - apple.y, 2)
+                );
+                return distance < 20; // Hide apple if snake is within 20 pixels
+            });
+            
+            // Update visibility
+            if (snakeNearApple && apple.visible) {
+                apple.element.style.opacity = '0';
+                apple.visible = false;
+            } else if (!snakeNearApple && !apple.visible) {
+                apple.element.style.opacity = '1';
+                apple.visible = true;
             }
         });
     }
