@@ -593,11 +593,15 @@ class SnakeGame {
             y: headPos.y + (nextHeadPos.y - headPos.y) * t
         };
         
-        // Add subtle undulation to head
-        const waveOffset = Math.sin(this.snakeAnimationFrame * 0.15) * 2;
+        // Add realistic irregular undulation to head
+        const primaryWave = Math.sin(this.snakeAnimationFrame * 0.12) * 1.8;
+        const secondaryWave = Math.sin(this.snakeAnimationFrame * 0.31) * 0.8;
+        const tertiaryWave = Math.cos(this.snakeAnimationFrame * 0.07) * 0.5;
+        const irregularOffset = primaryWave + secondaryWave + tertiaryWave;
+        
         const adjustedHeadPos = {
             x: interpolatedHead.x,
-            y: interpolatedHead.y + waveOffset
+            y: interpolatedHead.y + irregularOffset
         };
         
         // Update body points (follow the head with proper spacing)
@@ -621,8 +625,11 @@ class SnakeGame {
                 const next = this.bodyPoints[i + 1];
                 const next2 = this.bodyPoints[i + 2];
                 
-                // Add wave motion to body points
-                const bodyWave = Math.sin((this.snakeAnimationFrame * 0.08) + (i * 0.3)) * 1.2;
+                // Add realistic irregular wave motion to body points
+                const bodyPrimary = Math.sin((this.snakeAnimationFrame * 0.09) + (i * 0.25)) * 1.1;
+                const bodySecondary = Math.cos((this.snakeAnimationFrame * 0.17) + (i * 0.4)) * 0.6;
+                const bodyTertiary = Math.sin((this.snakeAnimationFrame * 0.06) + (i * 0.15)) * 0.4;
+                const bodyWave = bodyPrimary + bodySecondary + bodyTertiary;
                 
                 // Control points for smooth curves
                 const cp1x = current.x + (next.x - this.bodyPoints[i - 1].x) * 0.2;
@@ -669,17 +676,22 @@ class SnakeGame {
         if (Math.floor(this.snakeAnimationFrame / 40) % 3 === 0) {
             const tongueLength = 8;
             
-            // Add jiggle motion to tongue
-            const jiggleX = Math.sin(this.snakeAnimationFrame * 0.8) * 1.5;
-            const jiggleY = Math.cos(this.snakeAnimationFrame * 1.2) * 1;
+            // Add realistic irregular jiggle motion to tongue
+            const jigglePrimaryX = Math.sin(this.snakeAnimationFrame * 0.73) * 1.2;
+            const jiggleSecondaryX = Math.cos(this.snakeAnimationFrame * 1.47) * 0.8;
+            const jigglePrimaryY = Math.cos(this.snakeAnimationFrame * 0.91) * 0.9;
+            const jiggleSecondaryY = Math.sin(this.snakeAnimationFrame * 1.23) * 0.5;
+            
+            const jiggleX = jigglePrimaryX + jiggleSecondaryX;
+            const jiggleY = jigglePrimaryY + jiggleSecondaryY;
             
             const tongueX = adjustedHeadPos.x + Math.cos(angle) * (12 + tongueLength) + jiggleX;
             const tongueY = adjustedHeadPos.y + Math.sin(angle) * (12 + tongueLength) + jiggleY;
             const forkOffset = 2;
             
-            // Add jiggle to fork ends as well
-            const forkJiggle1 = Math.sin(this.snakeAnimationFrame * 1.5) * 0.8;
-            const forkJiggle2 = Math.cos(this.snakeAnimationFrame * 1.8) * 0.8;
+            // Add irregular jiggle to fork ends
+            const forkJiggle1 = Math.sin(this.snakeAnimationFrame * 1.37) * 0.7 + Math.cos(this.snakeAnimationFrame * 2.13) * 0.3;
+            const forkJiggle2 = Math.cos(this.snakeAnimationFrame * 1.61) * 0.8 + Math.sin(this.snakeAnimationFrame * 1.97) * 0.4;
             
             const tongueData = `M ${adjustedHeadPos.x + Math.cos(angle) * 12} ${adjustedHeadPos.y + Math.sin(angle) * 12} 
                               L ${tongueX} ${tongueY}
