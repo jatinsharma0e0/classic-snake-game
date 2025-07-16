@@ -100,10 +100,10 @@ body {
 }
 
 .game-title {
-    font-family: 'Driftwood', 'Arial', sans-serif;
+    font-family: 'Driftwood', 'Driftwood', Driftwood;
     font-size: 4rem;
-    font-weight: bold;
-    color: #1B5E20;
+    /* font-weight: bold; */
+    color: #3B2F2F;
     text-shadow: 
         0 1px 0 rgba(139, 69, 19, 0.6),
         0 -1px 0 rgba(0, 0, 0, 0.4),
@@ -179,6 +179,23 @@ body {
 .start-game-btn-image:hover {
     transform: translateY(-5px) scale(1.05);
     filter: drop-shadow(0 15px 35px rgba(139, 69, 19, 0.6)) brightness(1.1);
+}
+
+.play-button-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    z-index: 11;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    transition: all 0.3s ease;
+}
+
+.start-button-container:hover .play-button-overlay {
+    transform: translate(-50%, -55%) scale(1.1);
 }
 
 .snake-path-container {
