@@ -118,6 +118,7 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Replaced circular snake segments with continuous blue snake body
 - Added distinct snake head with white eyes and black pupils
 - Implemented mouth opening animation when within 1 block of food
-- Added red tongue animation that appears every 7 seconds when not eating
+- Added red tongue animation that appears randomly every 5-9 seconds when not eating
 - Snake mouth opens with visible teeth and fangs when approaching food
 - Added smooth connections between snake segments for fluid movement
+- Snake now starts with 3 blocks minimum body length for better gameplay

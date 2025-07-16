@@ -14,9 +14,11 @@ class SnakeGame {
         this.score = 0;
         this.highScore = this.getHighScore();
         
-        // Snake properties
+        // Snake properties - Start with 3 blocks
         this.snake = [
-            { x: 10, y: 10 }
+            { x: 10, y: 10 },
+            { x: 9, y: 10 },
+            { x: 8, y: 10 }
         ];
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
@@ -173,8 +175,12 @@ class SnakeGame {
         this.gameStarted = true;
         this.gameOverScreen.classList.add('hidden');
         
-        // Reset game state
-        this.snake = [{ x: 10, y: 10 }];
+        // Reset game state - Start with 3 blocks
+        this.snake = [
+            { x: 10, y: 10 },
+            { x: 9, y: 10 },
+            { x: 8, y: 10 }
+        ];
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         this.score = 0;
