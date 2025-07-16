@@ -24,15 +24,6 @@ class SnakeGame {
         // Food properties
         this.food = this.generateFood();
         
-        // Load apple image
-        this.appleImage = new Image();
-        this.appleImage.src = 'assets/apple.png';
-        this.appleImageLoaded = false;
-        
-        this.appleImage.onload = () => {
-            this.appleImageLoaded = true;
-        };
-        
         // DOM elements
         this.startScreen = document.getElementById('startScreen');
         this.gameScreen = document.getElementById('gameScreen');
@@ -377,69 +368,48 @@ class SnakeGame {
     }
     
     drawApple(x, y) {
-        if (this.appleImageLoaded) {
-            // Use the custom apple image
-            const size = this.gridSize - 2; // Slightly smaller than grid
-            const centerX = x + (this.gridSize - size) / 2;
-            const centerY = y + (this.gridSize - size) / 2;
-            
-            // Draw shadow first
-            this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-            this.ctx.shadowBlur = 4;
-            this.ctx.shadowOffsetX = 2;
-            this.ctx.shadowOffsetY = 2;
-            
-            this.ctx.drawImage(this.appleImage, centerX, centerY, size, size);
-            
-            // Reset shadow
-            this.ctx.shadowBlur = 0;
-            this.ctx.shadowOffsetX = 0;
-            this.ctx.shadowOffsetY = 0;
-        } else {
-            // Fallback to original drawn apple while image loads
-            const centerX = x + this.gridSize / 2;
-            const centerY = y + this.gridSize / 2;
-            const radius = this.gridSize / 2 - 2;
-            
-            // Apple body (red gradient)
-            const appleGradient = this.ctx.createRadialGradient(
-                centerX - radius/3, centerY - radius/3, 0,
-                centerX, centerY, radius
-            );
-            appleGradient.addColorStop(0, '#FF6B6B');
-            appleGradient.addColorStop(1, '#E74C3C');
-            
-            this.ctx.fillStyle = appleGradient;
-            this.ctx.beginPath();
-            this.ctx.arc(centerX, centerY + 1, radius, 0, Math.PI * 2);
-            this.ctx.fill();
-            
-            // Apple shadow
-            this.ctx.shadowColor = 'rgba(231, 76, 60, 0.5)';
-            this.ctx.shadowBlur = 8;
-            this.ctx.shadowOffsetX = 2;
-            this.ctx.shadowOffsetY = 2;
-            this.ctx.fill();
-            this.ctx.shadowBlur = 0;
-            this.ctx.shadowOffsetX = 0;
-            this.ctx.shadowOffsetY = 0;
-            
-            // Apple stem (brown)
-            this.ctx.fillStyle = '#8B4513';
-            this.ctx.fillRect(centerX - 1, centerY - radius - 2, 2, 4);
-            
-            // Leaf (green)
-            this.ctx.fillStyle = '#27AE60';
-            this.ctx.beginPath();
-            this.ctx.ellipse(centerX + 3, centerY - radius, 3, 2, Math.PI / 4, 0, Math.PI * 2);
-            this.ctx.fill();
-            
-            // Apple highlight
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-            this.ctx.beginPath();
-            this.ctx.arc(centerX - radius/3, centerY - radius/3, radius/3, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
+        const centerX = x + this.gridSize / 2;
+        const centerY = y + this.gridSize / 2;
+        const radius = this.gridSize / 2 - 2;
+        
+        // Apple body (red gradient)
+        const appleGradient = this.ctx.createRadialGradient(
+            centerX - radius/3, centerY - radius/3, 0,
+            centerX, centerY, radius
+        );
+        appleGradient.addColorStop(0, '#FF6B6B');
+        appleGradient.addColorStop(1, '#E74C3C');
+        
+        this.ctx.fillStyle = appleGradient;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY + 1, radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Apple shadow
+        this.ctx.shadowColor = 'rgba(231, 76, 60, 0.5)';
+        this.ctx.shadowBlur = 8;
+        this.ctx.shadowOffsetX = 2;
+        this.ctx.shadowOffsetY = 2;
+        this.ctx.fill();
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        
+        // Apple stem (brown)
+        this.ctx.fillStyle = '#8B4513';
+        this.ctx.fillRect(centerX - 1, centerY - radius - 2, 2, 4);
+        
+        // Leaf (green)
+        this.ctx.fillStyle = '#27AE60';
+        this.ctx.beginPath();
+        this.ctx.ellipse(centerX + 3, centerY - radius, 3, 2, Math.PI / 4, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Apple highlight
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        this.ctx.beginPath();
+        this.ctx.arc(centerX - radius/3, centerY - radius/3, radius/3, 0, Math.PI * 2);
+        this.ctx.fill();
     }
     
     drawGrid() {
