@@ -34,6 +34,10 @@ class SnakeGame {
         // Food properties - Normal random generation for gameplay
         this.food = this.generateFood();
         
+        // Obstacle properties
+        this.obstacles = [];
+        this.obstacleImages = {};
+        
         // DOM elements
         this.startScreen = document.getElementById('startScreen');
         this.gameScreen = document.getElementById('gameScreen');
@@ -49,6 +53,9 @@ class SnakeGame {
         
         // Initialize game
         this.init();
+        
+        // Load obstacle images
+        this.loadObstacleImages();
         
         // Initialize snake animation for start screen
         this.initStartScreenSnake();
@@ -70,6 +77,109 @@ class SnakeGame {
         
         // Start game loop
         this.gameLoop();
+    }
+    
+    loadObstacleImages() {
+        const imageNames = ['1-block-rock', '2-blocks-rock', '4-blocks-rock', '1-block-obstacle'];
+        
+        imageNames.forEach(name => {
+            const img = new Image();
+            img.src = `assets/${name}.png`;
+            this.obstacleImages[name] = img;
+        });
+    }
+    
+    generateObstacles() {
+        this.obstacles = [];
+        
+        // Generate 3-5 random obstacles
+        const numObstacles = 3 + Math.floor(Math.random() * 3);
+        
+        for (let i = 0; i < numObstacles; i++) {
+            const obstacleTypes = [
+                { type: '1-block-rock', width: 1, height: 1 },
+                { type: '2-blocks-rock', width: 2, height: 1 },
+                { type: '4-blocks-rock', width: 2, height: 2 },
+                { type: '1-block-obstacle', width: 1, height: 1 }
+            ];
+            
+            const obstacle = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+            
+            // Find a valid position that doesn't conflict with snake or food
+            let position;
+            let attempts = 0;
+            do {
+                position = {
+                    x: Math.floor(Math.random() * (this.tileCount - obstacle.width)),
+                    y: Math.floor(Math.random() * (this.tileCount - obstacle.height))
+                };
+                attempts++;
+            } while (this.isObstacleConflicting(position, obstacle) && attempts < 100);
+            
+            if (attempts < 100) {
+                this.obstacles.push({
+                    x: position.x,
+                    y: position.y,
+                    type: obstacle.type,
+                    width: obstacle.width,
+                    height: obstacle.height
+                });
+            }
+        }
+    }
+    
+    isObstacleConflicting(position, obstacle) {
+        // Check conflict with snake
+        for (let segment of this.snake) {
+            for (let dx = 0; dx < obstacle.width; dx++) {
+                for (let dy = 0; dy < obstacle.height; dy++) {
+                    if (segment.x === position.x + dx && segment.y === position.y + dy) {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        // Check conflict with food
+        for (let dx = 0; dx < obstacle.width; dx++) {
+            for (let dy = 0; dy < obstacle.height; dy++) {
+                if (this.food.x === position.x + dx && this.food.y === position.y + dy) {
+                    return true;
+                }
+            }
+        }
+        
+        // Check conflict with other obstacles
+        for (let existingObstacle of this.obstacles) {
+            if (this.rectanglesOverlap(
+                position.x, position.y, obstacle.width, obstacle.height,
+                existingObstacle.x, existingObstacle.y, existingObstacle.width, existingObstacle.height
+            )) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    rectanglesOverlap(x1, y1, w1, h1, x2, y2, w2, h2) {
+        return !(x1 + w1 <= x2 || x2 + w2 <= x1 || y1 + h1 <= y2 || y2 + h2 <= y1);
+    }
+    
+    checkObstacleCollision(head) {
+        if (!this.obstacles || !Array.isArray(this.obstacles)) {
+            return false;
+        }
+        for (let obstacle of this.obstacles) {
+            for (let dx = 0; dx < obstacle.width; dx++) {
+                for (let dy = 0; dy < obstacle.height; dy++) {
+                    if (head.x === obstacle.x + dx && head.y === obstacle.y + dy) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
     
     showStartScreen() {
@@ -102,6 +212,7 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         this.score = 0;
+        this.generateObstacles();
         this.food = this.generateFood();
         this.updateScoreDisplay();
     }
@@ -185,6 +296,7 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         this.score = 0;
+        this.generateObstacles();
         this.food = this.generateFood();
         this.updateScoreDisplay();
     }
@@ -196,7 +308,7 @@ class SnakeGame {
     generateFood() {
         let foodPosition;
         
-        // Keep generating until we find a position not occupied by snake
+        // Keep generating until we find a position not occupied by snake or obstacles
         do {
             foodPosition = {
                 x: Math.floor(Math.random() * this.tileCount),
@@ -204,9 +316,25 @@ class SnakeGame {
             };
         } while (this.snake.some(segment => 
             segment.x === foodPosition.x && segment.y === foodPosition.y
-        ));
+        ) || this.isPositionInObstacle(foodPosition));
         
         return foodPosition;
+    }
+    
+    isPositionInObstacle(position) {
+        if (!this.obstacles || !Array.isArray(this.obstacles)) {
+            return false;
+        }
+        for (let obstacle of this.obstacles) {
+            for (let dx = 0; dx < obstacle.width; dx++) {
+                for (let dy = 0; dy < obstacle.height; dy++) {
+                    if (position.x === obstacle.x + dx && position.y === obstacle.y + dy) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
     
     updateGame() {
@@ -229,6 +357,12 @@ class SnakeGame {
         
         // Check self collision
         if (this.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+            this.gameOver();
+            return;
+        }
+        
+        // Check obstacle collision
+        if (this.checkObstacleCollision(head)) {
             this.gameOver();
             return;
         }
@@ -314,6 +448,9 @@ class SnakeGame {
         // Clear canvas with jungle background
         this.drawJungleBackground();
         
+        // Draw obstacles
+        this.drawObstacles();
+        
         // Draw food
         this.drawApple(this.food.x * this.gridSize, this.food.y * this.gridSize);
         
@@ -323,6 +460,25 @@ class SnakeGame {
         // Draw start message if game hasn't started
         if (!this.gameStarted) {
             this.drawStartMessage();
+        }
+    }
+    
+    drawObstacles() {
+        if (!this.obstacles || !Array.isArray(this.obstacles)) {
+            return;
+        }
+        
+        for (let obstacle of this.obstacles) {
+            const img = this.obstacleImages[obstacle.type];
+            if (img && img.complete) {
+                this.ctx.drawImage(
+                    img,
+                    obstacle.x * this.gridSize,
+                    obstacle.y * this.gridSize,
+                    obstacle.width * this.gridSize,
+                    obstacle.height * this.gridSize
+                );
+            }
         }
     }
     
