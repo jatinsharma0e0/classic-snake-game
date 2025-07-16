@@ -685,9 +685,9 @@ class SnakeGame {
         this.snakeHead.setAttribute('transform', headRotation);
         
         // Position eyes relative to head
-        const eyeOffsetX = Math.cos(angle) * 3;
-        const eyeOffsetY = Math.sin(angle) * 3;
-        const eyeSeparation = 4;
+        const eyeOffsetX = Math.cos(angle) * 4;
+        const eyeOffsetY = Math.sin(angle) * 4;
+        const eyeSeparation = 6;
         
         // Eye positions (perpendicular to movement direction)
         const perpX = -Math.sin(angle) * eyeSeparation;
