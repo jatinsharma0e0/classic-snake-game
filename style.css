@@ -262,12 +262,14 @@ body {
     justify-content: center;
     gap: 15px;
     background-image: url('assets/title-bg.png');
-    background-size: 100% 100%;
+    background-size: 100% 140%;
     background-repeat: no-repeat;
     background-position: center;
-    padding: 20px 40px;
+    padding: 30px 40px;
     border-radius: 15px;
-    min-height: 80px;
+    min-height: 100px;
+    position: relative;
+    overflow: hidden;
 }
 
 .game-snake-icon {
