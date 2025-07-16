@@ -16,12 +16,38 @@ html {
     height: 100%;
     width: 100%;
     overflow: hidden;
+    /* Prevent text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* Prevent dragging */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    /* Disable touch callouts on mobile */
+    -webkit-touch-callout: none;
+    /* Prevent zooming on mobile */
+    touch-action: manipulation;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    /* Prevent text selection on all elements */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* Prevent dragging on all elements */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
 }
 
 body {
@@ -35,6 +61,21 @@ body {
     left: 0;
     margin: 0;
     padding: 0;
+    /* Prevent text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* Prevent dragging */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    /* Disable touch callouts on mobile */
+    -webkit-touch-callout: none;
+    /* Prevent zooming on mobile */
+    touch-action: manipulation;
 }
 
 /* Start Screen Styles */

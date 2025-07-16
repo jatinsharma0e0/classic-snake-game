@@ -99,6 +99,10 @@ class SnakeGame {
         });
         this.backToMenuBtn.addEventListener('click', () => {
             this.audioManager.playSound('buttonClick');
+            
+            // Unblock interactions when returning to menu
+            this.blockUnderlyingInteractions(false);
+            
             this.showStartScreen();
         });
         // Mute button functionality for both buttons
@@ -125,6 +129,9 @@ class SnakeGame {
         };
         
         this.tutorialOverlay.addEventListener('click', dismissTutorial);
+        
+        // Setup interaction restrictions
+        this.setupInteractionRestrictions();
         
         // Start game loop
         this.gameLoop();
@@ -261,6 +268,9 @@ class SnakeGame {
         this.startScreen.classList.add('hidden');
         this.gameScreen.classList.remove('hidden');
         
+        // Ensure interactions are unblocked when entering game
+        this.blockUnderlyingInteractions(false);
+        
         // Show tutorial overlay
         this.tutorialOverlay.style.display = 'flex';
         this.tutorialOverlay.classList.remove('fade-out');
@@ -390,6 +400,9 @@ class SnakeGame {
     }
     
     restartGame() {
+        // Unblock interactions when restarting
+        this.blockUnderlyingInteractions(false);
+        
         this.startGame();
     }
     
@@ -579,6 +592,10 @@ class SnakeGame {
             this.knockbackOffset = { x: 0, y: 0 };
             this.finalScoreElement.textContent = this.score;
             this.bestScoreElement.textContent = this.highScore;
+            
+            // Block interactions with underlying elements during modal
+            this.blockUnderlyingInteractions(true);
+            
             this.gameOverScreen.classList.remove('hidden');
             
             // Play game over sound
@@ -1085,6 +1102,113 @@ class SnakeGame {
         setTimeout(() => {
             requestAnimationFrame(() => this.gameLoop());
         }, 120); // Game speed - lower number = faster game
+    }
+    
+    setupInteractionRestrictions() {
+        // Prevent right-click context menu
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+        });
+        
+        // Prevent text selection and dragging
+        document.addEventListener('selectstart', (e) => {
+            e.preventDefault();
+            return false;
+        });
+        
+        document.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+            return false;
+        });
+        
+        // Prevent long-press on mobile (touchstart events)
+        document.addEventListener('touchstart', (e) => {
+            // Allow single touches for legitimate interactions
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        });
+        
+        // Prevent mobile zooming gestures
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Prevent double-tap zoom on iOS
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+        
+        // Block certain keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Block F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, F5, Ctrl+R
+            if (
+                e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.key === 'u') ||
+                (e.ctrlKey && e.key === 's') ||
+                e.key === 'F5' ||
+                (e.ctrlKey && e.key === 'r')
+            ) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // Ensure canvas maintains focus during gameplay
+        this.maintainCanvasFocus();
+        
+        // Prevent scrolling with arrow keys and space
+        document.addEventListener('keydown', (e) => {
+            if (this.gameRunning && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    maintainCanvasFocus() {
+        // Focus canvas when game starts
+        this.canvas.addEventListener('click', () => {
+            this.canvas.focus();
+        });
+        
+        // Refocus canvas if it loses focus during gameplay
+        const refocusCanvas = () => {
+            if (this.gameRunning && document.activeElement !== this.canvas) {
+                setTimeout(() => {
+                    this.canvas.focus();
+                }, 10);
+            }
+        };
+        
+        document.addEventListener('blur', refocusCanvas);
+        window.addEventListener('blur', refocusCanvas);
+        
+        // Make canvas focusable
+        this.canvas.setAttribute('tabindex', '0');
+        this.canvas.style.outline = 'none';
+    }
+    
+    blockUnderlyingInteractions(isBlocked) {
+        // Block interactions with underlying elements during modals
+        if (isBlocked) {
+            document.body.style.pointerEvents = 'none';
+            // Allow interaction only with modal elements
+            const modalElements = document.querySelectorAll('.game-over, .game-over *, .tutorial-overlay, .tutorial-overlay *');
+            modalElements.forEach(element => {
+                element.style.pointerEvents = 'auto';
+            });
+        } else {
+            document.body.style.pointerEvents = 'auto';
+        }
     }
     
     initStartScreenSnake() {

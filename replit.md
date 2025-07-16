@@ -177,3 +177,18 @@ The application is designed for real-time interactive experiences with 3D graphi
 - All audio is balanced, non-intrusive, and maintains joyful cartoon style
 - Background music stops during gameplay to focus on sound effects
 - Audio system respects user preferences with mute toggle option
+
+**User Interaction Restrictions & Game Protection (July 16, 2025):**
+- Implemented comprehensive user interaction restrictions to prevent unintended actions
+- Prevented text selection across all pages and elements using CSS user-select: none
+- Disabled image and element dragging with user-drag: none properties
+- Blocked browser right-click context menu throughout the entire application
+- Prevented mobile long-press menus and touch callouts on all devices
+- Disabled mobile zooming with touch-action: manipulation and viewport meta settings
+- Blocked double-tap zoom behavior specifically on iOS devices
+- Prevented page scrolling during gameplay and locked viewport in place
+- Blocked common keyboard shortcuts (F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, F5, Ctrl+R)
+- Added modal blocking functionality that prevents clicks on underlying elements during Game Over screen
+- Implemented canvas focus management to ensure keyboard controls remain responsive throughout gameplay
+- Added automatic canvas refocusing when focus is lost during active gameplay
+- All restrictions feel seamless and don't interfere with legitimate game interactions
