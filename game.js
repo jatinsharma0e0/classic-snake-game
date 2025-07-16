@@ -46,7 +46,7 @@ class SnakeGame {
         
         // Background image
         this.grassBg = new Image();
-        this.grassBg.src = 'assets/grass-bg.jpg';
+        this.grassBg.src = 'assets/grass-bg.webp';
         
         // DOM elements
         this.startScreen = document.getElementById('startScreen');
@@ -730,14 +730,6 @@ class SnakeGame {
             
             this.ctx.fillStyle = gradient;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        }
-        
-        // Add subtle texture pattern
-        this.ctx.fillStyle = 'rgba(45, 80, 22, 0.05)';
-        for (let i = 0; i < this.canvas.width; i += 40) {
-            for (let j = 0; j < this.canvas.height; j += 40) {
-                this.ctx.fillRect(i, j, 20, 20);
-            }
         }
     }
     
