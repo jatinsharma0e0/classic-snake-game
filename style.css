@@ -123,9 +123,7 @@ body {
     align-items: center;
 }
 
-.start-game-btn {
-    border: none;
-    background: none;
+.start-game-btn-image {
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 10;
@@ -135,7 +133,7 @@ body {
     filter: drop-shadow(0 8px 25px rgba(139, 69, 19, 0.4));
 }
 
-.start-game-btn:hover {
+.start-game-btn-image:hover {
     transform: translateY(-5px) scale(1.05);
     filter: drop-shadow(0 15px 35px rgba(139, 69, 19, 0.6)) brightness(1.1);
 }
