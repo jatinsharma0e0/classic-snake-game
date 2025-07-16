@@ -2,11 +2,12 @@
 
 ## Overview
 
-This is a full-stack web application built with React/TypeScript frontend and Express.js backend. The project uses Drizzle ORM with PostgreSQL for data persistence, and is configured for 3D graphics with Three.js. The application appears to be set up as a game or interactive experience with audio support and comprehensive UI components.
+This is a full-stack web application built with React/TypeScript frontend and Express.js backend. The project includes a complete Snake Game with jungle theme and is configured for 3D graphics with Three.js. The application has been successfully migrated from Replit Agent to Replit environment with proper security practices and client/server separation.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Landing page: Snake game should be the main landing page (not game hub interface).
 Landing page preference: Direct access to snake game, no hub interface.
 
 ## System Architecture
@@ -100,3 +101,13 @@ Landing page preference: Direct access to snake game, no hub interface.
 - `db:push`: Database schema synchronization
 
 The application is designed for real-time interactive experiences with 3D graphics, audio feedback, and persistent user data. The modular architecture allows for easy extension of game mechanics, additional storage backends, and enhanced 3D features.
+
+## Recent Changes
+
+**Migration Completed (January 16, 2025):**
+- Successfully migrated from Replit Agent to Replit environment
+- Fixed React application to redirect to Snake game as landing page
+- Adjusted decorative apple positioning to avoid overlap with snake emoji
+- Server running properly on port 5000 with client/server separation
+- Snake game accessible at root (/) and /snake routes
+- All security best practices implemented
