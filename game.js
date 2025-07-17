@@ -81,8 +81,8 @@ class SnakeGame {
         this.grassBg = new Image();
         this.grassBg.src = 'assets/grass-bg.webp';
         
-        // Audio system
-        this.audioManager = new AudioManager();
+        // Audio system - will be initialized after assets load
+        this.audioManager = null;
         this.moveCounter = 0; // For subtle movement sounds
         
         // DOM elements
@@ -106,6 +106,9 @@ class SnakeGame {
         // Custom skin system
         this.currentSkin = 'default';
         this.customSkinImages = {};
+        
+        // Initialize object pools for performance
+        this.initializeObjectPools();
         
         // Initialize game
         this.init();
@@ -134,24 +137,34 @@ class SnakeGame {
         // Event listeners
         document.addEventListener('keydown', (e) => this.handleKeyPress(e));
         this.startGameBtn.addEventListener('click', () => {
-            this.audioManager.resumeAudioContext(); // Initialize audio on first interaction
-            this.audioManager.playSound('buttonClick');
+            if (this.audioManager) {
+                this.audioManager && this.audioManager.resumeAudioContext(); // Initialize audio on first interaction
+                this.audioManager && this.audioManager.playSound('buttonClick');
+            }
             this.showGameScreen();
         });
         this.skinEditorBtn.addEventListener('click', () => {
-            this.audioManager.playSound('buttonClick');
+            if (this.audioManager) {
+                this.audioManager && this.audioManager.playSound('buttonClick');
+            }
             window.location.href = 'skin-editor.html';
         });
         this.restartBtn.addEventListener('click', () => {
-            this.audioManager.playSound('buttonClick');
+            if (this.audioManager) {
+                this.audioManager && this.audioManager.playSound('buttonClick');
+            }
             this.restartGame();
         });
         this.restartGameBtn.addEventListener('click', () => {
-            this.audioManager.playSound('buttonClick');
+            if (this.audioManager) {
+                this.audioManager && this.audioManager.playSound('buttonClick');
+            }
             this.restartGame();
         });
         this.backToMenuBtn.addEventListener('click', () => {
-            this.audioManager.playSound('buttonClick');
+            if (this.audioManager) {
+                this.audioManager && this.audioManager.playSound('buttonClick');
+            }
             
             // Unblock interactions when returning to menu
             this.blockUnderlyingInteractions(false);
@@ -160,13 +173,15 @@ class SnakeGame {
         });
         // Mute button functionality for both buttons
         const handleMuteToggle = () => {
-            const isMuted = this.audioManager.toggleMute();
-            const muteIcon = isMuted ? '🔇' : '🔊';
-            this.muteBtn.textContent = muteIcon;
-            this.homeMuteBtn.textContent = muteIcon;
-            
-            if (!isMuted) {
-                this.audioManager.playSound('buttonClick');
+            if (this.audioManager) {
+                const isMuted = this.audioManager && this.audioManager.toggleMute();
+                const muteIcon = isMuted ? '🔇' : '🔊';
+                this.muteBtn.textContent = muteIcon;
+                this.homeMuteBtn.textContent = muteIcon;
+                
+                if (!isMuted) {
+                    this.audioManager && this.audioManager.playSound('buttonClick');
+                }
             }
         };
         
@@ -183,7 +198,7 @@ class SnakeGame {
         
         this.tutorialOverlay.addEventListener('click', dismissTutorial);
         
-        // Setup interaction restrictions
+            // Setup interaction restrictions
         this.setupInteractionRestrictions();
         
         // Setup optimized performance features
@@ -430,7 +445,7 @@ class SnakeGame {
         this.startScreenHighScore.textContent = this.highScore;
         
         // Set audio manager to start screen mode and play background music
-        this.audioManager.setScreen(true);
+        this.audioManager && this.audioManager.setScreen(true);
     }
     
     showGameScreen() {
@@ -464,8 +479,8 @@ class SnakeGame {
         this.updateScoreDisplay();
         
         // Set audio manager to game screen mode and play game start sound
-        this.audioManager.setScreen(false);
-        this.audioManager.playSound('gameStart');
+        this.audioManager && this.audioManager.setScreen(false);
+        this.audioManager && this.audioManager.playSound('gameStart');
     }
     
     handleKeyPress(e) {
@@ -621,7 +636,7 @@ class SnakeGame {
         // Check wall collision
         if (head.x < 0 || head.x >= this.tileCountX || 
             head.y < 0 || head.y >= this.tileCountY) {
-            this.audioManager.playSound('collision');
+            this.audioManager && this.audioManager.playSound('collision');
             this.gameOver();
             return;
         }
@@ -629,7 +644,7 @@ class SnakeGame {
         // Check self collision (excluding the current head position)
         for (let i = 1; i < this.snake.length; i++) {
             if (this.snake[i].x === head.x && this.snake[i].y === head.y) {
-                this.audioManager.playSound('collision');
+                this.audioManager && this.audioManager.playSound('collision');
                 this.gameOver();
                 return;
             }
@@ -637,7 +652,7 @@ class SnakeGame {
         
         // Check obstacle collision
         if (this.checkObstacleCollision(head)) {
-            this.audioManager.playSound('collision');
+            this.audioManager && this.audioManager.playSound('collision');
             this.gameOver();
             return;
         }
@@ -647,7 +662,7 @@ class SnakeGame {
         // Play subtle movement sound occasionally
         this.moveCounter++;
         if (this.moveCounter % 10 === 0) { // Every 10th move
-            this.audioManager.playSound('snakeMove');
+            this.audioManager && this.audioManager.playSound('snakeMove');
         }
         
         // Check if snake is near food (within 1 block)
@@ -668,7 +683,7 @@ class SnakeGame {
             this.nextTongueTime = 10000 + Math.random() * 5000; // Set next random interval (10-15 seconds)
             
             // Play tongue flick sound
-            this.audioManager.playSound('tongueFlick');
+            this.audioManager && this.audioManager.playSound('tongueFlick');
         }
         
         if (this.tongueOut) {
@@ -686,7 +701,7 @@ class SnakeGame {
             this.food = this.generateFood();
             
             // Play eating sound
-            this.audioManager.playSound('eatFood');
+            this.audioManager && this.audioManager.playSound('eatFood');
             
             // Update high score if needed
             if (this.score > this.highScore) {
@@ -740,7 +755,7 @@ class SnakeGame {
         this.isDead = true;
         
         // Play hit impact sound
-        this.audioManager.playSound('hitImpact');
+        this.audioManager && this.audioManager.playSound('hitImpact');
         
         // Start hit animation
         this.hitAnimation = true;
@@ -781,7 +796,7 @@ class SnakeGame {
             this.gameOverScreen.classList.remove('hidden');
             
             // Play game over sound
-            this.audioManager.playSound('gameOver');
+            this.audioManager && this.audioManager.playSound('gameOver');
             
             // Clear the timeout reference
             this.gameOverTimeout = null;
@@ -1370,56 +1385,7 @@ class SnakeGame {
         this.ctx.restore();
     }
     
-    drawSnakeBody() {
-        if (this.snake.length === 0) return;
-        
-        const bodyWidth = this.gridSize * 0.8;
-        const bodyHeight = this.gridSize * 0.6;
-        
-        // Create path for snake body
-        this.ctx.beginPath();
-        
-        for (let i = 0; i < this.snake.length; i++) {
-            const segment = this.snake[i];
-            const x = segment.x * this.gridSize + this.gridSize / 2;
-            const y = segment.y * this.gridSize + this.gridSize / 2;
-            
-            if (i === 0) {
-                // Start at head
-                this.ctx.moveTo(x, y);
-            } else {
-                // Line to each segment
-                this.ctx.lineTo(x, y);
-            }
-        }
-        
-        // Style the snake body
-        this.ctx.strokeStyle = '#4169E1';
-        this.ctx.lineWidth = bodyWidth;
-        this.ctx.lineCap = 'round';
-        this.ctx.lineJoin = 'round';
-        this.ctx.stroke();
-        
-        // Add inner body highlight
-        this.ctx.beginPath();
-        for (let i = 0; i < this.snake.length; i++) {
-            const segment = this.snake[i];
-            const x = segment.x * this.gridSize + this.gridSize / 2;
-            const y = segment.y * this.gridSize + this.gridSize / 2;
-            
-            if (i === 0) {
-                this.ctx.moveTo(x, y);
-            } else {
-                this.ctx.lineTo(x, y);
-            }
-        }
-        
-        this.ctx.strokeStyle = '#6495ED';
-        this.ctx.lineWidth = bodyWidth * 0.7;
-        this.ctx.lineCap = 'round';
-        this.ctx.lineJoin = 'round';
-        this.ctx.stroke();
-    }
+    // Removed duplicate drawSnakeBody method - using optimized version only
     
     drawSnakeHead() {
         if (this.snake.length === 0) return;
@@ -2348,10 +2314,7 @@ class SnakeGame {
 
 }
 
-// Start the game when page loads
-window.addEventListener('load', () => {
-    new SnakeGame();
-});
+// Removed duplicate game initialization - using asset loader system only
 
 // Loading and Initialization System
 let gameInstance = null;
@@ -2397,10 +2360,13 @@ function initializeGame() {
             // Initialize the game now that assets are loaded
             gameInstance = new SnakeGame();
             
+            // Initialize audio manager after assets are loaded
+            gameInstance.audioManager = new AudioManager();
+            
             // Initialize audio after user interaction
             document.addEventListener('click', function initAudio() {
-                if (gameInstance && gameInstance.initAudioContext) {
-                    gameInstance.initAudioContext();
+                if (gameInstance && gameInstance.audioManager) {
+                    gameInstance.audioManager.resumeAudioContext();
                 }
                 document.removeEventListener('click', initAudio);
             });
