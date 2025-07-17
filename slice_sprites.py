@@ -9,7 +9,7 @@ import os
 
 def slice_sprite_sheet():
     # Load the sprite sheet
-    sprite_sheet = Image.open('attached_assets/greeny-sprite-sheet_1752753513665.jpg')
+    sprite_sheet = Image.open('attached_assets/snake-sprite-example-cells_1752754206671.png')
     
     # Calculate cell dimensions (5 columns, 4 rows)
     width, height = sprite_sheet.size
