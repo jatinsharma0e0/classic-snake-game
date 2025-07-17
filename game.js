@@ -59,6 +59,31 @@ class SnakeGame {
         this.nextTongueTime = 5000 + Math.random() * 4000; // Random interval 5-9 seconds
         this.tongueWiggleTimer = 0;
         
+        // Personality animations for charming male snake
+        this.blinkTime = 0;
+        this.lastBlinkTime = 0;
+        this.isBlinking = false;
+        this.blinkDuration = 150; // ms
+        this.nextBlinkTime = 2000 + Math.random() * 3000; // Random 2-5 seconds
+        
+        this.eyebrowRaise = 0;
+        this.confidenceBoost = 0;
+        this.lastConfidenceTime = 0;
+        this.nextConfidenceTime = 8000 + Math.random() * 7000; // Random 8-15 seconds
+        
+        this.tailWag = 0;
+        this.headTilt = 0;
+        this.cheekyGrin = false;
+        this.grinTimer = 0;
+        
+        this.winkTime = 0;
+        this.lastWinkTime = 0;
+        this.isWinking = false;
+        this.nextWinkTime = 12000 + Math.random() * 8000; // Random 12-20 seconds
+        
+        this.idleAnimTimer = 0;
+        this.swaggerTimer = 0;
+        
         // Food properties - Normal random generation for gameplay
         this.food = this.generateFood();
         
@@ -922,13 +947,14 @@ class SnakeGame {
         
         const bodyWidth = this.gridSize * 0.8;
         
-        // Cache snake body gradient
-        if (!this.gradientCache.has('snakeBody')) {
+        // Cache enhanced male snake body gradient
+        if (!this.gradientCache.has('maleSnakeBody')) {
             const gradient = this.ctx.createLinearGradient(0, 0, 0, bodyWidth);
-            gradient.addColorStop(0, '#6495ED');
-            gradient.addColorStop(0.5, '#4169E1');
-            gradient.addColorStop(1, '#1E3A8A');
-            this.gradientCache.set('snakeBody', gradient);
+            gradient.addColorStop(0, '#2E8B57'); // Sea Green
+            gradient.addColorStop(0.3, '#228B22'); // Forest Green  
+            gradient.addColorStop(0.7, '#006400'); // Dark Green
+            gradient.addColorStop(1, '#013220'); // Very Dark Green
+            this.gradientCache.set('maleSnakeBody', gradient);
         }
         
         // Performance: create single path for entire snake
@@ -946,12 +972,21 @@ class SnakeGame {
             }
         }
         
-        // Single stroke for entire body
-        this.ctx.strokeStyle = this.gradientCache.get('snakeBody');
+        // Single stroke for entire body with enhanced masculine colors
+        this.ctx.strokeStyle = this.gradientCache.get('maleSnakeBody');
         this.ctx.lineWidth = bodyWidth;
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
         this.ctx.stroke();
+        
+        // Add subtle golden stripes along body for masculine appeal
+        if (this.snake.length > 1) {
+            this.ctx.strokeStyle = '#FFD700';
+            this.ctx.lineWidth = 2;
+            this.ctx.globalAlpha = 0.3;
+            this.ctx.stroke();
+            this.ctx.globalAlpha = 1.0;
+        }
     }
     
     drawSnakeHeadOptimized() {
@@ -969,12 +1004,17 @@ class SnakeGame {
         else if (this.direction.y === 1) angle = Math.PI / 2; // Down
         else if (this.direction.y === -1) angle = -Math.PI / 2; // Up
         
-        // Cache head gradient
-        if (!this.gradientCache.has('snakeHead')) {
+        // Update personality animations
+        this.updatePersonalityAnimations();
+        
+        // Cache enhanced male snake head gradient with cooler, bolder colors
+        if (!this.gradientCache.has('maleSnakeHead')) {
             const gradient = this.ctx.createRadialGradient(-radius/3, -radius/3, 0, 0, 0, radius);
-            gradient.addColorStop(0, '#6495ED');
-            gradient.addColorStop(1, '#4169E1');
-            this.gradientCache.set('snakeHead', gradient);
+            gradient.addColorStop(0, '#2E8B57'); // Sea Green - confident, masculine
+            gradient.addColorStop(0.4, '#228B22'); // Forest Green
+            gradient.addColorStop(0.8, '#006400'); // Dark Green
+            gradient.addColorStop(1, '#013220'); // Very Dark Green
+            this.gradientCache.set('maleSnakeHead', gradient);
         }
         
         // Performance: save/restore only when needed
@@ -982,50 +1022,127 @@ class SnakeGame {
         this.ctx.translate(centerX, centerY);
         this.ctx.rotate(angle);
         
-        // Head circle
-        this.ctx.fillStyle = this.gradientCache.get('snakeHead');
+        // Add subtle head tilt for personality
+        if (this.headTilt !== 0) {
+            this.ctx.rotate(this.headTilt * Math.PI / 180);
+        }
+        
+        // Head circle with enhanced gradient
+        this.ctx.fillStyle = this.gradientCache.get('maleSnakeHead');
         this.ctx.beginPath();
-        this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        this.ctx.arc(0, 0, radius + this.confidenceBoost, 0, Math.PI * 2);
         this.ctx.fill();
         
-        // Draw eyes efficiently (solid colors only for performance)
-        const eyeOffset = radius * 0.4;
-        const eyeSize = radius * 0.25;
+        // Add golden accent stripes for masculine appeal
+        this.ctx.strokeStyle = '#FFD700';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, radius * 0.7, Math.PI * 0.1, Math.PI * 0.4);
+        this.ctx.stroke();
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, radius * 0.7, Math.PI * 0.6, Math.PI * 0.9);
+        this.ctx.stroke();
         
-        // White eyes
+        // Draw enhanced eyes with personality
+        const eyeOffset = radius * 0.35;
+        const eyeSize = radius * 0.28; // Slightly bigger for boldness
+        
+        // Eye whites with confident shape
         this.ctx.fillStyle = 'white';
         this.ctx.beginPath();
-        this.ctx.arc(eyeOffset, -eyeOffset * 0.5, eyeSize, 0, Math.PI * 2);
-        this.ctx.arc(-eyeOffset, -eyeOffset * 0.5, eyeSize, 0, Math.PI * 2);
+        // Left eye (slightly narrowed for confident look)
+        this.ctx.ellipse(-eyeOffset, -eyeOffset * 0.4 + this.eyebrowRaise, eyeSize, eyeSize * 0.9, 0, 0, Math.PI * 2);
+        // Right eye (handle winking)
+        if (this.isWinking) {
+            // Draw closed eye as a line
+            this.ctx.moveTo(eyeOffset - eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
+            this.ctx.lineTo(eyeOffset + eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = 'black';
+            this.ctx.stroke();
+        } else if (this.isBlinking) {
+            // Both eyes closed
+            this.ctx.moveTo(-eyeOffset - eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
+            this.ctx.lineTo(-eyeOffset + eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
+            this.ctx.moveTo(eyeOffset - eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
+            this.ctx.lineTo(eyeOffset + eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = 'black';
+            this.ctx.stroke();
+        } else {
+            // Normal open eyes
+            this.ctx.ellipse(eyeOffset, -eyeOffset * 0.4 + this.eyebrowRaise, eyeSize, eyeSize * 0.9, 0, 0, Math.PI * 2);
+        }
         this.ctx.fill();
         
+        // Draw eyebrows for masculine expression
+        if (!this.isBlinking) {
+            this.ctx.strokeStyle = '#013220';
+            this.ctx.lineWidth = 2;
+            this.ctx.beginPath();
+            // Left eyebrow (slightly angled for confidence)
+            this.ctx.moveTo(-eyeOffset - eyeSize * 0.8, -eyeOffset * 0.8 + this.eyebrowRaise);
+            this.ctx.lineTo(-eyeOffset + eyeSize * 0.8, -eyeOffset * 1.2 + this.eyebrowRaise);
+            // Right eyebrow
+            this.ctx.moveTo(eyeOffset - eyeSize * 0.8, -eyeOffset * 1.2 + this.eyebrowRaise);
+            this.ctx.lineTo(eyeOffset + eyeSize * 0.8, -eyeOffset * 0.8 + this.eyebrowRaise);
+            this.ctx.stroke();
+        }
+        
         // Pupils (check for death state)
-        this.ctx.fillStyle = 'black';
-        this.ctx.beginPath();
         if (this.isDead) {
             // Draw X X for dead eyes (performance optimized)
             const pupilSize = eyeSize * 0.6;
-            this.ctx.lineWidth = 2;
+            this.ctx.lineWidth = 3;
             this.ctx.strokeStyle = 'black';
             
             // Left eye X
-            this.ctx.moveTo(-eyeOffset - pupilSize/2, -eyeOffset * 0.5 - pupilSize/2);
-            this.ctx.lineTo(-eyeOffset + pupilSize/2, -eyeOffset * 0.5 + pupilSize/2);
-            this.ctx.moveTo(-eyeOffset + pupilSize/2, -eyeOffset * 0.5 - pupilSize/2);
-            this.ctx.lineTo(-eyeOffset - pupilSize/2, -eyeOffset * 0.5 + pupilSize/2);
+            this.ctx.beginPath();
+            this.ctx.moveTo(-eyeOffset - pupilSize/2, -eyeOffset * 0.4 - pupilSize/2);
+            this.ctx.lineTo(-eyeOffset + pupilSize/2, -eyeOffset * 0.4 + pupilSize/2);
+            this.ctx.moveTo(-eyeOffset + pupilSize/2, -eyeOffset * 0.4 - pupilSize/2);
+            this.ctx.lineTo(-eyeOffset - pupilSize/2, -eyeOffset * 0.4 + pupilSize/2);
             
             // Right eye X
-            this.ctx.moveTo(eyeOffset - pupilSize/2, -eyeOffset * 0.5 - pupilSize/2);
-            this.ctx.lineTo(eyeOffset + pupilSize/2, -eyeOffset * 0.5 + pupilSize/2);
-            this.ctx.moveTo(eyeOffset + pupilSize/2, -eyeOffset * 0.5 - pupilSize/2);
-            this.ctx.lineTo(eyeOffset - pupilSize/2, -eyeOffset * 0.5 + pupilSize/2);
+            this.ctx.moveTo(eyeOffset - pupilSize/2, -eyeOffset * 0.4 - pupilSize/2);
+            this.ctx.lineTo(eyeOffset + pupilSize/2, -eyeOffset * 0.4 + pupilSize/2);
+            this.ctx.moveTo(eyeOffset + pupilSize/2, -eyeOffset * 0.4 - pupilSize/2);
+            this.ctx.lineTo(eyeOffset - pupilSize/2, -eyeOffset * 0.4 + pupilSize/2);
             
             this.ctx.stroke();
-        } else {
-            // Normal pupils
-            this.ctx.arc(eyeOffset, -eyeOffset * 0.5, eyeSize * 0.4, 0, Math.PI * 2);
-            this.ctx.arc(-eyeOffset, -eyeOffset * 0.5, eyeSize * 0.4, 0, Math.PI * 2);
+        } else if (!this.isBlinking && !this.isWinking) {
+            // Normal pupils with confident gaze
+            this.ctx.fillStyle = 'black';
+            this.ctx.beginPath();
+            this.ctx.arc(-eyeOffset, -eyeOffset * 0.4 + this.eyebrowRaise, eyeSize * 0.5, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffset, -eyeOffset * 0.4 + this.eyebrowRaise, eyeSize * 0.5, 0, Math.PI * 2);
             this.ctx.fill();
+            
+            // Eye shine for liveliness
+            this.ctx.fillStyle = 'white';
+            this.ctx.beginPath();
+            this.ctx.arc(-eyeOffset + eyeSize * 0.15, -eyeOffset * 0.4 - eyeSize * 0.15 + this.eyebrowRaise, eyeSize * 0.15, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffset + eyeSize * 0.15, -eyeOffset * 0.4 - eyeSize * 0.15 + this.eyebrowRaise, eyeSize * 0.15, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        
+        // Draw cheeky grin or confident mouth
+        if (this.cheekyGrin || this.mouthOpen) {
+            this.ctx.strokeStyle = '#8B0000';
+            this.ctx.lineWidth = 2;
+            this.ctx.beginPath();
+            if (this.cheekyGrin) {
+                // Cheeky smile
+                this.ctx.arc(0, radius * 0.3, radius * 0.4, 0.2, Math.PI - 0.2);
+            } else {
+                // Open mouth for eating
+                this.ctx.arc(0, radius * 0.4, radius * 0.25, 0, Math.PI);
+            }
+            this.ctx.stroke();
+        
+        // Draw enhanced tongue if visible
+        if (this.tongueOut) {
+            this.drawEnhancedTongue(radius);
         }
         
         this.ctx.restore();
@@ -1987,6 +2104,106 @@ class SnakeGame {
             width: Math.min(this.canvas.width, width + 10),
             height: Math.min(this.canvas.height, height + 10)
         });
+    }
+    
+    // Personality animations for charming male snake
+    updatePersonalityAnimations() {
+        const currentTime = Date.now();
+        
+        // Blinking animation
+        if (currentTime - this.lastBlinkTime > this.nextBlinkTime) {
+            this.isBlinking = true;
+            this.blinkTime = currentTime;
+            this.lastBlinkTime = currentTime;
+            this.nextBlinkTime = 2000 + Math.random() * 3000; // Random 2-5 seconds
+        }
+        
+        if (this.isBlinking && currentTime - this.blinkTime > this.blinkDuration) {
+            this.isBlinking = false;
+        }
+        
+        // Winking animation (charming male trait)
+        if (currentTime - this.lastWinkTime > this.nextWinkTime && !this.isBlinking) {
+            this.isWinking = true;
+            this.winkTime = currentTime;
+            this.lastWinkTime = currentTime;
+            this.nextWinkTime = 12000 + Math.random() * 8000; // Random 12-20 seconds
+        }
+        
+        if (this.isWinking && currentTime - this.winkTime > 300) { // Quick wink
+            this.isWinking = false;
+        }
+        
+        // Confidence boost animation (puffing chest)
+        if (currentTime - this.lastConfidenceTime > this.nextConfidenceTime) {
+            this.confidenceBoost = Math.sin((currentTime - this.lastConfidenceTime) / 100) * 2;
+            this.eyebrowRaise = Math.sin((currentTime - this.lastConfidenceTime) / 150) * 1;
+            
+            if (currentTime - this.lastConfidenceTime > this.nextConfidenceTime + 2000) {
+                this.lastConfidenceTime = currentTime;
+                this.nextConfidenceTime = 8000 + Math.random() * 7000; // Random 8-15 seconds
+                this.confidenceBoost = 0;
+                this.eyebrowRaise = 0;
+            }
+        }
+        
+        // Cheeky grin animation
+        this.grinTimer += 16; // Assuming 60fps
+        if (this.grinTimer > 10000 && this.grinTimer < 12000) { // Grin for 2 seconds every 10-12 seconds
+            this.cheekyGrin = true;
+        } else {
+            this.cheekyGrin = false;
+            if (this.grinTimer > 15000) this.grinTimer = 0; // Reset timer
+        }
+        
+        // Head tilt for personality
+        this.idleAnimTimer += 16;
+        this.headTilt = Math.sin(this.idleAnimTimer / 2000) * 3; // Subtle head tilt
+        
+        // Swagger/confidence animations
+        this.swaggerTimer += 16;
+        if (this.swaggerTimer > 20000) {
+            this.swaggerTimer = 0;
+        }
+    }
+    
+    // Enhanced tongue drawing with personality
+    drawEnhancedTongue(headRadius) {
+        const tongueLength = headRadius * 1.2;
+        const tongueWidth = 2;
+        
+        // Tongue wiggle animation
+        this.tongueWiggleTimer += 16;
+        const wiggleX = Math.sin(this.tongueWiggleTimer / 100) * 2;
+        const wiggleY = Math.sin(this.tongueWiggleTimer / 80) * 1;
+        
+        // Forked tongue design
+        this.ctx.strokeStyle = '#DC143C'; // Deep red
+        this.ctx.lineWidth = tongueWidth;
+        this.ctx.lineCap = 'round';
+        
+        this.ctx.beginPath();
+        // Main tongue body
+        this.ctx.moveTo(headRadius * 0.8, 0);
+        this.ctx.lineTo(headRadius * 0.8 + tongueLength * 0.7 + wiggleX, wiggleY);
+        
+        // Left fork
+        this.ctx.moveTo(headRadius * 0.8 + tongueLength * 0.7 + wiggleX, wiggleY);
+        this.ctx.lineTo(headRadius * 0.8 + tongueLength + wiggleX - 3, wiggleY - 3);
+        
+        // Right fork  
+        this.ctx.moveTo(headRadius * 0.8 + tongueLength * 0.7 + wiggleX, wiggleY);
+        this.ctx.lineTo(headRadius * 0.8 + tongueLength + wiggleX - 3, wiggleY + 3);
+        
+        this.ctx.stroke();
+        
+        // Add tongue highlight for depth
+        this.ctx.strokeStyle = '#FF6B6B';
+        this.ctx.lineWidth = tongueWidth * 0.5;
+        this.ctx.beginPath();
+        this.ctx.moveTo(headRadius * 0.8, 0);
+        this.ctx.lineTo(headRadius * 0.8 + tongueLength * 0.5 + wiggleX * 0.5, wiggleY * 0.5);
+        this.ctx.stroke();
     }
 }
 
