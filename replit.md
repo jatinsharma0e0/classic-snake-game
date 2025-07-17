@@ -94,7 +94,10 @@ The application is designed for real-time interactive experiences with 3D graphi
 
 ## Recent Changes
 
-**UI Enhancement: Golden Theme Consistency and Home Button (July 17, 2025):**
+**Safe Area Implementation and UI Enhancement (July 17, 2025):**
+- Added safe area around snake's starting position (3-block radius) where no obstacles spawn
+- Modified isObstacleConflicting() function to prevent obstacle generation near snake start (10, 10)
+- Updated mute button to use X symbol instead of ~ for muted state with proper SVG icons
 - Added Home button to game screen (positioned left of restart button) with golden theme styling
 - Fixed mute button to maintain golden SVG icons for both muted and unmuted states
 - Updated both home screen and game screen mute buttons to use consistent SVG icons instead of emojis

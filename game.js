@@ -416,6 +416,25 @@ class SnakeGame {
     }
     
     isObstacleConflicting(position, obstacle) {
+        // Define safe area around snake's starting position (10, 10)
+        const safeAreaRadius = 3; // 3 blocks radius around starting position
+        const snakeStartX = 10;
+        const snakeStartY = 10;
+        
+        // Check if obstacle is within safe area
+        for (let dx = 0; dx < obstacle.width; dx++) {
+            for (let dy = 0; dy < obstacle.height; dy++) {
+                const obstacleX = position.x + dx;
+                const obstacleY = position.y + dy;
+                
+                // Check if this part of the obstacle is within the safe area
+                if (Math.abs(obstacleX - snakeStartX) <= safeAreaRadius && 
+                    Math.abs(obstacleY - snakeStartY) <= safeAreaRadius) {
+                    return true;
+                }
+            }
+        }
+        
         // Check conflict with snake
         for (let segment of this.snake) {
             for (let dx = 0; dx < obstacle.width; dx++) {
