@@ -99,6 +99,7 @@ class SnakeGame {
         this.restartBtn = document.getElementById('restartBtn');
         this.restartGameBtn = document.getElementById('restartGameBtn');
         this.backToMenuBtn = document.getElementById('backToMenuBtn');
+        this.homeBtn = document.getElementById('homeBtn');
         this.muteBtn = document.getElementById('muteBtn');
         this.homeMuteBtn = document.getElementById('homeMuteBtn');
         this.tutorialOverlay = document.getElementById('tutorialOverlay');
@@ -163,7 +164,18 @@ class SnakeGame {
         });
         this.backToMenuBtn.addEventListener('click', () => {
             if (this.audioManager) {
-                this.audioManager && this.audioManager.playSound('buttonClick');
+                this.audioManager.playSound('buttonClick');
+            }
+            
+            // Unblock interactions when returning to menu
+            this.blockUnderlyingInteractions(false);
+            
+            this.showStartScreen();
+        });
+        
+        this.homeBtn.addEventListener('click', () => {
+            if (this.audioManager) {
+                this.audioManager.playSound('buttonClick');
             }
             
             // Unblock interactions when returning to menu
