@@ -1008,11 +1008,11 @@ class SnakeGame {
             const prevDir = { x: current.x - prev.x, y: current.y - prev.y };
             const nextDir = { x: next.x - current.x, y: next.y - current.y };
             
-            if (prevDir.x === nextDir.x) {
-                // Vertical straight segment
+            if (prevDir.x === nextDir.x && prevDir.x === 0) {
+                // Vertical straight segment (moving up/down, X stays the same)
                 bodySprite = 'body_vertical';
-            } else if (prevDir.y === nextDir.y) {
-                // Horizontal straight segment
+            } else if (prevDir.y === nextDir.y && prevDir.y === 0) {
+                // Horizontal straight segment (moving left/right, Y stays the same)
                 bodySprite = 'body_horizontal';
             } else {
                 // Corner piece - determine turn direction

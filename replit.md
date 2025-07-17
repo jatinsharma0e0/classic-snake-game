@@ -224,3 +224,11 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Enhanced CSS with hardware acceleration (translateZ, will-change, backface-visibility)
 - Created render state caching to skip redundant drawing operations
 - All optimizations maintain visual quality while targeting 60 FPS on low-end hardware
+
+**Bug Fix: Snake Body Sprite Orientation (July 17, 2025):**
+- Fixed critical bug where snake body sprites used wrong orientation
+- Corrected logic in drawSnakeBodySprite() function to properly distinguish between horizontal and vertical movement
+- When snake moves horizontally (left/right), now correctly uses body_horizontal.png sprite
+- When snake moves vertically (up/down), now correctly uses body_vertical.png sprite
+- Fixed condition to check if direction vectors are zero for straight segments
+- Snake body segments now properly align with movement direction for visual consistency
