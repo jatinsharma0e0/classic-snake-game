@@ -530,71 +530,104 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.9);
-    color: white;
-    padding: 30px;
-    border-radius: 15px;
-    border: 2px solid #ff6b6b;
-    box-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+    z-index: 1000;
+}
+
+.game-over-board {
+    background: url('assets/game-over-board.png') no-repeat center center;
+    background-size: contain;
+    width: 400px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px 40px 40px;
+    position: relative;
+}
+
+.scores-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.score-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    backdrop-filter: blur(5px);
 }
 
-.game-over h2 {
-    color: #ff6b6b;
-    font-size: 2rem;
-    margin-bottom: 15px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.game-over p {
+.score-label {
+    font-family: 'Driftwood', serif;
     font-size: 1.2rem;
-    margin-bottom: 10px;
+    color: #4a3c1a;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
 }
 
-.best-score {
-    color: #ffd93d !important;
+.score-value {
+    font-family: 'Display-Dots-Two-Sans', monospace;
+    font-size: 2rem;
     font-weight: bold;
+    color: #2d5016;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
 }
 
-.restart-btn {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-    color: white;
+.buttons-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.leaf-button {
+    background: none;
     border: none;
-    padding: 12px 24px;
-    font-size: 1.1rem;
-    border-radius: 25px;
     cursor: pointer;
-    margin-top: 15px;
+    padding: 0;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    position: relative;
+    width: 120px;
+    height: 60px;
 }
 
-.restart-btn:hover {
-    background: linear-gradient(135deg, #ee5a52, #ff6b6b);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+.retry-button {
+    background: url('assets/game-over-buttons.png') no-repeat;
+    background-position: 0 0;
+    background-size: 240px 120px;
 }
 
-.back-menu-btn {
-    background: linear-gradient(135deg, #4fd1c7, #68d391);
-    color: #1a3a0e;
-    border: none;
-    padding: 12px 24px;
+.home-button {
+    background: url('assets/game-over-buttons.png') no-repeat;
+    background-position: 0 -60px;
+    background-size: 240px 120px;
+}
+
+.leaf-button:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+}
+
+.leaf-button:active {
+    transform: scale(0.95);
+}
+
+.button-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Driftwood', serif;
     font-size: 1.1rem;
-    border-radius: 25px;
-    cursor: pointer;
-    margin-top: 10px;
-    margin-left: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(79, 209, 199, 0.3);
+    font-weight: bold;
+    color: #f5f5dc;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
 }
 
-.back-menu-btn:hover {
-    background: linear-gradient(135deg, #68d391, #4fd1c7);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(79, 209, 199, 0.4);
-}
+
 
 .tutorial-overlay {
     position: absolute;
