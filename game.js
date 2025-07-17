@@ -73,6 +73,9 @@ class SnakeGame {
         this.obstacles = [];
         this.obstacleImages = {};
         
+        // Snake sprite images
+        this.snakeImages = {};
+        
         // Background image
         this.grassBg = new Image();
         this.grassBg.src = 'assets/grass-bg.webp';
@@ -103,6 +106,9 @@ class SnakeGame {
         
         // Load obstacle images
         this.loadObstacleImages();
+        
+        // Load snake sprite images
+        this.loadSnakeImages();
         
         // Initialize snake animation for start screen
         this.initStartScreenSnake();
@@ -183,6 +189,28 @@ class SnakeGame {
             img.src = `assets/${name}.png`;
             this.obstacleImages[name] = img;
         });
+    }
+    
+    loadSnakeImages() {
+        const snakeImageNames = [
+            'head_up', 'head_down', 'head_left', 'head_right',
+            'head_eyes_up',
+            'body_straight_horizontal', 'body_straight_vertical',
+            'body_corner_1', 'body_corner_2', 'body_corner_3', 'body_corner_4',
+            'body_curve_large', 'body_curve_small',
+            'body_segment_1', 'body_segment_2',
+            'tail_up', 'tail_down', 'tail_left', 'tail_right'
+        ];
+        
+        snakeImageNames.forEach(name => {
+            const img = new Image();
+            img.src = `assets/snakes/greeny/${name}.png`;
+            this.snakeImages[name] = img;
+        });
+        
+        // Also load the apple sprite
+        this.appleImage = new Image();
+        this.appleImage.src = 'assets/food/apple/apple.png';
     }
     
     generateObstacles() {
@@ -680,7 +708,7 @@ class SnakeGame {
         this.drawObstaclesOptimized();
         
         // Draw food (optimized)
-        this.drawAppleOptimized(this.food.x * this.gridSize, this.food.y * this.gridSize);
+        this.drawAppleSprite(this.food.x * this.gridSize, this.food.y * this.gridSize);
         
         // Draw continuous snake (optimized)
         this.drawContinuousSnakeOptimized();
@@ -893,6 +921,15 @@ class SnakeGame {
         this.ctx.restore();
     }
     
+    drawAppleSprite(x, y) {
+        if (this.appleImage && this.appleImage.complete) {
+            this.ctx.drawImage(this.appleImage, x, y, this.gridSize, this.gridSize);
+        } else {
+            // Fallback to original apple drawing if sprite not loaded
+            this.drawAppleOptimized(x, y);
+        }
+    }
+    
     drawJungleBackground() {
         // Draw grass background image if loaded
         if (this.grassBg.complete) {
@@ -914,14 +951,103 @@ class SnakeGame {
     drawContinuousSnakeOptimized() {
         if (this.snake.length === 0) return;
         
-        // CRITICAL FIX: Always draw snake - render state caching was causing invisibility
-        // Canvas is cleared each frame, so we must redraw the snake every frame
+        // Use sprite-based snake rendering
+        this.drawSpriteBasedSnake();
+    }
+    
+    drawSpriteBasedSnake() {
+        if (this.snake.length === 0) return;
         
-        // Draw optimized snake body first
-        this.drawSnakeBodyOptimized();
+        // Draw each segment with appropriate sprite
+        for (let i = 0; i < this.snake.length; i++) {
+            const segment = this.snake[i];
+            const x = segment.x * this.gridSize;
+            const y = segment.y * this.gridSize;
+            
+            if (i === 0) {
+                // Draw head
+                this.drawSnakeHeadSprite(x, y);
+            } else if (i === this.snake.length - 1) {
+                // Draw tail
+                this.drawSnakeTailSprite(x, y, i);
+            } else {
+                // Draw body segment
+                this.drawSnakeBodySprite(x, y, i);
+            }
+        }
+    }
+    
+    drawSnakeHeadSprite(x, y) {
+        let headSprite = 'head_right'; // Default facing right
         
-        // Then draw the optimized head with eyes on top
-        this.drawSnakeHeadOptimized();
+        // Determine head direction based on movement
+        if (this.direction.x === 1) headSprite = 'head_right';
+        else if (this.direction.x === -1) headSprite = 'head_left';
+        else if (this.direction.y === 1) headSprite = 'head_down';
+        else if (this.direction.y === -1) headSprite = 'head_up';
+        
+        // Use eyes variant occasionally for more personality
+        if (Math.random() < 0.3 && headSprite === 'head_up') {
+            headSprite = 'head_eyes_up';
+        }
+        
+        const img = this.snakeImages[headSprite];
+        if (img && img.complete) {
+            this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
+        }
+    }
+    
+    drawSnakeBodySprite(x, y, index) {
+        const current = this.snake[index];
+        const prev = this.snake[index - 1];
+        const next = this.snake[index + 1];
+        
+        let bodySprite = 'body_straight_horizontal'; // Default
+        
+        if (prev && next) {
+            // Determine if this is a corner or straight segment
+            const prevDir = { x: current.x - prev.x, y: current.y - prev.y };
+            const nextDir = { x: next.x - current.x, y: next.y - current.y };
+            
+            if (prevDir.x === nextDir.x) {
+                // Vertical straight segment
+                bodySprite = 'body_straight_vertical';
+            } else if (prevDir.y === nextDir.y) {
+                // Horizontal straight segment
+                bodySprite = 'body_straight_horizontal';
+            } else {
+                // Corner piece - use different corner sprites for variety
+                const cornerTypes = ['body_corner_1', 'body_corner_2', 'body_corner_3', 'body_corner_4'];
+                bodySprite = cornerTypes[index % cornerTypes.length];
+            }
+        }
+        
+        const img = this.snakeImages[bodySprite];
+        if (img && img.complete) {
+            this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
+        }
+    }
+    
+    drawSnakeTailSprite(x, y, index) {
+        const current = this.snake[index];
+        const prev = this.snake[index - 1];
+        
+        let tailSprite = 'tail_right'; // Default
+        
+        if (prev) {
+            // Determine tail direction based on previous segment
+            const direction = { x: current.x - prev.x, y: current.y - prev.y };
+            
+            if (direction.x === 1) tailSprite = 'tail_right';
+            else if (direction.x === -1) tailSprite = 'tail_left';
+            else if (direction.y === 1) tailSprite = 'tail_down';
+            else if (direction.y === -1) tailSprite = 'tail_up';
+        }
+        
+        const img = this.snakeImages[tailSprite];
+        if (img && img.complete) {
+            this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
+        }
     }
     
     drawSnakeBodyOptimized() {
