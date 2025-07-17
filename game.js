@@ -193,12 +193,12 @@ class SnakeGame {
     
     loadSnakeImages() {
         const snakeImageNames = [
+            // Head sprites
             'head_up', 'head_down', 'head_left', 'head_right',
-            'head_eyes_up',
-            'body_straight_horizontal', 'body_straight_vertical',
-            'body_corner_1', 'body_corner_2', 'body_corner_3', 'body_corner_4',
-            'body_curve_large', 'body_curve_small',
-            'body_segment_1', 'body_segment_2',
+            // Body sprites
+            'body_horizontal', 'body_vertical',
+            'body_turn_left_down', 'body_turn_up_left', 'body_turn_down_right', 'body_turn_right_up',
+            // Tail sprites
             'tail_up', 'tail_down', 'tail_left', 'tail_right'
         ];
         
@@ -978,8 +978,13 @@ class SnakeGame {
     }
     
     drawSnakeHeadSprite(x, y) {
-        // Use the working head sprite with eyes (body_corner_2.png contains a proper head)
-        let headSprite = 'body_corner_2'; // This sprite actually contains a head with eyes
+        let headSprite = 'head_right'; // Default facing right
+        
+        // Determine head direction based on movement
+        if (this.direction.x === 1) headSprite = 'head_right';
+        else if (this.direction.x === -1) headSprite = 'head_left';
+        else if (this.direction.y === 1) headSprite = 'head_down';
+        else if (this.direction.y === -1) headSprite = 'head_up';
         
         // Check if the image exists and is loaded
         const img = this.snakeImages[headSprite];
@@ -996,7 +1001,7 @@ class SnakeGame {
         const prev = this.snake[index - 1];
         const next = this.snake[index + 1];
         
-        let bodySprite = 'body_corner_1'; // Use the working vertical pipe sprite as default
+        let bodySprite = 'body_horizontal'; // Default horizontal body
         
         if (prev && next) {
             // Determine if this is a corner or straight segment
@@ -1004,14 +1009,24 @@ class SnakeGame {
             const nextDir = { x: next.x - current.x, y: next.y - current.y };
             
             if (prevDir.x === nextDir.x) {
-                // Vertical straight segment - use the working pipe sprite
-                bodySprite = 'body_corner_1';
+                // Vertical straight segment
+                bodySprite = 'body_vertical';
             } else if (prevDir.y === nextDir.y) {
-                // Horizontal straight segment - use the spotted sprite
-                bodySprite = 'body_straight_horizontal';
+                // Horizontal straight segment
+                bodySprite = 'body_horizontal';
             } else {
-                // Corner piece - use the curved sprite
-                bodySprite = 'body_curve_large';
+                // Corner piece - determine turn direction
+                if ((prevDir.x === -1 && nextDir.y === 1) || (prevDir.y === -1 && nextDir.x === 1)) {
+                    bodySprite = 'body_turn_left_down'; // left→down or up→right
+                } else if ((prevDir.x === 1 && nextDir.y === -1) || (prevDir.y === 1 && nextDir.x === -1)) {
+                    bodySprite = 'body_turn_up_left'; // up→left or right→down
+                } else if ((prevDir.y === 1 && nextDir.x === 1) || (prevDir.x === -1 && nextDir.y === -1)) {
+                    bodySprite = 'body_turn_down_right'; // down→right or left→up
+                } else if ((prevDir.x === 1 && nextDir.y === 1) || (prevDir.y === -1 && nextDir.x === -1)) {
+                    bodySprite = 'body_turn_right_up'; // right→up or down→left
+                } else {
+                    bodySprite = 'body_horizontal'; // Default fallback
+                }
             }
         }
         
@@ -1027,8 +1042,20 @@ class SnakeGame {
     }
     
     drawSnakeTailSprite(x, y, index) {
-        // Use a simple body sprite for tail since tail sprites appear to be transparent
-        let tailSprite = 'body_corner_1'; // Use the working pipe sprite
+        const current = this.snake[index];
+        const prev = this.snake[index - 1];
+        
+        let tailSprite = 'tail_right'; // Default facing right
+        
+        if (prev) {
+            // Determine tail direction based on previous segment
+            const direction = { x: current.x - prev.x, y: current.y - prev.y };
+            
+            if (direction.x === 1) tailSprite = 'tail_right';
+            else if (direction.x === -1) tailSprite = 'tail_left';
+            else if (direction.y === 1) tailSprite = 'tail_down';
+            else if (direction.y === -1) tailSprite = 'tail_up';
+        }
         
         // Check if the sprite has content
         const img = this.snakeImages[tailSprite];
