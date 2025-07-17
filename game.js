@@ -59,30 +59,43 @@ class SnakeGame {
         this.nextTongueTime = 5000 + Math.random() * 4000; // Random interval 5-9 seconds
         this.tongueWiggleTimer = 0;
         
-        // Personality animations for charming male snake
+        // Cute male snake personality animations
         this.blinkTime = 0;
         this.lastBlinkTime = 0;
         this.isBlinking = false;
-        this.blinkDuration = 150; // ms
-        this.nextBlinkTime = 2000 + Math.random() * 3000; // Random 2-5 seconds
+        this.blinkDuration = 200; // Softer, slower blinks
+        this.nextBlinkTime = 3000 + Math.random() * 4000; // More relaxed blinking
         
-        this.eyebrowRaise = 0;
-        this.confidenceBoost = 0;
-        this.lastConfidenceTime = 0;
-        this.nextConfidenceTime = 8000 + Math.random() * 7000; // Random 8-15 seconds
+        this.headTilt = 0;
+        this.shyTiltTime = 0;
+        this.lastShyTiltTime = 0;
+        this.nextShyTiltTime = 6000 + Math.random() * 9000; // Shy head tilts
         
         this.tailWag = 0;
-        this.headTilt = 0;
-        this.cheekyGrin = false;
-        this.grinTimer = 0;
+        this.tailWagTime = 0;
+        this.isTailWagging = false;
+        this.lastTailWagTime = 0;
+        this.nextTailWagTime = 8000 + Math.random() * 7000; // Happy tail wagging
         
-        this.winkTime = 0;
-        this.lastWinkTime = 0;
-        this.isWinking = false;
-        this.nextWinkTime = 12000 + Math.random() * 8000; // Random 12-20 seconds
+        this.happyBounce = 0;
+        this.bounceTime = 0;
+        this.isBouncing = false;
+        this.lastBounceTime = 0;
+        this.nextBounceTime = 15000 + Math.random() * 10000; // Occasional happy bounces
+        
+        this.eyeSparkle = 0;
+        this.sparkleTime = 0;
+        this.isSparklingEyes = false;
+        this.lastSparkleTime = 0;
+        this.nextSparkleTime = 12000 + Math.random() * 8000; // Eye sparkles for cuteness
+        
+        this.sweetSmile = false;
+        this.smileTimer = 0;
+        this.cuteBlush = 0;
+        this.blushTimer = 0;
         
         this.idleAnimTimer = 0;
-        this.swaggerTimer = 0;
+        this.gentleSway = 0;
         
         // Food properties - Normal random generation for gameplay
         this.food = this.generateFood();
@@ -947,14 +960,15 @@ class SnakeGame {
         
         const bodyWidth = this.gridSize * 0.8;
         
-        // Cache enhanced male snake body gradient
-        if (!this.gradientCache.has('maleSnakeBody')) {
+        // Cache cute snake body gradient with bright, friendly colors
+        if (!this.gradientCache.has('cuteSnakeBody')) {
             const gradient = this.ctx.createLinearGradient(0, 0, 0, bodyWidth);
-            gradient.addColorStop(0, '#2E8B57'); // Sea Green
-            gradient.addColorStop(0.3, '#228B22'); // Forest Green  
-            gradient.addColorStop(0.7, '#006400'); // Dark Green
-            gradient.addColorStop(1, '#013220'); // Very Dark Green
-            this.gradientCache.set('maleSnakeBody', gradient);
+            gradient.addColorStop(0, '#98FB98'); // Pale Green - soft and cute
+            gradient.addColorStop(0.3, '#90EE90'); // Light Green
+            gradient.addColorStop(0.6, '#7CFC00'); // Lawn Green - cheerful
+            gradient.addColorStop(0.9, '#32CD32'); // Lime Green
+            gradient.addColorStop(1, '#228B22'); // Forest Green for depth
+            this.gradientCache.set('cuteSnakeBody', gradient);
         }
         
         // Performance: create single path for entire snake
@@ -972,20 +986,36 @@ class SnakeGame {
             }
         }
         
-        // Single stroke for entire body with enhanced masculine colors
-        this.ctx.strokeStyle = this.gradientCache.get('maleSnakeBody');
+        // Single stroke for entire body with cute, friendly colors
+        this.ctx.strokeStyle = this.gradientCache.get('cuteSnakeBody');
         this.ctx.lineWidth = bodyWidth;
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
         this.ctx.stroke();
         
-        // Add subtle golden stripes along body for masculine appeal
+        // Add adorable pastel accents along body
         if (this.snake.length > 1) {
-            this.ctx.strokeStyle = '#FFD700';
+            this.ctx.strokeStyle = '#FFE4B5'; // Soft pastel yellow
             this.ctx.lineWidth = 2;
-            this.ctx.globalAlpha = 0.3;
+            this.ctx.globalAlpha = 0.5;
             this.ctx.stroke();
             this.ctx.globalAlpha = 1.0;
+            
+            // Add cute tail wag effect
+            if (this.isTailWagging && this.snake.length > 2) {
+                const tail = this.snake[this.snake.length - 1];
+                const tailX = tail.x * this.gridSize + this.gridSize / 2;
+                const tailY = tail.y * this.gridSize + this.gridSize / 2;
+                
+                this.ctx.save();
+                this.ctx.translate(tailX, tailY);
+                this.ctx.rotate(this.tailWag * Math.PI / 180);
+                this.ctx.fillStyle = '#FFB6C1'; // Light pink for cute effect
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, bodyWidth * 0.6, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.restore();
+            }
         }
     }
     
@@ -1007,14 +1037,15 @@ class SnakeGame {
         // Update personality animations
         this.updatePersonalityAnimations();
         
-        // Cache enhanced male snake head gradient with cooler, bolder colors
-        if (!this.gradientCache.has('maleSnakeHead')) {
+        // Cache cute male snake head gradient with bright, friendly colors
+        if (!this.gradientCache.has('cuteSnakeHead')) {
             const gradient = this.ctx.createRadialGradient(-radius/3, -radius/3, 0, 0, 0, radius);
-            gradient.addColorStop(0, '#2E8B57'); // Sea Green - confident, masculine
-            gradient.addColorStop(0.4, '#228B22'); // Forest Green
-            gradient.addColorStop(0.8, '#006400'); // Dark Green
-            gradient.addColorStop(1, '#013220'); // Very Dark Green
-            this.gradientCache.set('maleSnakeHead', gradient);
+            gradient.addColorStop(0, '#98FB98'); // Pale Green - soft and friendly
+            gradient.addColorStop(0.3, '#90EE90'); // Light Green
+            gradient.addColorStop(0.6, '#7CFC00'); // Lawn Green - bright and cheerful
+            gradient.addColorStop(0.9, '#32CD32'); // Lime Green
+            gradient.addColorStop(1, '#228B22'); // Forest Green for depth
+            this.gradientCache.set('cuteSnakeHead', gradient);
         }
         
         // Performance: save/restore only when needed
@@ -1022,128 +1053,143 @@ class SnakeGame {
         this.ctx.translate(centerX, centerY);
         this.ctx.rotate(angle);
         
-        // Add subtle head tilt for personality
+        // Add cute head tilt and bounce for adorable personality
         if (this.headTilt !== 0) {
             this.ctx.rotate(this.headTilt * Math.PI / 180);
         }
         
-        // Head circle with enhanced gradient
-        this.ctx.fillStyle = this.gradientCache.get('maleSnakeHead');
+        // Cute rounded head with soft gradient
+        this.ctx.fillStyle = this.gradientCache.get('cuteSnakeHead');
         this.ctx.beginPath();
-        this.ctx.arc(0, 0, radius + this.confidenceBoost, 0, Math.PI * 2);
+        this.ctx.arc(0, 0 - this.happyBounce, radius * 1.1, 0, Math.PI * 2); // Slightly bigger for cuteness
         this.ctx.fill();
         
-        // Add golden accent stripes for masculine appeal
-        this.ctx.strokeStyle = '#FFD700';
+        // Add adorable polka dot pattern
+        this.ctx.fillStyle = '#FFE4B5'; // Soft yellow dots
+        this.ctx.globalAlpha = 0.6;
+        for (let i = 0; i < 4; i++) {
+            const dotAngle = (i * Math.PI) / 2;
+            const dotX = Math.cos(dotAngle) * radius * 0.5;
+            const dotY = Math.sin(dotAngle) * radius * 0.5 - this.happyBounce;
+            this.ctx.beginPath();
+            this.ctx.arc(dotX, dotY, radius * 0.12, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        this.ctx.globalAlpha = 1.0;
+        
+        // Add cute blush if active
+        if (this.cuteBlush > 0) {
+            this.ctx.fillStyle = '#FFB6C1'; // Light pink blush
+            this.ctx.globalAlpha = this.cuteBlush;
+            this.ctx.beginPath();
+            this.ctx.ellipse(-radius * 0.6, radius * 0.2 - this.happyBounce, radius * 0.25, radius * 0.15, 0, 0, Math.PI * 2);
+            this.ctx.ellipse(radius * 0.6, radius * 0.2 - this.happyBounce, radius * 0.25, radius * 0.15, 0, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.globalAlpha = 1.0;
+        }
+        
+        // Draw big, adorable eyes
+        const eyeOffset = radius * 0.3;
+        const eyeSize = radius * 0.35; // Much bigger for cuteness
+        
+        // Big round eye whites for innocent look
+        this.ctx.fillStyle = 'white';
+        this.ctx.strokeStyle = '#E0E0E0';
         this.ctx.lineWidth = 1;
         this.ctx.beginPath();
-        this.ctx.arc(0, 0, radius * 0.7, Math.PI * 0.1, Math.PI * 0.4);
-        this.ctx.stroke();
-        this.ctx.beginPath();
-        this.ctx.arc(0, 0, radius * 0.7, Math.PI * 0.6, Math.PI * 0.9);
-        this.ctx.stroke();
         
-        // Draw enhanced eyes with personality
-        const eyeOffset = radius * 0.35;
-        const eyeSize = radius * 0.28; // Slightly bigger for boldness
-        
-        // Eye whites with confident shape
-        this.ctx.fillStyle = 'white';
-        this.ctx.beginPath();
-        // Left eye (slightly narrowed for confident look)
-        this.ctx.ellipse(-eyeOffset, -eyeOffset * 0.4 + this.eyebrowRaise, eyeSize, eyeSize * 0.9, 0, 0, Math.PI * 2);
-        // Right eye (handle winking)
-        if (this.isWinking) {
-            // Draw closed eye as a line
-            this.ctx.moveTo(eyeOffset - eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
-            this.ctx.lineTo(eyeOffset + eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
-            this.ctx.lineWidth = 2;
-            this.ctx.strokeStyle = 'black';
-            this.ctx.stroke();
-        } else if (this.isBlinking) {
-            // Both eyes closed
-            this.ctx.moveTo(-eyeOffset - eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
-            this.ctx.lineTo(-eyeOffset + eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
-            this.ctx.moveTo(eyeOffset - eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
-            this.ctx.lineTo(eyeOffset + eyeSize, -eyeOffset * 0.4 + this.eyebrowRaise);
-            this.ctx.lineWidth = 2;
-            this.ctx.strokeStyle = 'black';
+        if (this.isBlinking) {
+            // Both eyes closed with cute arched lines
+            this.ctx.beginPath();
+            this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.8, Math.PI * 0.2, Math.PI * 0.8);
+            this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.8, Math.PI * 0.2, Math.PI * 0.8);
+            this.ctx.lineWidth = 3;
+            this.ctx.strokeStyle = '#228B22';
             this.ctx.stroke();
         } else {
-            // Normal open eyes
-            this.ctx.ellipse(eyeOffset, -eyeOffset * 0.4 + this.eyebrowRaise, eyeSize, eyeSize * 0.9, 0, 0, Math.PI * 2);
-        }
-        this.ctx.fill();
-        
-        // Draw eyebrows for masculine expression
-        if (!this.isBlinking) {
-            this.ctx.strokeStyle = '#013220';
-            this.ctx.lineWidth = 2;
-            this.ctx.beginPath();
-            // Left eyebrow (slightly angled for confidence)
-            this.ctx.moveTo(-eyeOffset - eyeSize * 0.8, -eyeOffset * 0.8 + this.eyebrowRaise);
-            this.ctx.lineTo(-eyeOffset + eyeSize * 0.8, -eyeOffset * 1.2 + this.eyebrowRaise);
-            // Right eyebrow
-            this.ctx.moveTo(eyeOffset - eyeSize * 0.8, -eyeOffset * 1.2 + this.eyebrowRaise);
-            this.ctx.lineTo(eyeOffset + eyeSize * 0.8, -eyeOffset * 0.8 + this.eyebrowRaise);
+            // Normal big round eyes
+            this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize, 0, Math.PI * 2);
+            this.ctx.fill();
             this.ctx.stroke();
         }
         
-        // Pupils (check for death state)
+        // Pupils and eye expressions
         if (this.isDead) {
-            // Draw X X for dead eyes (performance optimized)
-            const pupilSize = eyeSize * 0.6;
-            this.ctx.lineWidth = 3;
+            // Sad spiral eyes for cute death animation
             this.ctx.strokeStyle = 'black';
-            
-            // Left eye X
-            this.ctx.beginPath();
-            this.ctx.moveTo(-eyeOffset - pupilSize/2, -eyeOffset * 0.4 - pupilSize/2);
-            this.ctx.lineTo(-eyeOffset + pupilSize/2, -eyeOffset * 0.4 + pupilSize/2);
-            this.ctx.moveTo(-eyeOffset + pupilSize/2, -eyeOffset * 0.4 - pupilSize/2);
-            this.ctx.lineTo(-eyeOffset - pupilSize/2, -eyeOffset * 0.4 + pupilSize/2);
-            
-            // Right eye X
-            this.ctx.moveTo(eyeOffset - pupilSize/2, -eyeOffset * 0.4 - pupilSize/2);
-            this.ctx.lineTo(eyeOffset + pupilSize/2, -eyeOffset * 0.4 + pupilSize/2);
-            this.ctx.moveTo(eyeOffset + pupilSize/2, -eyeOffset * 0.4 - pupilSize/2);
-            this.ctx.lineTo(eyeOffset - pupilSize/2, -eyeOffset * 0.4 + pupilSize/2);
-            
-            this.ctx.stroke();
-        } else if (!this.isBlinking && !this.isWinking) {
-            // Normal pupils with confident gaze
-            this.ctx.fillStyle = 'black';
-            this.ctx.beginPath();
-            this.ctx.arc(-eyeOffset, -eyeOffset * 0.4 + this.eyebrowRaise, eyeSize * 0.5, 0, Math.PI * 2);
-            this.ctx.arc(eyeOffset, -eyeOffset * 0.4 + this.eyebrowRaise, eyeSize * 0.5, 0, Math.PI * 2);
-            this.ctx.fill();
-            
-            // Eye shine for liveliness
-            this.ctx.fillStyle = 'white';
-            this.ctx.beginPath();
-            this.ctx.arc(-eyeOffset + eyeSize * 0.15, -eyeOffset * 0.4 - eyeSize * 0.15 + this.eyebrowRaise, eyeSize * 0.15, 0, Math.PI * 2);
-            this.ctx.arc(eyeOffset + eyeSize * 0.15, -eyeOffset * 0.4 - eyeSize * 0.15 + this.eyebrowRaise, eyeSize * 0.15, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
-        
-        // Draw cheeky grin or confident mouth
-        if (this.cheekyGrin || this.mouthOpen) {
-            this.ctx.strokeStyle = '#8B0000';
             this.ctx.lineWidth = 2;
             this.ctx.beginPath();
-            if (this.cheekyGrin) {
-                // Cheeky smile
-                this.ctx.arc(0, radius * 0.3, radius * 0.4, 0.2, Math.PI - 0.2);
-            } else {
-                // Open mouth for eating
-                this.ctx.arc(0, radius * 0.4, radius * 0.25, 0, Math.PI);
+            // Left eye spiral
+            for (let i = 0; i < 3; i++) {
+                this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.3 - i * 3, 0, Math.PI * 2);
+            }
+            // Right eye spiral  
+            for (let i = 0; i < 3; i++) {
+                this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.3 - i * 3, 0, Math.PI * 2);
             }
             this.ctx.stroke();
+        } else if (!this.isBlinking) {
+            // Adorable big pupils for innocent look
+            this.ctx.fillStyle = 'black';
+            this.ctx.beginPath();
+            this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.4, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.4, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // Multiple sparkles for extra cuteness
+            this.ctx.fillStyle = 'white';
+            this.ctx.beginPath();
+            // Main shine spots
+            this.ctx.arc(-eyeOffset + eyeSize * 0.2, -eyeOffset * 0.6 - eyeSize * 0.2 - this.happyBounce, eyeSize * 0.12, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffset + eyeSize * 0.2, -eyeOffset * 0.6 - eyeSize * 0.2 - this.happyBounce, eyeSize * 0.12, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // Secondary smaller sparkles
+            this.ctx.beginPath();
+            this.ctx.arc(-eyeOffset - eyeSize * 0.15, -eyeOffset * 0.6 + eyeSize * 0.1 - this.happyBounce, eyeSize * 0.06, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffset - eyeSize * 0.15, -eyeOffset * 0.6 + eyeSize * 0.1 - this.happyBounce, eyeSize * 0.06, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // Special sparkle animation
+            if (this.isSparklingEyes) {
+                this.ctx.fillStyle = '#FFD700';
+                this.ctx.globalAlpha = 0.8;
+                this.ctx.beginPath();
+                this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.08 + this.eyeSparkle, 0, Math.PI * 2);
+                this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.08 + this.eyeSparkle, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.globalAlpha = 1.0;
+            }
         }
         
-        // Draw enhanced tongue if visible
+        // Draw sweet smile or eating mouth
+        if (this.sweetSmile || this.mouthOpen) {
+            this.ctx.strokeStyle = '#FF69B4';
+            this.ctx.lineWidth = 2;
+            this.ctx.beginPath();
+            if (this.sweetSmile) {
+                // Sweet, gentle smile
+                this.ctx.arc(0, radius * 0.4 - this.happyBounce, radius * 0.3, 0.3, Math.PI - 0.3);
+            } else {
+                // Open mouth for eating (smaller and cuter)
+                this.ctx.arc(0, radius * 0.5 - this.happyBounce, radius * 0.2, 0, Math.PI);
+            }
+            this.ctx.stroke();
+            
+            // Add tiny cute teeth when mouth is open
+            if (this.mouthOpen) {
+                this.ctx.fillStyle = 'white';
+                this.ctx.beginPath();
+                this.ctx.rect(-2, radius * 0.5 - this.happyBounce, 1, 3);
+                this.ctx.rect(1, radius * 0.5 - this.happyBounce, 1, 3);
+                this.ctx.fill();
+            }
+        }
+        
+        // Draw cute heart-shaped tongue if visible
         if (this.tongueOut) {
-            this.drawEnhancedTongue(radius);
+            this.drawCuteTongue(radius);
         }
         
         this.ctx.restore();
@@ -2107,104 +2153,135 @@ class SnakeGame {
         });
     }
     
-    // Personality animations for charming male snake
+    // Cute male snake personality animations
     updatePersonalityAnimations() {
         const currentTime = Date.now();
         
-        // Blinking animation
+        // Soft blinking animation
         if (currentTime - this.lastBlinkTime > this.nextBlinkTime) {
             this.isBlinking = true;
             this.blinkTime = currentTime;
             this.lastBlinkTime = currentTime;
-            this.nextBlinkTime = 2000 + Math.random() * 3000; // Random 2-5 seconds
+            this.nextBlinkTime = 3000 + Math.random() * 4000; // More relaxed blinking
         }
         
         if (this.isBlinking && currentTime - this.blinkTime > this.blinkDuration) {
             this.isBlinking = false;
         }
         
-        // Winking animation (charming male trait)
-        if (currentTime - this.lastWinkTime > this.nextWinkTime && !this.isBlinking) {
-            this.isWinking = true;
-            this.winkTime = currentTime;
-            this.lastWinkTime = currentTime;
-            this.nextWinkTime = 12000 + Math.random() * 8000; // Random 12-20 seconds
+        // Shy head tilt animation
+        if (currentTime - this.lastShyTiltTime > this.nextShyTiltTime) {
+            this.shyTiltTime = currentTime;
+            this.lastShyTiltTime = currentTime;
+            this.nextShyTiltTime = 6000 + Math.random() * 9000; // Shy tilts
         }
         
-        if (this.isWinking && currentTime - this.winkTime > 300) { // Quick wink
-            this.isWinking = false;
-        }
-        
-        // Confidence boost animation (puffing chest)
-        if (currentTime - this.lastConfidenceTime > this.nextConfidenceTime) {
-            this.confidenceBoost = Math.sin((currentTime - this.lastConfidenceTime) / 100) * 2;
-            this.eyebrowRaise = Math.sin((currentTime - this.lastConfidenceTime) / 150) * 1;
-            
-            if (currentTime - this.lastConfidenceTime > this.nextConfidenceTime + 2000) {
-                this.lastConfidenceTime = currentTime;
-                this.nextConfidenceTime = 8000 + Math.random() * 7000; // Random 8-15 seconds
-                this.confidenceBoost = 0;
-                this.eyebrowRaise = 0;
-            }
-        }
-        
-        // Cheeky grin animation
-        this.grinTimer += 16; // Assuming 60fps
-        if (this.grinTimer > 10000 && this.grinTimer < 12000) { // Grin for 2 seconds every 10-12 seconds
-            this.cheekyGrin = true;
+        // Calculate shy head tilt
+        if (currentTime - this.shyTiltTime < 2000) { // 2 second tilt duration
+            const tiltProgress = (currentTime - this.shyTiltTime) / 2000;
+            this.headTilt = Math.sin(tiltProgress * Math.PI) * 8; // Gentle tilt
         } else {
-            this.cheekyGrin = false;
-            if (this.grinTimer > 15000) this.grinTimer = 0; // Reset timer
+            this.headTilt = 0;
         }
         
-        // Head tilt for personality
+        // Happy tail wagging
+        if (currentTime - this.lastTailWagTime > this.nextTailWagTime) {
+            this.isTailWagging = true;
+            this.tailWagTime = currentTime;
+            this.lastTailWagTime = currentTime;
+            this.nextTailWagTime = 8000 + Math.random() * 7000; // Happy wagging
+        }
+        
+        if (this.isTailWagging && currentTime - this.tailWagTime < 3000) { // 3 second wag
+            this.tailWag = Math.sin((currentTime - this.tailWagTime) / 200) * 10; // Cute wagging
+        } else {
+            this.isTailWagging = false;
+            this.tailWag = 0;
+        }
+        
+        // Happy bouncing animation
+        if (currentTime - this.lastBounceTime > this.nextBounceTime) {
+            this.isBouncing = true;
+            this.bounceTime = currentTime;
+            this.lastBounceTime = currentTime;
+            this.nextBounceTime = 15000 + Math.random() * 10000; // Occasional bounces
+        }
+        
+        if (this.isBouncing && currentTime - this.bounceTime < 1500) { // 1.5 second bounce
+            const bounceProgress = (currentTime - this.bounceTime) / 1500;
+            this.happyBounce = Math.sin(bounceProgress * Math.PI * 2) * 3; // Cute bouncing
+        } else {
+            this.isBouncing = false;
+            this.happyBounce = 0;
+        }
+        
+        // Eye sparkle animation
+        if (currentTime - this.lastSparkleTime > this.nextSparkleTime) {
+            this.isSparklingEyes = true;
+            this.sparkleTime = currentTime;
+            this.lastSparkleTime = currentTime;
+            this.nextSparkleTime = 12000 + Math.random() * 8000; // Sparkle timing
+        }
+        
+        if (this.isSparklingEyes && currentTime - this.sparkleTime < 1000) { // 1 second sparkle
+            this.eyeSparkle = Math.sin((currentTime - this.sparkleTime) / 100) * 2; // Sparkle effect
+        } else {
+            this.isSparklingEyes = false;
+            this.eyeSparkle = 0;
+        }
+        
+        // Sweet smile animation
+        this.smileTimer += 16;
+        if (this.smileTimer > 8000 && this.smileTimer < 10000) { // Smile for 2 seconds every 8-10 seconds
+            this.sweetSmile = true;
+        } else {
+            this.sweetSmile = false;
+            if (this.smileTimer > 12000) this.smileTimer = 0; // Reset timer
+        }
+        
+        // Cute blush animation
+        this.blushTimer += 16;
+        if (this.blushTimer > 20000 && this.blushTimer < 22000) { // Blush for 2 seconds every 20-22 seconds
+            this.cuteBlush = Math.sin((this.blushTimer - 20000) / 2000 * Math.PI) * 0.7; // Gentle blush fade
+        } else {
+            this.cuteBlush = 0;
+            if (this.blushTimer > 25000) this.blushTimer = 0; // Reset timer
+        }
+        
+        // Gentle swaying motion for idle charm
         this.idleAnimTimer += 16;
-        this.headTilt = Math.sin(this.idleAnimTimer / 2000) * 3; // Subtle head tilt
-        
-        // Swagger/confidence animations
-        this.swaggerTimer += 16;
-        if (this.swaggerTimer > 20000) {
-            this.swaggerTimer = 0;
-        }
+        this.gentleSway = Math.sin(this.idleAnimTimer / 3000) * 1; // Very subtle sway
     }
     
-    // Enhanced tongue drawing with personality
-    drawEnhancedTongue(headRadius) {
-        const tongueLength = headRadius * 1.2;
-        const tongueWidth = 2;
+    // Cute heart-shaped tongue drawing
+    drawCuteTongue(headRadius) {
+        const tongueLength = headRadius * 0.8;
         
         // Tongue wiggle animation
         this.tongueWiggleTimer += 16;
-        const wiggleX = Math.sin(this.tongueWiggleTimer / 100) * 2;
-        const wiggleY = Math.sin(this.tongueWiggleTimer / 80) * 1;
+        const wiggleX = Math.sin(this.tongueWiggleTimer / 150) * 1.5;
+        const wiggleY = Math.sin(this.tongueWiggleTimer / 120) * 0.8;
         
-        // Forked tongue design
-        this.ctx.strokeStyle = '#DC143C'; // Deep red
-        this.ctx.lineWidth = tongueWidth;
-        this.ctx.lineCap = 'round';
+        // Heart-shaped tongue design
+        this.ctx.fillStyle = '#FF69B4'; // Hot pink for cuteness
+        this.ctx.save();
+        this.ctx.translate(headRadius * 0.9 + wiggleX, wiggleY);
+        this.ctx.scale(0.3, 0.3); // Make it small and cute
         
+        // Draw heart shape
         this.ctx.beginPath();
-        // Main tongue body
-        this.ctx.moveTo(headRadius * 0.8, 0);
-        this.ctx.lineTo(headRadius * 0.8 + tongueLength * 0.7 + wiggleX, wiggleY);
+        this.ctx.moveTo(0, 5);
+        this.ctx.bezierCurveTo(-10, -5, -20, 0, 0, 15);
+        this.ctx.bezierCurveTo(20, 0, 10, -5, 0, 5);
+        this.ctx.fill();
         
-        // Left fork
-        this.ctx.moveTo(headRadius * 0.8 + tongueLength * 0.7 + wiggleX, wiggleY);
-        this.ctx.lineTo(headRadius * 0.8 + tongueLength + wiggleX - 3, wiggleY - 3);
-        
-        // Right fork  
-        this.ctx.moveTo(headRadius * 0.8 + tongueLength * 0.7 + wiggleX, wiggleY);
-        this.ctx.lineTo(headRadius * 0.8 + tongueLength + wiggleX - 3, wiggleY + 3);
-        
-        this.ctx.stroke();
-        
-        // Add tongue highlight for depth
-        this.ctx.strokeStyle = '#FF6B6B';
-        this.ctx.lineWidth = tongueWidth * 0.5;
+        // Add heart highlight
+        this.ctx.fillStyle = '#FFB6C1'; // Light pink highlight
         this.ctx.beginPath();
-        this.ctx.moveTo(headRadius * 0.8, 0);
-        this.ctx.lineTo(headRadius * 0.8 + tongueLength * 0.5 + wiggleX * 0.5, wiggleY * 0.5);
-        this.ctx.stroke();
+        this.ctx.ellipse(-5, 2, 3, 2, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        this.ctx.restore();
     }
 }
 
