@@ -27,6 +27,7 @@ class SnakeGame {
         // Game state
         this.gameRunning = false;
         this.gameStarted = false;
+        this.gameOverTimeout = null;
         this.score = 0;
         this.highScore = this.getHighScore();
         this.hitAnimation = false;
@@ -725,7 +726,15 @@ class SnakeGame {
     }
     
     gameOver() {
+        // Prevent multiple game over calls
+        if (!this.gameRunning) return;
+        
         this.gameRunning = false;
+        
+        // Clear any existing game over timeout to prevent duplicates
+        if (this.gameOverTimeout) {
+            clearTimeout(this.gameOverTimeout);
+        }
         
         // Mark snake as dead (for X X eyes)
         this.isDead = true;
@@ -757,7 +766,10 @@ class SnakeGame {
         }
         
         // Show game over screen after animation delay
-        setTimeout(() => {
+        this.gameOverTimeout = setTimeout(() => {
+            // Double check game is still not running
+            if (this.gameRunning) return;
+            
             this.hitAnimation = false;
             this.knockbackOffset = { x: 0, y: 0 };
             this.finalScoreElement.textContent = this.score;
@@ -770,6 +782,9 @@ class SnakeGame {
             
             // Play game over sound
             this.audioManager.playSound('gameOver');
+            
+            // Clear the timeout reference
+            this.gameOverTimeout = null;
         }, 1000);
     }
     
