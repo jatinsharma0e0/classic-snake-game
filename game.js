@@ -1139,6 +1139,7 @@ class SnakeGame {
                 this.ctx.arc(0, radius * 0.4, radius * 0.25, 0, Math.PI);
             }
             this.ctx.stroke();
+        }
         
         // Draw enhanced tongue if visible
         if (this.tongueOut) {
