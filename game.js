@@ -271,6 +271,7 @@ class SnakeGame {
         // Map greeny sprites to game sprite names (simplified for rotation-based rendering)
         const spriteMapping = {
             'head_up': 'assets/skins/greeny/greeny_head.png',
+            'dead_head': 'assets/skins/greeny/greeny_dead_head.png',
             'body_horizontal': 'assets/skins/greeny/greeny_body_straight.png',
             'body_turn_left_down': 'assets/skins/greeny/greeny_body_turn.png',
             'tail_up': 'assets/skins/greeny/greeny_tail.png'
@@ -1167,8 +1168,10 @@ class SnakeGame {
     }
     
     drawSnakeHeadSprite(x, y) {
-        // Use the greeny head sprite and rotate it based on direction
-        const img = this.getSnakeImage('head_up'); // Use the base head sprite
+        // Use the dead head sprite when snake is dead, otherwise use normal head
+        const headSprite = this.isDead ? 'dead_head' : 'head_up';
+        const img = this.getSnakeImage(headSprite);
+        
         if (img && img.complete && img.naturalWidth > 0) {
             // Calculate rotation angle based on movement direction
             // Default sprite faces right, so adjust rotations accordingly
