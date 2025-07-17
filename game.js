@@ -1012,7 +1012,9 @@ class SnakeGame {
                 this.ctx.rotate(this.tailWag * Math.PI / 180);
                 this.ctx.fillStyle = '#FFB6C1'; // Light pink for cute effect
                 this.ctx.beginPath();
-                this.ctx.arc(0, 0, bodyWidth * 0.6, 0, Math.PI * 2);
+                // Ensure tail radius is always positive
+                const tailRadius = Math.max(1, bodyWidth * 0.6);
+                this.ctx.arc(0, 0, tailRadius, 0, Math.PI * 2);
                 this.ctx.fill();
                 this.ctx.restore();
             }
@@ -1061,7 +1063,9 @@ class SnakeGame {
         // Cute rounded head with soft gradient
         this.ctx.fillStyle = this.gradientCache.get('cuteSnakeHead');
         this.ctx.beginPath();
-        this.ctx.arc(0, 0 - this.happyBounce, radius * 1.1, 0, Math.PI * 2); // Slightly bigger for cuteness
+        // Ensure head radius is always positive
+        const headRadius = Math.max(1, radius * 1.1);
+        this.ctx.arc(0, 0 - this.happyBounce, headRadius, 0, Math.PI * 2); // Slightly bigger for cuteness
         this.ctx.fill();
         
         // Add adorable polka dot pattern
@@ -1072,7 +1076,9 @@ class SnakeGame {
             const dotX = Math.cos(dotAngle) * radius * 0.5;
             const dotY = Math.sin(dotAngle) * radius * 0.5 - this.happyBounce;
             this.ctx.beginPath();
-            this.ctx.arc(dotX, dotY, radius * 0.12, 0, Math.PI * 2);
+            // Ensure dot radius is always positive
+            const dotRadius = Math.max(0.5, radius * 0.12);
+            this.ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
             this.ctx.fill();
         }
         this.ctx.globalAlpha = 1.0;
@@ -1082,8 +1088,11 @@ class SnakeGame {
             this.ctx.fillStyle = '#FFB6C1'; // Light pink blush
             this.ctx.globalAlpha = this.cuteBlush;
             this.ctx.beginPath();
-            this.ctx.ellipse(-radius * 0.6, radius * 0.2 - this.happyBounce, radius * 0.25, radius * 0.15, 0, 0, Math.PI * 2);
-            this.ctx.ellipse(radius * 0.6, radius * 0.2 - this.happyBounce, radius * 0.25, radius * 0.15, 0, 0, Math.PI * 2);
+            // Ensure blush radii are always positive
+            const blushRadiusX = Math.max(0.5, radius * 0.25);
+            const blushRadiusY = Math.max(0.5, radius * 0.15);
+            this.ctx.ellipse(-radius * 0.6, radius * 0.2 - this.happyBounce, blushRadiusX, blushRadiusY, 0, 0, Math.PI * 2);
+            this.ctx.ellipse(radius * 0.6, radius * 0.2 - this.happyBounce, blushRadiusX, blushRadiusY, 0, 0, Math.PI * 2);
             this.ctx.fill();
             this.ctx.globalAlpha = 1.0;
         }
@@ -1101,15 +1110,18 @@ class SnakeGame {
         if (this.isBlinking) {
             // Both eyes closed with cute arched lines
             this.ctx.beginPath();
-            this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.8, Math.PI * 0.2, Math.PI * 0.8);
-            this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.8, Math.PI * 0.2, Math.PI * 0.8);
+            // Ensure eye radii are always positive
+            const blinkRadius = Math.max(0.5, eyeSize * 0.8);
+            this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, blinkRadius, Math.PI * 0.2, Math.PI * 0.8);
+            this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, blinkRadius, Math.PI * 0.2, Math.PI * 0.8);
             this.ctx.lineWidth = 3;
             this.ctx.strokeStyle = '#228B22';
             this.ctx.stroke();
         } else {
             // Normal big round eyes
-            this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize, 0, Math.PI * 2);
-            this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize, 0, Math.PI * 2);
+            const normalEyeRadius = Math.max(0.5, eyeSize);
+            this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, normalEyeRadius, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, normalEyeRadius, 0, Math.PI * 2);
             this.ctx.fill();
             this.ctx.stroke();
         }
@@ -1122,33 +1134,38 @@ class SnakeGame {
             this.ctx.beginPath();
             // Left eye spiral
             for (let i = 0; i < 3; i++) {
-                this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.3 - i * 3, 0, Math.PI * 2);
+                const spiralRadius = Math.max(0.5, eyeSize * 0.3 - i * 3);
+                this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, spiralRadius, 0, Math.PI * 2);
             }
             // Right eye spiral  
             for (let i = 0; i < 3; i++) {
-                this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.3 - i * 3, 0, Math.PI * 2);
+                const spiralRadius = Math.max(0.5, eyeSize * 0.3 - i * 3);
+                this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, spiralRadius, 0, Math.PI * 2);
             }
             this.ctx.stroke();
         } else if (!this.isBlinking) {
             // Adorable big pupils for innocent look
             this.ctx.fillStyle = 'black';
             this.ctx.beginPath();
-            this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.4, 0, Math.PI * 2);
-            this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.4, 0, Math.PI * 2);
+            const pupilRadius = Math.max(0.5, eyeSize * 0.4);
+            this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, pupilRadius, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, pupilRadius, 0, Math.PI * 2);
             this.ctx.fill();
             
             // Multiple sparkles for extra cuteness
             this.ctx.fillStyle = 'white';
             this.ctx.beginPath();
             // Main shine spots
-            this.ctx.arc(-eyeOffset + eyeSize * 0.2, -eyeOffset * 0.6 - eyeSize * 0.2 - this.happyBounce, eyeSize * 0.12, 0, Math.PI * 2);
-            this.ctx.arc(eyeOffset + eyeSize * 0.2, -eyeOffset * 0.6 - eyeSize * 0.2 - this.happyBounce, eyeSize * 0.12, 0, Math.PI * 2);
+            const mainShineRadius = Math.max(0.5, eyeSize * 0.12);
+            this.ctx.arc(-eyeOffset + eyeSize * 0.2, -eyeOffset * 0.6 - eyeSize * 0.2 - this.happyBounce, mainShineRadius, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffset + eyeSize * 0.2, -eyeOffset * 0.6 - eyeSize * 0.2 - this.happyBounce, mainShineRadius, 0, Math.PI * 2);
             this.ctx.fill();
             
             // Secondary smaller sparkles
             this.ctx.beginPath();
-            this.ctx.arc(-eyeOffset - eyeSize * 0.15, -eyeOffset * 0.6 + eyeSize * 0.1 - this.happyBounce, eyeSize * 0.06, 0, Math.PI * 2);
-            this.ctx.arc(eyeOffset - eyeSize * 0.15, -eyeOffset * 0.6 + eyeSize * 0.1 - this.happyBounce, eyeSize * 0.06, 0, Math.PI * 2);
+            const smallShineRadius = Math.max(0.5, eyeSize * 0.06);
+            this.ctx.arc(-eyeOffset - eyeSize * 0.15, -eyeOffset * 0.6 + eyeSize * 0.1 - this.happyBounce, smallShineRadius, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffset - eyeSize * 0.15, -eyeOffset * 0.6 + eyeSize * 0.1 - this.happyBounce, smallShineRadius, 0, Math.PI * 2);
             this.ctx.fill();
             
             // Special sparkle animation
@@ -1156,8 +1173,10 @@ class SnakeGame {
                 this.ctx.fillStyle = '#FFD700';
                 this.ctx.globalAlpha = 0.8;
                 this.ctx.beginPath();
-                this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.08 + this.eyeSparkle, 0, Math.PI * 2);
-                this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, eyeSize * 0.08 + this.eyeSparkle, 0, Math.PI * 2);
+                // Ensure sparkle radius is always positive
+                const sparkleRadius = Math.max(0.5, eyeSize * 0.08 + Math.abs(this.eyeSparkle));
+                this.ctx.arc(-eyeOffset, -eyeOffset * 0.6 - this.happyBounce, sparkleRadius, 0, Math.PI * 2);
+                this.ctx.arc(eyeOffset, -eyeOffset * 0.6 - this.happyBounce, sparkleRadius, 0, Math.PI * 2);
                 this.ctx.fill();
                 this.ctx.globalAlpha = 1.0;
             }
@@ -1170,10 +1189,12 @@ class SnakeGame {
             this.ctx.beginPath();
             if (this.sweetSmile) {
                 // Sweet, gentle smile
-                this.ctx.arc(0, radius * 0.4 - this.happyBounce, radius * 0.3, 0.3, Math.PI - 0.3);
+                const smileRadius = Math.max(0.5, radius * 0.3);
+                this.ctx.arc(0, radius * 0.4 - this.happyBounce, smileRadius, 0.3, Math.PI - 0.3);
             } else {
                 // Open mouth for eating (smaller and cuter)
-                this.ctx.arc(0, radius * 0.5 - this.happyBounce, radius * 0.2, 0, Math.PI);
+                const mouthRadius = Math.max(0.5, radius * 0.2);
+                this.ctx.arc(0, radius * 0.5 - this.happyBounce, mouthRadius, 0, Math.PI);
             }
             this.ctx.stroke();
             
