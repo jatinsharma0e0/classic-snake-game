@@ -625,11 +625,13 @@ class SnakeGame {
             return;
         }
         
-        // Check self collision
-        if (this.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-            this.audioManager.playSound('collision');
-            this.gameOver();
-            return;
+        // Check self collision (excluding the current head position)
+        for (let i = 1; i < this.snake.length; i++) {
+            if (this.snake[i].x === head.x && this.snake[i].y === head.y) {
+                this.audioManager.playSound('collision');
+                this.gameOver();
+                return;
+            }
         }
         
         // Check obstacle collision
@@ -1164,16 +1166,16 @@ class SnakeGame {
             // Use the greeny tail sprite and rotate it based on direction
             const img = this.getSnakeImage('tail_up'); // Use base tail sprite
             if (img && img.complete && img.naturalWidth > 0) {
-                // Determine tail direction based on direction FROM previous segment TO current tail position
-                const direction = { x: current.x - prev.x, y: current.y - prev.y };
+                // Determine tail direction - tail should point TOWARD the previous segment
+                const direction = { x: prev.x - current.x, y: prev.y - current.y };
                 
-                // Tail should point away from the previous segment (in direction of movement)
+                // Tail should point toward the previous segment (opposite of movement direction)
                 // Default tail sprite points up, so adjust rotations accordingly
                 let rotation = 0;
-                if (direction.x === 1) rotation = Math.PI / 2;  // Moving right: 90°
-                else if (direction.x === -1) rotation = -Math.PI / 2;  // Moving left: -90°
-                else if (direction.y === 1) rotation = Math.PI;  // Moving down: 180°
-                else if (direction.y === -1) rotation = 0;  // Moving up: 0° (default orientation)
+                if (direction.x === 1) rotation = Math.PI / 2;  // Point right: 90°
+                else if (direction.x === -1) rotation = -Math.PI / 2;  // Point left: -90°
+                else if (direction.y === 1) rotation = Math.PI;  // Point down: 180°
+                else if (direction.y === -1) rotation = 0;  // Point up: 0° (default orientation)
                 
                 this.drawRotatedSprite(img, x, y, this.gridSize, this.gridSize, rotation);
             } else {
