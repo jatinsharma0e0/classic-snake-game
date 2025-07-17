@@ -275,7 +275,7 @@ class SkinEditor {
                 <div class="skin-preview">
                     <div style="width: 80px; height: 80px; background: linear-gradient(45deg, #88D8A3, #6BB77B); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; text-align: center;">Built-in<br/>Default</div>
                 </div>
-                <div class="skin-name">Default Built-in</div>
+                <div class="skin-name">Default Greeny</div>
                 <button class="select-skin-btn">Selected</button>
             </div>
         `;

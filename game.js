@@ -215,20 +215,39 @@ class SnakeGame {
     }
     
     loadDefaultSkin() {
-        // This will be updated when new default skin is provided
-        // For now, keep empty to prepare for new skin replacement
-        const snakeImageNames = [
-            // Head sprites
-            'head_up', 'head_down', 'head_left', 'head_right',
-            // Body sprites
-            'body_horizontal', 'body_vertical',
-            'body_turn_left_down', 'body_turn_up_left', 'body_turn_down_right', 'body_turn_right_up',
-            // Tail sprites
-            'tail_up', 'tail_down', 'tail_left', 'tail_right'
-        ];
+        // Load the new greeny default skin
+        this.defaultSkinLoaded = false;
         
-        // Default skin will be loaded here when new skin assets are provided
-        // For now, the game will use fallback rendering until new default skin is installed
+        // Map greeny sprites to game sprite names
+        const spriteMapping = {
+            'head_up': 'assets/skins/greeny/greeny_head.png',
+            'head_down': 'assets/skins/greeny/greeny_head.png',
+            'head_left': 'assets/skins/greeny/greeny_head.png',
+            'head_right': 'assets/skins/greeny/greeny_head.png',
+            'body_horizontal': 'assets/skins/greeny/greeny_body_straight.png',
+            'body_vertical': 'assets/skins/greeny/greeny_body_straight.png',
+            'body_turn_left_down': 'assets/skins/greeny/greeny_body_turn.png',
+            'body_turn_up_left': 'assets/skins/greeny/greeny_body_turn.png',
+            'body_turn_down_right': 'assets/skins/greeny/greeny_body_turn.png',
+            'body_turn_right_up': 'assets/skins/greeny/greeny_body_turn.png',
+            'tail_up': 'assets/skins/greeny/greeny_tail.png',
+            'tail_down': 'assets/skins/greeny/greeny_tail.png',
+            'tail_left': 'assets/skins/greeny/greeny_tail.png',
+            'tail_right': 'assets/skins/greeny/greeny_tail.png'
+        };
+        
+        // Load each sprite
+        Object.keys(spriteMapping).forEach(spriteName => {
+            const img = new Image();
+            img.src = spriteMapping[spriteName];
+            this.snakeImages[spriteName] = img;
+        });
+        
+        // Load the food sprite
+        this.appleImage = new Image();
+        this.appleImage.src = 'assets/skins/greeny/greeny_food.png';
+        
+        this.defaultSkinLoaded = true;
     }
     
     loadCustomSkin() {
@@ -2297,3 +2316,59 @@ class SnakeGame {
 window.addEventListener('load', () => {
     new SnakeGame();
 });
+
+// Loading and Initialization System
+let gameInstance = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize loading screen and asset preloading
+    initializeGame();
+});
+
+function initializeGame() {
+    const loadingScreen = document.getElementById('loadingScreen');
+    const startScreen = document.getElementById('startScreen');
+    const progressFill = document.getElementById('progressFill');
+    const loadingText = document.getElementById('loadingText');
+    
+    // Set up asset loader callbacks
+    window.assetLoader.setProgressCallback((progress, loaded, total) => {
+        progressFill.style.width = `${progress}%`;
+        loadingText.textContent = `Loading assets... ${progress}%`;
+        
+        // Update loading text based on progress
+        if (progress < 30) {
+            loadingText.textContent = `Loading core assets... ${progress}%`;
+        } else if (progress < 60) {
+            loadingText.textContent = `Loading sprites... ${progress}%`;
+        } else if (progress < 90) {
+            loadingText.textContent = `Loading audio... ${progress}%`;
+        } else {
+            loadingText.textContent = `Almost ready... ${progress}%`;
+        }
+    });
+    
+    window.assetLoader.setCompleteCallback(() => {
+        // All assets loaded, show start screen
+        loadingText.textContent = 'Ready to play!';
+        progressFill.style.width = '100%';
+        
+        setTimeout(() => {
+            loadingScreen.classList.remove('active');
+            loadingScreen.style.display = 'none';
+            startScreen.style.display = 'block';
+            
+            // Initialize the game now that assets are loaded
+            gameInstance = new SnakeGame();
+            
+            // Initialize audio after user interaction
+            document.addEventListener('click', function initAudio() {
+                gameInstance.initAudioContext();
+                document.removeEventListener('click', initAudio);
+            });
+        }, 1000);
+    });
+    
+    // Start loading assets
+    window.assetLoader.loadAllAssets();
+}

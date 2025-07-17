@@ -7,8 +7,31 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen active">
+        <div class="loading-container">
+            <div class="loading-title">
+                <img src="assets/snake-icon.png" alt="" class="snake-icon loading-icon">
+                <h1>Snake Game</h1>
+            </div>
+            <div class="loading-subtitle">Preparing your jungle adventure...</div>
+            <div class="loading-progress">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <div id="loadingText" class="loading-text">Loading assets... 0%</div>
+            </div>
+            <div class="loading-snake">
+                <div class="snake-segment head"></div>
+                <div class="snake-segment body"></div>
+                <div class="snake-segment body"></div>
+                <div class="snake-segment tail"></div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Start Screen -->
-    <div id="startScreen" class="start-screen">
+    <div id="startScreen" class="start-screen" style="display: none;">
         <div class="jungle-background">
         </div>
         
@@ -133,6 +156,7 @@
         </div>
     </div>
 
+    <script src="asset-loader.js"></script>
     <script src="audio.js"></script>
     <script src="game.js"></script>
 </body>
