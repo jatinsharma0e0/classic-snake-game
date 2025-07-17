@@ -204,6 +204,19 @@ class SnakeGame {
     }
     
     loadSnakeImages() {
+        // Initialize empty snake images object - will be populated by default skin or custom skin
+        this.snakeImages = {};
+        
+        // Initialize apple image - will be loaded by default skin or custom skin
+        this.appleImage = null;
+        
+        // Load default skin if no custom skin is selected
+        this.loadDefaultSkin();
+    }
+    
+    loadDefaultSkin() {
+        // This will be updated when new default skin is provided
+        // For now, keep empty to prepare for new skin replacement
         const snakeImageNames = [
             // Head sprites
             'head_up', 'head_down', 'head_left', 'head_right',
@@ -214,15 +227,8 @@ class SnakeGame {
             'tail_up', 'tail_down', 'tail_left', 'tail_right'
         ];
         
-        snakeImageNames.forEach(name => {
-            const img = new Image();
-            img.src = `assets/snakes/greeny/${name}.png`;
-            this.snakeImages[name] = img;
-        });
-        
-        // Also load the apple sprite
-        this.appleImage = new Image();
-        this.appleImage.src = 'assets/food/apple/apple.png';
+        // Default skin will be loaded here when new skin assets are provided
+        // For now, the game will use fallback rendering until new default skin is installed
     }
     
     loadCustomSkin() {

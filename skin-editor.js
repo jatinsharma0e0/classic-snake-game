@@ -273,9 +273,9 @@ class SkinEditor {
         this.skinsGallery.innerHTML = `
             <div class="skin-item active" data-skin="default">
                 <div class="skin-preview">
-                    <img src="assets/snakes/greeny/head_up.png" alt="Default Skin">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(45deg, #88D8A3, #6BB77B); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; text-align: center;">Built-in<br/>Default</div>
                 </div>
-                <div class="skin-name">Default Green</div>
+                <div class="skin-name">Default Built-in</div>
                 <button class="select-skin-btn">Selected</button>
             </div>
         `;
