@@ -186,13 +186,13 @@ class SnakeGame {
         // Mute button functionality for both buttons
         const handleMuteToggle = () => {
             if (this.audioManager) {
-                const isMuted = this.audioManager && this.audioManager.toggleMute();
-                const muteIcon = isMuted ? '🔇' : '🔊';
-                this.muteBtn.textContent = muteIcon;
-                this.homeMuteBtn.textContent = muteIcon;
+                const isMuted = this.audioManager.toggleMute();
+                
+                // Update both mute buttons with SVG icons
+                this.updateMuteButtonIcons(isMuted);
                 
                 if (!isMuted) {
-                    this.audioManager && this.audioManager.playSound('buttonClick');
+                    this.audioManager.playSound('buttonClick');
                 }
             }
         };
@@ -219,6 +219,26 @@ class SnakeGame {
         
         // Start optimized game loop
         requestAnimationFrame((time) => this.gameLoop(time));
+    }
+    
+    updateMuteButtonIcons(isMuted) {
+        // SVG for unmuted state (sound on)
+        const unmuteIcon = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93l-1.41 1.41A8.98 8.98 0 0 1 21 12a8.98 8.98 0 0 1-3.34 5.66l1.41 1.41A10.97 10.97 0 0 0 23 12a10.97 10.97 0 0 0-3.93-7.07zM16.24 7.76l-1.41 1.41A4.98 4.98 0 0 1 17 12a4.98 4.98 0 0 1-2.17 2.83l1.41 1.41A6.97 6.97 0 0 0 19 12a6.97 6.97 0 0 0-2.76-4.24z"/>
+            </svg>
+        `;
+        
+        // SVG for muted state (sound off)
+        const muteIcon = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-2 2M21 9l-2 2"/>
+            </svg>
+        `;
+        
+        // Update both mute buttons
+        this.muteBtn.innerHTML = isMuted ? muteIcon : unmuteIcon;
+        this.homeMuteBtn.innerHTML = isMuted ? muteIcon : unmuteIcon;
     }
     
     loadObstacleImages() {
