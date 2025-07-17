@@ -1,0 +1,59 @@
+# 🎨 Creative Brief: Custom Skins System for Snake & Food
+
+We aim to make the game more engaging and personalizable by introducing a **Custom Skins System**, allowing players to design and upload their own snake and food skins. Below is the proposed plan and specification:
+
+---
+
+## ✨ Objective:
+Enable players to upload their own sprite sheets to customize the snake and food appearances, enriching gameplay and encouraging creativity.
+
+---
+
+## 🛠️ Key Features:
+### 1. Spritesheet Image Slicer Tool
+- Build an automated **Spritesheet Slicer** that accepts a single **1080×1080px** sprite sheet image.
+- The slicer should:
+  - Divide the sprite sheet into a **3×3 grid** (3 rows × 3 columns = 9 segments), each **360×360px**.
+  - Automatically ignore and skip saving “empty” or unused slices where applicable.
+  - Save and label the relevant sliced segments for integration into the game.
+
+---
+
+## 🐍 Standard 3×3 Snake & Food Sprite Sheet Layout
+The uploaded sprite sheet must conform to the following layout. The slicer will extract and map each segment accordingly:
+
+| 📍 Cell (row, col) | 🔷 Segment Type   | 📖 Purpose / Notes |
+|--------------------|-------------------|---------------------|
+| (1,1)              | Body Turn         | Corner segment, rotatable to fit any turn (e.g., left→down, up→right, etc.) |
+| (1,2)              | Body              | Straight segment, used between head and tail, grows as snake eats |
+| (1,3)              | Head              | Snake’s head, default facing direction (can be rotated in-game) |
+| (2,1)              | Tail              | Snake’s tail, default facing direction (can be rotated in-game) |
+| (2,2)              | Empty             | Optional — can be used for an extra asset |
+| (2,3)              | Empty             | Optional — can be used for an extra asset |
+| (3,1)              | Apple / Food      | Collectible food item for the snake |
+| (3,2)              | Empty             | Optional — can be used for future assets |
+| (3,3)              | Dead Head         | Snake’s head in a dead state (with X eyes, etc.) |
+
+---
+
+## 🔄 Workflow:
+- Players create and upload a **1080×1080px sprite sheet**, designed according to the above layout.
+- The **Spritesheet Slicer Tool** processes the upload:
+  - Slices the image into 9 segments.
+  - Identifies and ignores truly empty/blank cells.
+  - Saves and labels the usable segments.
+- The game engine applies the new skin to the snake and food in-game, replacing the default assets.
+
+---
+
+## 👥 Target Users:
+- Designers creating themed skins.
+- Players wanting to personalize their experience.
+- Developers integrating new skins into the game.
+
+---
+
+## 🚀 Deliverables:
+✅ Spritesheet Slicer Tool (with UI for upload & preview).  
+✅ Sliced and labeled segments ready for the game engine.  
+✅ Updated game supporting dynamic skin loading.

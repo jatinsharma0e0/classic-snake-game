@@ -88,6 +88,7 @@ class SnakeGame {
         this.startScreen = document.getElementById('startScreen');
         this.gameScreen = document.getElementById('gameScreen');
         this.startGameBtn = document.getElementById('startGameBtn');
+        this.skinEditorBtn = document.getElementById('skinEditorBtn');
         this.startScreenHighScore = document.getElementById('startScreenHighScore');
         this.scoreElement = document.getElementById('score');
         this.highScoreElement = document.getElementById('highScore');
@@ -101,6 +102,10 @@ class SnakeGame {
         this.homeMuteBtn = document.getElementById('homeMuteBtn');
         this.tutorialOverlay = document.getElementById('tutorialOverlay');
         
+        // Custom skin system
+        this.currentSkin = 'default';
+        this.customSkinImages = {};
+        
         // Initialize game
         this.init();
         
@@ -109,6 +114,9 @@ class SnakeGame {
         
         // Load snake sprite images
         this.loadSnakeImages();
+        
+        // Load custom skin if available
+        this.loadCustomSkin();
         
         // Initialize snake animation for start screen
         this.initStartScreenSnake();
@@ -128,6 +136,10 @@ class SnakeGame {
             this.audioManager.resumeAudioContext(); // Initialize audio on first interaction
             this.audioManager.playSound('buttonClick');
             this.showGameScreen();
+        });
+        this.skinEditorBtn.addEventListener('click', () => {
+            this.audioManager.playSound('buttonClick');
+            window.location.href = 'skin-editor.html';
         });
         this.restartBtn.addEventListener('click', () => {
             this.audioManager.playSound('buttonClick');
@@ -211,6 +223,63 @@ class SnakeGame {
         // Also load the apple sprite
         this.appleImage = new Image();
         this.appleImage.src = 'assets/food/apple/apple.png';
+    }
+    
+    loadCustomSkin() {
+        // Check if a custom skin is selected
+        const selectedSkin = localStorage.getItem('currentSkin');
+        if (selectedSkin && selectedSkin !== 'default') {
+            this.currentSkin = selectedSkin;
+            
+            // Load custom skin from localStorage
+            const savedSkins = JSON.parse(localStorage.getItem('customSkins') || '[]');
+            const skinData = savedSkins.find(skin => skin.id === selectedSkin);
+            
+            if (skinData && skinData.segments) {
+                this.customSkinImages = {};
+                
+                // Map sprite sheet segments to game sprite names
+                const segmentMapping = {
+                    '0-0': ['body_turn_left_down', 'body_turn_up_left', 'body_turn_down_right', 'body_turn_right_up'], // Body Turn (rotatable)
+                    '0-1': ['body_horizontal', 'body_vertical'], // Body Straight (rotatable)
+                    '0-2': ['head_up', 'head_down', 'head_left', 'head_right'], // Head (rotatable)
+                    '1-0': ['tail_up', 'tail_down', 'tail_left', 'tail_right'], // Tail (rotatable)
+                    '2-0': ['apple'], // Food
+                    '2-2': ['dead_head'] // Dead Head
+                };
+                
+                // Load each segment into multiple sprite variants
+                Object.keys(segmentMapping).forEach(segmentKey => {
+                    const segment = skinData.segments[segmentKey];
+                    if (segment && !segment.isEmpty) {
+                        const spriteNames = segmentMapping[segmentKey];
+                        spriteNames.forEach(spriteName => {
+                            const img = new Image();
+                            img.src = segment.dataURL;
+                            this.customSkinImages[spriteName] = img;
+                        });
+                    }
+                });
+                
+                console.log('Custom skin loaded:', selectedSkin);
+            }
+        }
+    }
+    
+    getSnakeImage(spriteName) {
+        // Return custom skin image if available, otherwise default
+        if (this.currentSkin !== 'default' && this.customSkinImages[spriteName]) {
+            return this.customSkinImages[spriteName];
+        }
+        return this.snakeImages[spriteName];
+    }
+    
+    getFoodImage() {
+        // Return custom food image if available, otherwise default
+        if (this.currentSkin !== 'default' && this.customSkinImages['apple']) {
+            return this.customSkinImages['apple'];
+        }
+        return this.appleImage;
     }
     
     generateObstacles() {
@@ -922,8 +991,10 @@ class SnakeGame {
     }
     
     drawAppleSprite(x, y) {
-        if (this.appleImage && this.appleImage.complete) {
-            this.ctx.drawImage(this.appleImage, x, y, this.gridSize, this.gridSize);
+        // Use custom food image if available
+        const foodImg = this.getFoodImage();
+        if (foodImg && foodImg.complete) {
+            this.ctx.drawImage(foodImg, x, y, this.gridSize, this.gridSize);
         } else {
             // Fallback to original apple drawing if sprite not loaded
             this.drawAppleOptimized(x, y);
@@ -986,8 +1057,8 @@ class SnakeGame {
         else if (this.direction.y === 1) headSprite = 'head_down';
         else if (this.direction.y === -1) headSprite = 'head_up';
         
-        // Check if the image exists and is loaded
-        const img = this.snakeImages[headSprite];
+        // Check if the image exists and is loaded (use custom skin if available)
+        const img = this.getSnakeImage(headSprite);
         if (img && img.complete && img.naturalWidth > 0) {
             this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
         } else {
@@ -1030,8 +1101,8 @@ class SnakeGame {
             }
         }
         
-        // Check if the sprite actually has content before using it
-        const img = this.snakeImages[bodySprite];
+        // Check if the sprite actually has content before using it (use custom skin if available)
+        const img = this.getSnakeImage(bodySprite);
         if (img && img.complete && img.naturalWidth > 0) {
             this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
         } else {
@@ -1058,8 +1129,8 @@ class SnakeGame {
             else if (direction.y === -1) tailSprite = 'tail_up';  // Moving up ⬆️
         }
         
-        // Check if the sprite has content
-        const img = this.snakeImages[tailSprite];
+        // Check if the sprite has content (use custom skin if available)
+        const img = this.getSnakeImage(tailSprite);
         if (img && img.complete && img.naturalWidth > 0) {
             this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
         } else {
