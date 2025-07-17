@@ -94,6 +94,16 @@ The application is designed for real-time interactive experiences with 3D graphi
 
 ## Recent Changes
 
+**Game Over Screen Redesign with Custom Wooden Board (July 17, 2025):**
+- Replaced default Game Over screen with custom wooden board background (game-over-board.png)
+- Updated layout to display Score and Best Score in organized first row with custom styling
+- Replaced generic buttons with custom leaf-style RETRY and HOME buttons (retry-button.png, home-button.png)
+- Added proper jungle-themed typography using Driftwood font for score labels
+- Implemented Display-Dots-Two-Sans font for score values with enhanced contrast and shadows
+- Removed old CSS styling for generic buttons and implemented new leaf button system
+- Enhanced hover effects with scaling and brightness filters for better user interaction
+- All Game Over UI elements now match jungle theme with wooden textures and leaf designs
+
 **Safe Area Implementation and UI Enhancement (July 17, 2025):**
 - Added safe area around snake's starting position (3-block radius) where no obstacles spawn
 - Modified isObstacleConflicting() function to prevent obstacle generation near snake start (10, 10)
