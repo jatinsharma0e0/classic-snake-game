@@ -1048,13 +1048,14 @@ class SnakeGame {
         let tailSprite = 'tail_right'; // Default facing right
         
         if (prev) {
-            // Determine tail direction based on previous segment
+            // Determine tail direction based on direction FROM previous segment TO current tail position
+            // This makes the tail point in the direction the snake is moving
             const direction = { x: current.x - prev.x, y: current.y - prev.y };
             
-            if (direction.x === 1) tailSprite = 'tail_right';
-            else if (direction.x === -1) tailSprite = 'tail_left';
-            else if (direction.y === 1) tailSprite = 'tail_down';
-            else if (direction.y === -1) tailSprite = 'tail_up';
+            if (direction.x === 1) tailSprite = 'tail_right';  // Moving right ➡️
+            else if (direction.x === -1) tailSprite = 'tail_left';  // Moving left ⬅️
+            else if (direction.y === 1) tailSprite = 'tail_down';  // Moving down ⬇️
+            else if (direction.y === -1) tailSprite = 'tail_up';  // Moving up ⬆️
         }
         
         // Check if the sprite has content
