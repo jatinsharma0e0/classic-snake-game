@@ -1,0 +1,51 @@
+# 🐍 Snake Animation Orientation Enhancement Brief
+
+---
+
+## 🎯 Objective
+The current implementation successfully uses the correct sprite sheet slices and assigns them to the appropriate snake segments (head, body, tail) in the game.  
+However, the movement animation still appears incorrect because the segments are not properly **rotated or oriented** to match the snake's moving direction.
+
+In the attached screenshot, you can see:
+- The segments (head, body, tail) are placed in the right order.
+- But their orientations don’t follow the snake’s actual path or turning.
+
+---
+
+## 🛠️ Required Enhancements
+To make the animation visually correct and smooth:
+1. Implement logic to dynamically **rotate and orient each segment** according to:
+   - The direction of movement of the snake at each step.
+   - The relative positions of adjacent segments (to decide if a segment is straight, turning, head, or tail, and at what angle).
+
+2. Specifically:
+   - **Head:** Rotate to face the direction of the next move.
+   - **Body (straight):** Rotate horizontal or vertical depending on path.
+   - **Body (turn):** Rotate to form the correct corner (e.g., up→right, right→down, etc.).
+   - **Tail:** Rotate to point toward the preceding segment.
+
+---
+
+## 📐 Suggested Logic
+- At each game tick:
+  - For each segment:
+    - Identify the previous and next positions of the segment in the snake array.
+    - Determine if the segment is:
+      - Start (head) → face toward next segment.
+      - End (tail) → face toward previous segment.
+      - Middle → check if path is straight (same row or same column) or a corner (change in both row & column).
+  - Based on the above, assign the correct slice **and rotate it appropriately (0°, 90°, 180°, 270°)**.
+
+---
+
+## 👥 Outcome
+✅ Head, body, and tail not only appear in correct order but also **face the correct directions**.  
+✅ Smooth and visually coherent snake movement animation.  
+✅ Supports all turns and directional changes seamlessly.
+
+---
+
+## 🚀 Deliverables
+- Updated code logic to calculate segment orientations each frame.
+- Integrated rotation/orientation mechanism with the rendering engine.
+- QA to test all corner cases (turns, reversals, quick direction changes).

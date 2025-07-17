@@ -215,25 +215,15 @@ class SnakeGame {
     }
     
     loadDefaultSkin() {
-        // Load the new greeny default skin
+        // Load the new greeny default skin - using single sprites with rotation
         this.defaultSkinLoaded = false;
         
-        // Map greeny sprites to game sprite names
+        // Map greeny sprites to game sprite names (simplified for rotation-based rendering)
         const spriteMapping = {
             'head_up': 'assets/skins/greeny/greeny_head.png',
-            'head_down': 'assets/skins/greeny/greeny_head.png',
-            'head_left': 'assets/skins/greeny/greeny_head.png',
-            'head_right': 'assets/skins/greeny/greeny_head.png',
             'body_horizontal': 'assets/skins/greeny/greeny_body_straight.png',
-            'body_vertical': 'assets/skins/greeny/greeny_body_straight.png',
             'body_turn_left_down': 'assets/skins/greeny/greeny_body_turn.png',
-            'body_turn_up_left': 'assets/skins/greeny/greeny_body_turn.png',
-            'body_turn_down_right': 'assets/skins/greeny/greeny_body_turn.png',
-            'body_turn_right_up': 'assets/skins/greeny/greeny_body_turn.png',
-            'tail_up': 'assets/skins/greeny/greeny_tail.png',
-            'tail_down': 'assets/skins/greeny/greeny_tail.png',
-            'tail_left': 'assets/skins/greeny/greeny_tail.png',
-            'tail_right': 'assets/skins/greeny/greeny_tail.png'
+            'tail_up': 'assets/skins/greeny/greeny_tail.png'
         };
         
         // Load each sprite
@@ -248,6 +238,24 @@ class SnakeGame {
         this.appleImage.src = 'assets/skins/greeny/greeny_food.png';
         
         this.defaultSkinLoaded = true;
+    }
+    
+    // Helper function to draw rotated sprites
+    drawRotatedSprite(image, x, y, width, height, rotation) {
+        this.ctx.save();
+        
+        // Move to the center of where we want to draw the sprite
+        const centerX = x + width / 2;
+        const centerY = y + height / 2;
+        this.ctx.translate(centerX, centerY);
+        
+        // Rotate around the center
+        this.ctx.rotate(rotation);
+        
+        // Draw the image centered on the rotation point
+        this.ctx.drawImage(image, -width / 2, -height / 2, width, height);
+        
+        this.ctx.restore();
     }
     
     loadCustomSkin() {
@@ -1074,18 +1082,18 @@ class SnakeGame {
     }
     
     drawSnakeHeadSprite(x, y) {
-        let headSprite = 'head_right'; // Default facing right
-        
-        // Determine head direction based on movement
-        if (this.direction.x === 1) headSprite = 'head_right';
-        else if (this.direction.x === -1) headSprite = 'head_left';
-        else if (this.direction.y === 1) headSprite = 'head_down';
-        else if (this.direction.y === -1) headSprite = 'head_up';
-        
-        // Check if the image exists and is loaded (use custom skin if available)
-        const img = this.getSnakeImage(headSprite);
+        // Use the greeny head sprite and rotate it based on direction
+        const img = this.getSnakeImage('head_up'); // Use the base head sprite
         if (img && img.complete && img.naturalWidth > 0) {
-            this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
+            // Calculate rotation angle based on movement direction
+            let rotation = 0;
+            if (this.direction.x === 1) rotation = Math.PI / 2; // Right: 90°
+            else if (this.direction.x === -1) rotation = -Math.PI / 2; // Left: -90°
+            else if (this.direction.y === 1) rotation = Math.PI; // Down: 180°
+            else if (this.direction.y === -1) rotation = 0; // Up: 0° (base orientation)
+            
+            // Draw rotated sprite
+            this.drawRotatedSprite(img, x, y, this.gridSize, this.gridSize, rotation);
         } else {
             // Fallback to optimized head rendering if sprite fails
             this.drawSnakeHeadOptimized();
@@ -1097,43 +1105,52 @@ class SnakeGame {
         const prev = this.snake[index - 1];
         const next = this.snake[index + 1];
         
-        let bodySprite = 'body_horizontal'; // Default horizontal body
-        
         if (prev && next) {
             // Determine if this is a corner or straight segment
             const prevDir = { x: current.x - prev.x, y: current.y - prev.y };
             const nextDir = { x: next.x - current.x, y: next.y - current.y };
             
+            let spriteType, rotation = 0;
+            
             if (prevDir.x === nextDir.x && prevDir.x === 0) {
-                // Vertical straight segment (moving up/down, X stays the same)
-                bodySprite = 'body_vertical';
+                // Vertical straight segment (moving up/down)
+                spriteType = 'body_straight';
+                rotation = Math.PI / 2; // Rotate 90° for vertical
             } else if (prevDir.y === nextDir.y && prevDir.y === 0) {
-                // Horizontal straight segment (moving left/right, Y stays the same)
-                bodySprite = 'body_horizontal';
+                // Horizontal straight segment (moving left/right)
+                spriteType = 'body_straight';
+                rotation = 0; // No rotation for horizontal
             } else {
-                // Corner piece - determine turn direction
+                // Corner piece - use turn sprite and rotate appropriately
+                spriteType = 'body_turn';
+                
+                // Determine rotation based on turn direction
                 if ((prevDir.x === -1 && nextDir.y === 1) || (prevDir.y === -1 && nextDir.x === 1)) {
-                    bodySprite = 'body_turn_left_down'; // left→down or up→right
-                } else if ((prevDir.x === 1 && nextDir.y === -1) || (prevDir.y === 1 && nextDir.x === -1)) {
-                    bodySprite = 'body_turn_up_left'; // up→left or right→down
-                } else if ((prevDir.y === 1 && nextDir.x === 1) || (prevDir.x === -1 && nextDir.y === -1)) {
-                    bodySprite = 'body_turn_down_right'; // down→right or left→up
+                    // left→down or up→right
+                    rotation = 0; // Base orientation
                 } else if ((prevDir.x === 1 && nextDir.y === 1) || (prevDir.y === -1 && nextDir.x === -1)) {
-                    bodySprite = 'body_turn_right_up'; // right→up or down→left
-                } else {
-                    bodySprite = 'body_horizontal'; // Default fallback
+                    // right→down or up→left
+                    rotation = Math.PI / 2; // 90°
+                } else if ((prevDir.x === 1 && nextDir.y === -1) || (prevDir.y === 1 && nextDir.x === -1)) {
+                    // right→up or down→left
+                    rotation = Math.PI; // 180°
+                } else if ((prevDir.x === -1 && nextDir.y === -1) || (prevDir.y === 1 && nextDir.x === 1)) {
+                    // left→up or down→right
+                    rotation = -Math.PI / 2; // -90°
                 }
             }
-        }
-        
-        // Check if the sprite actually has content before using it (use custom skin if available)
-        const img = this.getSnakeImage(bodySprite);
-        if (img && img.complete && img.naturalWidth > 0) {
-            this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
-        } else {
-            // Fallback: draw a simple colored square as body segment
-            this.ctx.fillStyle = '#7ED091'; // Match the mint green theme
-            this.ctx.fillRect(x + 2, y + 2, this.gridSize - 4, this.gridSize - 4);
+            
+            // Get the appropriate sprite
+            const spriteName = spriteType === 'body_straight' ? 'body_horizontal' : 'body_turn_left_down';
+            const img = this.getSnakeImage(spriteName);
+            
+            if (img && img.complete && img.naturalWidth > 0) {
+                this.drawRotatedSprite(img, x, y, this.gridSize, this.gridSize, rotation);
+            } else {
+                // Fallback: draw a simple colored square as body segment
+                this.ctx.fillStyle = '#7ED091'; // Match the mint green theme
+                this.ctx.fillRect(x + 2, y + 2, this.gridSize - 4, this.gridSize - 4);
+            }
         }
     }
     
@@ -1141,32 +1158,30 @@ class SnakeGame {
         const current = this.snake[index];
         const prev = this.snake[index - 1];
         
-        let tailSprite = 'tail_right'; // Default facing right
-        
         if (prev) {
-            // Determine tail direction based on direction FROM previous segment TO current tail position
-            // This makes the tail point in the direction the snake is moving
-            const direction = { x: current.x - prev.x, y: current.y - prev.y };
-            
-            if (direction.x === 1) tailSprite = 'tail_right';  // Moving right ➡️
-            else if (direction.x === -1) tailSprite = 'tail_left';  // Moving left ⬅️
-            else if (direction.y === 1) tailSprite = 'tail_down';  // Moving down ⬇️
-            else if (direction.y === -1) tailSprite = 'tail_up';  // Moving up ⬆️
-        }
-        
-        // Check if the sprite has content (use custom skin if available)
-        const img = this.getSnakeImage(tailSprite);
-        if (img && img.complete && img.naturalWidth > 0) {
-            this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
-        } else {
-            // Fallback: draw a smaller colored circle as tail
-            this.ctx.fillStyle = '#6BB77B'; // Slightly darker mint for tail
-            const centerX = x + this.gridSize / 2;
-            const centerY = y + this.gridSize / 2;
-            const radius = this.gridSize * 0.3;
-            this.ctx.beginPath();
-            this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            this.ctx.fill();
+            // Use the greeny tail sprite and rotate it based on direction
+            const img = this.getSnakeImage('tail_up'); // Use base tail sprite
+            if (img && img.complete && img.naturalWidth > 0) {
+                // Determine tail direction based on direction FROM previous segment TO current tail position
+                const direction = { x: current.x - prev.x, y: current.y - prev.y };
+                
+                let rotation = 0;
+                if (direction.x === 1) rotation = Math.PI / 2;  // Moving right: 90°
+                else if (direction.x === -1) rotation = -Math.PI / 2;  // Moving left: -90°
+                else if (direction.y === 1) rotation = Math.PI;  // Moving down: 180°
+                else if (direction.y === -1) rotation = 0;  // Moving up: 0° (base orientation)
+                
+                this.drawRotatedSprite(img, x, y, this.gridSize, this.gridSize, rotation);
+            } else {
+                // Fallback: draw a smaller colored circle as tail
+                this.ctx.fillStyle = '#6BB77B'; // Slightly darker mint for tail
+                const centerX = x + this.gridSize / 2;
+                const centerY = y + this.gridSize / 2;
+                const radius = this.gridSize * 0.3;
+                this.ctx.beginPath();
+                this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
         }
     }
     
@@ -2363,7 +2378,9 @@ function initializeGame() {
             
             // Initialize audio after user interaction
             document.addEventListener('click', function initAudio() {
-                gameInstance.initAudioContext();
+                if (gameInstance && gameInstance.initAudioContext) {
+                    gameInstance.initAudioContext();
+                }
                 document.removeEventListener('click', initAudio);
             });
         }, 1000);
