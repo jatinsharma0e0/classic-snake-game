@@ -929,13 +929,14 @@ class SnakeGame {
         
         const bodyWidth = this.gridSize * 0.8;
         
-        // Cache simple blue snake body
-        if (!this.gradientCache.has('simpleSnakeBody')) {
+        // Cache adorable mint green snake body with warm accents
+        if (!this.gradientCache.has('adorableSnakeBody')) {
             const gradient = this.ctx.createLinearGradient(0, 0, 0, bodyWidth);
-            gradient.addColorStop(0, '#4A90E2'); // Bright blue
-            gradient.addColorStop(0.5, '#357ABD'); // Medium blue
-            gradient.addColorStop(1, '#2E5B9A'); // Darker blue for depth
-            this.gradientCache.set('simpleSnakeBody', gradient);
+            gradient.addColorStop(0, '#A8E6CF'); // Light mint green
+            gradient.addColorStop(0.3, '#88D8A3'); // Fresh mint
+            gradient.addColorStop(0.7, '#7ED091'); // Vibrant mint
+            gradient.addColorStop(1, '#6BB77B'); // Deeper mint for depth
+            this.gradientCache.set('adorableSnakeBody', gradient);
         }
         
         // Performance: create single path for entire snake
@@ -953,12 +954,21 @@ class SnakeGame {
             }
         }
         
-        // Single stroke for entire body with simple blue color
-        this.ctx.strokeStyle = this.gradientCache.get('simpleSnakeBody');
+        // Single stroke for entire body with adorable mint green
+        this.ctx.strokeStyle = this.gradientCache.get('adorableSnakeBody');
         this.ctx.lineWidth = bodyWidth;
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
         this.ctx.stroke();
+        
+        // Add cute belly accent with creamy peach color
+        if (this.snake.length > 1) {
+            this.ctx.strokeStyle = '#FFEAA7'; // Soft creamy yellow
+            this.ctx.lineWidth = bodyWidth * 0.4; // Smaller width for belly stripe
+            this.ctx.globalAlpha = 0.8;
+            this.ctx.stroke();
+            this.ctx.globalAlpha = 1.0;
+        }
     }
     
     drawSnakeHeadOptimized() {
@@ -979,13 +989,14 @@ class SnakeGame {
         // Update personality animations
         this.updatePersonalityAnimations();
         
-        // Cache simple blue snake head
-        if (!this.gradientCache.has('simpleSnakeHead')) {
+        // Cache adorable mint green snake head with warm highlights
+        if (!this.gradientCache.has('adorableSnakeHead')) {
             const gradient = this.ctx.createRadialGradient(-radius/3, -radius/3, 0, 0, 0, radius);
-            gradient.addColorStop(0, '#4A90E2'); // Bright blue
-            gradient.addColorStop(0.5, '#357ABD'); // Medium blue
-            gradient.addColorStop(1, '#2E5B9A'); // Darker blue for depth
-            this.gradientCache.set('simpleSnakeHead', gradient);
+            gradient.addColorStop(0, '#B8F2D1'); // Lightest mint highlight
+            gradient.addColorStop(0.3, '#A8E6CF'); // Light mint green
+            gradient.addColorStop(0.7, '#88D8A3'); // Fresh mint
+            gradient.addColorStop(1, '#6BB77B'); // Deeper mint for depth
+            this.gradientCache.set('adorableSnakeHead', gradient);
         }
         
         // Performance: save/restore only when needed
@@ -993,11 +1004,20 @@ class SnakeGame {
         this.ctx.translate(centerX, centerY);
         this.ctx.rotate(angle);
         
-        // Simple rounded head with blue gradient
-        this.ctx.fillStyle = this.gradientCache.get('simpleSnakeHead');
+        // Adorable rounded head with mint green gradient
+        this.ctx.fillStyle = this.gradientCache.get('adorableSnakeHead');
         this.ctx.beginPath();
         this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
         this.ctx.fill();
+        
+        // Add cute coral pink cheek spots for extra charm
+        this.ctx.fillStyle = '#FFB3BA'; // Soft coral pink
+        this.ctx.globalAlpha = 0.6;
+        this.ctx.beginPath();
+        this.ctx.arc(-radius * 0.6, radius * 0.2, radius * 0.15, 0, Math.PI * 2);
+        this.ctx.arc(radius * 0.6, radius * 0.2, radius * 0.15, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.globalAlpha = 1.0;
         
         // Draw simple white eyes like in the reference image
         const eyeOffset = radius * 0.4;
@@ -1012,10 +1032,10 @@ class SnakeGame {
             this.ctx.fill();
         }
         
-        // Simple black pupils for the eyes
+        // Adorable pupils with sparkle
         if (this.isDead) {
             // X X for dead eyes
-            this.ctx.strokeStyle = 'black';
+            this.ctx.strokeStyle = '#2C3E50'; // Deep blue-gray instead of harsh black
             this.ctx.lineWidth = 2;
             this.ctx.beginPath();
             // Left eye X
@@ -1030,26 +1050,33 @@ class SnakeGame {
             this.ctx.lineTo(eyeOffset - eyeSize * 0.5, -radius * 0.3 + eyeSize * 0.5);
             this.ctx.stroke();
         } else if (!this.isBlinking) {
-            // Simple black pupils
-            this.ctx.fillStyle = 'black';
+            // Charming deep blue pupils
+            this.ctx.fillStyle = '#2C3E50'; // Deep blue-gray for friendlier look
             this.ctx.beginPath();
             this.ctx.arc(-eyeOffset, -radius * 0.3, eyeSize * 0.3, 0, Math.PI * 2);
             this.ctx.arc(eyeOffset, -radius * 0.3, eyeSize * 0.3, 0, Math.PI * 2);
             this.ctx.fill();
+            
+            // Add cute white sparkles
+            this.ctx.fillStyle = 'white';
+            this.ctx.beginPath();
+            this.ctx.arc(-eyeOffset + eyeSize * 0.15, -radius * 0.3 - eyeSize * 0.15, eyeSize * 0.08, 0, Math.PI * 2);
+            this.ctx.arc(eyeOffset + eyeSize * 0.15, -radius * 0.3 - eyeSize * 0.15, eyeSize * 0.08, 0, Math.PI * 2);
+            this.ctx.fill();
         }
         
-        // Draw simple mouth when eating
+        // Draw adorable mouth when eating
         if (this.mouthOpen) {
-            this.ctx.strokeStyle = 'black';
+            this.ctx.strokeStyle = '#2C3E50'; // Soft blue-gray
             this.ctx.lineWidth = 2;
             this.ctx.beginPath();
             this.ctx.arc(0, radius * 0.4, radius * 0.2, 0, Math.PI);
             this.ctx.stroke();
         }
         
-        // Draw simple tongue if visible
+        // Draw vibrant coral tongue if visible
         if (this.tongueOut) {
-            this.ctx.strokeStyle = '#FF69B4';
+            this.ctx.strokeStyle = '#FF6B6B'; // Warm coral red
             this.ctx.lineWidth = 3;
             this.ctx.lineCap = 'round';
             this.ctx.beginPath();
