@@ -978,22 +978,16 @@ class SnakeGame {
     }
     
     drawSnakeHeadSprite(x, y) {
-        let headSprite = 'head_right'; // Default facing right
+        // Use the working head sprite with eyes (body_corner_2.png contains a proper head)
+        let headSprite = 'body_corner_2'; // This sprite actually contains a head with eyes
         
-        // Determine head direction based on movement
-        if (this.direction.x === 1) headSprite = 'head_right';
-        else if (this.direction.x === -1) headSprite = 'head_left';
-        else if (this.direction.y === 1) headSprite = 'head_down';
-        else if (this.direction.y === -1) headSprite = 'head_up';
-        
-        // Use eyes variant occasionally for more personality
-        if (Math.random() < 0.3 && headSprite === 'head_up') {
-            headSprite = 'head_eyes_up';
-        }
-        
+        // Check if the image exists and is loaded
         const img = this.snakeImages[headSprite];
-        if (img && img.complete) {
+        if (img && img.complete && img.naturalWidth > 0) {
             this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
+        } else {
+            // Fallback to optimized head rendering if sprite fails
+            this.drawSnakeHeadOptimized();
         }
     }
     
@@ -1002,7 +996,7 @@ class SnakeGame {
         const prev = this.snake[index - 1];
         const next = this.snake[index + 1];
         
-        let bodySprite = 'body_straight_horizontal'; // Default
+        let bodySprite = 'body_corner_1'; // Use the working vertical pipe sprite as default
         
         if (prev && next) {
             // Determine if this is a corner or straight segment
@@ -1010,43 +1004,45 @@ class SnakeGame {
             const nextDir = { x: next.x - current.x, y: next.y - current.y };
             
             if (prevDir.x === nextDir.x) {
-                // Vertical straight segment
-                bodySprite = 'body_straight_vertical';
+                // Vertical straight segment - use the working pipe sprite
+                bodySprite = 'body_corner_1';
             } else if (prevDir.y === nextDir.y) {
-                // Horizontal straight segment
+                // Horizontal straight segment - use the spotted sprite
                 bodySprite = 'body_straight_horizontal';
             } else {
-                // Corner piece - use different corner sprites for variety
-                const cornerTypes = ['body_corner_1', 'body_corner_2', 'body_corner_3', 'body_corner_4'];
-                bodySprite = cornerTypes[index % cornerTypes.length];
+                // Corner piece - use the curved sprite
+                bodySprite = 'body_curve_large';
             }
         }
         
+        // Check if the sprite actually has content before using it
         const img = this.snakeImages[bodySprite];
-        if (img && img.complete) {
+        if (img && img.complete && img.naturalWidth > 0) {
             this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
+        } else {
+            // Fallback: draw a simple colored square as body segment
+            this.ctx.fillStyle = '#7ED091'; // Match the mint green theme
+            this.ctx.fillRect(x + 2, y + 2, this.gridSize - 4, this.gridSize - 4);
         }
     }
     
     drawSnakeTailSprite(x, y, index) {
-        const current = this.snake[index];
-        const prev = this.snake[index - 1];
+        // Use a simple body sprite for tail since tail sprites appear to be transparent
+        let tailSprite = 'body_corner_1'; // Use the working pipe sprite
         
-        let tailSprite = 'tail_right'; // Default
-        
-        if (prev) {
-            // Determine tail direction based on previous segment
-            const direction = { x: current.x - prev.x, y: current.y - prev.y };
-            
-            if (direction.x === 1) tailSprite = 'tail_right';
-            else if (direction.x === -1) tailSprite = 'tail_left';
-            else if (direction.y === 1) tailSprite = 'tail_down';
-            else if (direction.y === -1) tailSprite = 'tail_up';
-        }
-        
+        // Check if the sprite has content
         const img = this.snakeImages[tailSprite];
-        if (img && img.complete) {
+        if (img && img.complete && img.naturalWidth > 0) {
             this.ctx.drawImage(img, x, y, this.gridSize, this.gridSize);
+        } else {
+            // Fallback: draw a smaller colored circle as tail
+            this.ctx.fillStyle = '#6BB77B'; // Slightly darker mint for tail
+            const centerX = x + this.gridSize / 2;
+            const centerY = y + this.gridSize / 2;
+            const radius = this.gridSize * 0.3;
+            this.ctx.beginPath();
+            this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            this.ctx.fill();
         }
     }
     
