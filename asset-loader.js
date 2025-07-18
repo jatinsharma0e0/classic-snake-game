@@ -58,17 +58,17 @@ class AssetLoader {
             'assets/skins/greeny/greeny_dead_head.png'
         ];
         
-        // Audio assets
+        // Audio assets - Temporarily disabled due to corrupted files
         this.audioAssets = [
-            'assets/audio/background_music.mp3',
-            'assets/audio/button_click.mp3',
-            'assets/audio/game_start.mp3',
-            'assets/audio/snake_move.mp3',
-            'assets/audio/eat_food.mp3',
-            'assets/audio/tongue_flick.mp3',
-            'assets/audio/collision.mp3',
-            'assets/audio/hit_impact.mp3',
-            'assets/audio/game_over.mp3'
+            // 'assets/audio/background_music.mp3',
+            // 'assets/audio/button_click.mp3',
+            // 'assets/audio/game_start.mp3',
+            // 'assets/audio/snake_move.mp3',
+            // 'assets/audio/eat_food.mp3',
+            // 'assets/audio/tongue_flick.mp3',
+            // 'assets/audio/collision.mp3',
+            // 'assets/audio/hit_impact.mp3',
+            // 'assets/audio/game_over.mp3'
         ];
         
         // Combine all assets (fonts first for priority loading)
@@ -272,41 +272,60 @@ class AssetLoader {
     
     async validateSingleAsset(assetPath) {
         try {
+            const cacheKey = this.getCacheKey(assetPath);
+            const metaKey = this.getCacheMetaKey(assetPath);
+            
+            // Debug: Check if keys exist in localStorage
+            const hasCache = localStorage.getItem(cacheKey) !== null;
+            const hasMeta = localStorage.getItem(metaKey) !== null;
+            
+            if (!hasCache || !hasMeta) {
+                console.log(`Missing cache for ${assetPath}: cache=${hasCache}, meta=${hasMeta}`);
+                return false;
+            }
+            
             const cachedData = this.getCachedAsset(assetPath);
             const cachedMeta = this.getCachedAssetMeta(assetPath);
             
             if (!cachedData || !cachedMeta) {
+                console.log(`Failed to parse cache for ${assetPath}`);
                 return false;
             }
             
             // Check version
             if (cachedMeta.version !== this.cacheVersion) {
+                console.log(`Version mismatch for ${assetPath}: ${cachedMeta.version} vs ${this.cacheVersion}`);
                 return false;
             }
             
             // Check if data is non-empty and correct type
             if (!cachedData.data || !cachedData.type) {
+                console.log(`Invalid data for ${assetPath}: data=${!!cachedData.data}, type=${cachedData.type}`);
                 return false;
             }
             
             // Validate based on asset type
             if (assetPath.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
-                // For images, check if it's a valid data URL
-                return cachedData.type === 'image' && 
-                       cachedData.data.startsWith('data:image/') &&
-                       cachedData.data.length > 100; // Basic size check
+                const isValid = cachedData.type === 'image' && 
+                               cachedData.data.startsWith('data:image/') &&
+                               cachedData.data.length > 100;
+                if (!isValid) console.log(`Invalid image cache for ${assetPath}`);
+                return isValid;
             } else if (assetPath.match(/\.(mp3|ogg|wav)$/i)) {
-                // For audio, check if it's a valid data URL
-                return cachedData.type === 'audio' && 
-                       cachedData.data.startsWith('data:audio/') &&
-                       cachedData.data.length > 1000; // Basic size check
+                const isValid = cachedData.type === 'audio' && 
+                               cachedData.data.startsWith('data:audio/') &&
+                               cachedData.data.length > 1000;
+                if (!isValid) console.log(`Invalid audio cache for ${assetPath}`);
+                return isValid;
             } else if (assetPath.match(/\.(ttf|otf|woff|woff2)$/i)) {
-                // For fonts, check if it's a valid data URL
-                return cachedData.type === 'font' && 
-                       cachedData.data.startsWith('data:font/') &&
-                       cachedData.data.length > 1000; // Basic size check
+                const isValid = cachedData.type === 'font' && 
+                               cachedData.data.startsWith('data:font/') &&
+                               cachedData.data.length > 1000;
+                if (!isValid) console.log(`Invalid font cache for ${assetPath}`);
+                return isValid;
             }
             
+            console.log(`Valid cache for ${assetPath}`);
             return true;
         } catch(e) {
             console.warn(`Error validating cached asset: ${assetPath}`, e);
