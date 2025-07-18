@@ -198,8 +198,8 @@ body {
 .start-button-container {
     position: relative;
     margin: 40px auto;
-    width: 450px;
-    height: 250px;
+    width: fit-content;
+    height: fit-content;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -209,7 +209,7 @@ body {
     transition: all 0.3s ease;
     z-index: 10;
     position: relative;
-    width: 300px;
+    width: 500px;
     height: auto;
     filter: drop-shadow(0 8px 25px rgba(139, 69, 19, 0.4));
 }
