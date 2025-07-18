@@ -158,6 +158,9 @@ class AssetLoader {
             await Promise.all(fontPromises);
             console.log('Fonts loaded successfully!');
             
+            // Transition from black overlay to loading screen after fonts load
+            this.transitionToLoadingScreen();
+            
             // Step 2: Load remaining assets in parallel
             console.log('Loading remaining assets...');
             const otherAssets = [
@@ -172,6 +175,26 @@ class AssetLoader {
             console.log('All assets loaded successfully!');
         } catch (error) {
             console.error('Error loading assets:', error);
+        }
+    }
+    
+    transitionToLoadingScreen() {
+        const blackOverlay = document.getElementById('blackOverlay');
+        const loadingScreen = document.getElementById('loadingScreen');
+        
+        if (blackOverlay && loadingScreen) {
+            // Start fade out of black overlay
+            blackOverlay.classList.add('fade-out');
+            
+            // Show loading screen with slight delay for smooth transition
+            setTimeout(() => {
+                loadingScreen.classList.add('active');
+            }, 200);
+            
+            // Remove black overlay from DOM after transition completes
+            setTimeout(() => {
+                blackOverlay.style.display = 'none';
+            }, 800);
         }
     }
 }

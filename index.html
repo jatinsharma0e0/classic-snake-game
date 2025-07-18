@@ -7,8 +7,19 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Black Screen Overlay - Shows immediately before font loading -->
+    <div id="blackOverlay" class="black-overlay">
+        <div class="black-overlay-content">
+            <div class="initial-loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen active">
+    <div id="loadingScreen" class="loading-screen">
         <div class="loading-container">
             <div class="loading-title">
                 <h1>Snake Game</h1>

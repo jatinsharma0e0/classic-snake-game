@@ -760,6 +760,71 @@ body {
         font-size: 0.9rem;
     }
 }
+
+/* Black Screen Overlay - Shows immediately on page load */
+.black-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+}
+
+.black-overlay.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.black-overlay-content {
+    text-align: center;
+}
+
+.initial-loading-dots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.initial-loading-dots .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ffffff;
+    animation: dot-pulse 1.4s ease-in-out infinite both;
+}
+
+.initial-loading-dots .dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.initial-loading-dots .dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+.initial-loading-dots .dot:nth-child(3) {
+    animation-delay: 0s;
+}
+
+@keyframes dot-pulse {
+    0%, 80%, 100% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 /* Loading Screen Styles */
 .loading-screen {
     position: fixed;
@@ -768,14 +833,19 @@ body {
     width: 100vw;
     height: 100vh;
     background: linear-gradient(135deg, #2E7D32 0%, #388E3C 50%, #4CAF50 100%);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease-in, visibility 0.6s ease-in;
 }
 
 .loading-screen.active {
     display: flex;
+    opacity: 1;
+    visibility: visible;
 }
 
 .loading-container {
