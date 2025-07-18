@@ -87,20 +87,22 @@ body {
     position: relative;
     z-index: 2;
     text-align: center;
-    padding: 40px;
-    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     backdrop-filter: blur(7px);
     border: 2px solid rgba(104, 211, 145, 0.4);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    max-width: 800px;
+    width: 90%;
 }
 
 .home-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .header-buttons {
@@ -140,7 +142,7 @@ body {
         0 -2px 0 rgba(0, 0, 0, 0.6),
         2px 2px 4px rgba(0, 0, 0, 0.7),
         0 0 10px rgba(255, 255, 255, 0.3);
-    margin: 10px 0 20px 0;
+    margin: 0 0 15px 0;
     animation: titleGlow 3s ease-in-out infinite alternate;
     display: flex;
     align-items: center;
@@ -150,11 +152,12 @@ body {
     background-size: 100% 140%;
     background-repeat: no-repeat;
     background-position: center;
-    padding: 30px 40px;
+    padding: 25px 40px;
     border-radius: 15px;
-    min-height: 100px;
+    min-height: 90px;
     position: relative;
     overflow: hidden;
+    width: 100%;
 }
 
 .snake-icon {
@@ -183,16 +186,17 @@ body {
 }
 
 .subtitle {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     color: #90EE90;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     font-style: italic;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
-    background: rgba(0, 0, 0, 0.4);
-    padding: 10px 20px;
-    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 12px 25px;
+    border-radius: 20px;
     display: inline-block;
+    border: 1px solid rgba(144, 238, 144, 0.3);
 }
 
 .start-button-container {
