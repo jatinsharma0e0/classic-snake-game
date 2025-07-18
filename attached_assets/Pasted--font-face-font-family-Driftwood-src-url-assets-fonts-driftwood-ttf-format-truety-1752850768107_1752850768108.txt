@@ -16,17 +16,12 @@ html {
     height: 100%;
     width: 100%;
     overflow: hidden;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    /* Prevent text selection and dragging on all elements */
+    /* Prevent text selection */
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    /* Prevent dragging */
     -webkit-user-drag: none;
     -khtml-user-drag: none;
     -moz-user-drag: none;
@@ -36,6 +31,23 @@ html {
     -webkit-touch-callout: none;
     /* Prevent zooming on mobile */
     touch-action: manipulation;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* Prevent text selection on all elements */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* Prevent dragging on all elements */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
     
     /* Performance optimizations */
     -webkit-transform: translateZ(0);
@@ -55,6 +67,21 @@ body {
     left: 0;
     margin: 0;
     padding: 0;
+    /* Prevent text selection */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* Prevent dragging */
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    /* Disable touch callouts on mobile */
+    -webkit-touch-callout: none;
+    /* Prevent zooming on mobile */
+    touch-action: manipulation;
 }
 
 /* Start Screen Styles */
@@ -213,6 +240,11 @@ body {
     height: auto;
     filter: drop-shadow(0 8px 25px rgba(139, 69, 19, 0.4));
 }
+
+/* .start-game-btn-image:hover {
+    transform: translateY(-5px) scale(1.05);
+    filter: drop-shadow(0 15px 35px rgba(139, 69, 19, 0.6)) brightness(1.1);
+} */
 
 .stone-play-button-overlay {
     position: absolute;
@@ -575,7 +607,7 @@ body {
     justify-content: center;
     margin-top: none;
     width: 100%;
-    margin-bottom: 10%;
+    margin-bottom: 10%
 }
 
 .stone-button {
