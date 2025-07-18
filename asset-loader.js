@@ -16,20 +16,24 @@ class AssetLoader {
     }
     
     defineAssets() {
+        // Font assets (highest priority - load first)
+        this.fontAssets = [
+            'assets/fonts/driftwood.ttf',
+            'assets/fonts/Display-Dots-Two-Sans.ttf'
+        ];
+        
         // Core game assets
-        const coreAssets = [
+        this.coreAssets = [
             'assets/snake-icon.png',
             'assets/start-button.png',
             'assets/wooden-play-button.png',
             'assets/title-bg.png',
             'assets/jungle-bg.jpg',
-            'assets/grass-bg.webp',
-            'assets/fonts/driftwood.ttf',
-            'assets/fonts/Display-Dots-Two-Sans.ttf'
+            'assets/grass-bg.webp'
         ];
         
         // Obstacle assets
-        const obstacleAssets = [
+        this.obstacleAssets = [
             'assets/1-block-rock.png',
             'assets/2-blocks-rock.png',
             'assets/4-blocks-rock.png',
@@ -37,7 +41,7 @@ class AssetLoader {
         ];
         
         // Default greeny skin assets
-        const greenySkinAssets = [
+        this.greenySkinAssets = [
             'assets/skins/greeny/greeny_head.png',
             'assets/skins/greeny/greeny_body_straight.png',
             'assets/skins/greeny/greeny_body_turn.png',
@@ -47,7 +51,7 @@ class AssetLoader {
         ];
         
         // Audio assets
-        const audioAssets = [
+        this.audioAssets = [
             'assets/audio/background_music.mp3',
             'assets/audio/button_click.mp3',
             'assets/audio/game_start.mp3',
@@ -59,12 +63,13 @@ class AssetLoader {
             'assets/audio/game_over.mp3'
         ];
         
-        // Combine all assets
+        // Combine all assets (fonts first for priority loading)
         this.assets = [
-            ...coreAssets,
-            ...obstacleAssets,
-            ...greenySkinAssets,
-            ...audioAssets
+            ...this.fontAssets,
+            ...this.coreAssets,
+            ...this.obstacleAssets,
+            ...this.greenySkinAssets,
+            ...this.audioAssets
         ];
         
         this.totalAssets = this.assets.length;
@@ -146,11 +151,24 @@ class AssetLoader {
     async loadAllAssets() {
         console.log(`Starting to load ${this.totalAssets} assets...`);
         
-        // Load all assets in parallel for maximum performance
-        const promises = this.assets.map(src => this.loadAsset(src));
-        
         try {
-            await Promise.all(promises);
+            // Step 1: Load fonts first (critical for proper text rendering)
+            console.log('Loading fonts...');
+            const fontPromises = this.fontAssets.map(src => this.loadAsset(src));
+            await Promise.all(fontPromises);
+            console.log('Fonts loaded successfully!');
+            
+            // Step 2: Load remaining assets in parallel
+            console.log('Loading remaining assets...');
+            const otherAssets = [
+                ...this.coreAssets,
+                ...this.obstacleAssets,
+                ...this.greenySkinAssets,
+                ...this.audioAssets
+            ];
+            const otherPromises = otherAssets.map(src => this.loadAsset(src));
+            await Promise.all(otherPromises);
+            
             console.log('All assets loaded successfully!');
         } catch (error) {
             console.error('Error loading assets:', error);
