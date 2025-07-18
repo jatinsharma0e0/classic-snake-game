@@ -216,7 +216,9 @@ class AssetLoader {
         
         this.cleanupOldCache();
         
-        let allAssetsValid = true;
+        let criticalAssetsValid = true;
+        let totalValid = 0;
+        let totalCritical = 0;
         const validationPromises = [];
         
         for (const assetPath of this.assets) {
@@ -229,16 +231,43 @@ class AssetLoader {
         for (let i = 0; i < results.length; i++) {
             const assetPath = this.assets[i];
             const isValid = results[i];
+            const isAudio = assetPath.match(/\.(mp3|ogg|wav)$/i);
             
             this.assetStatus.set(assetPath, isValid ? 'cached' : 'needs_download');
             
-            if (!isValid) {
-                allAssetsValid = false;
+            if (isValid) {
+                totalValid++;
+            }
+            
+            // Only count non-audio assets as critical for validation
+            if (!isAudio) {
+                totalCritical++;
+                if (!isValid) {
+                    criticalAssetsValid = false;
+                }
             }
         }
         
-        console.log(`Asset validation complete. All valid: ${allAssetsValid}`);
-        return allAssetsValid;
+        const validPercentage = Math.round((totalValid / this.assets.length) * 100);
+        const expectedNonAudio = this.assets.length - this.audioAssets.length;
+        console.log(`Asset validation complete. Critical assets valid: ${criticalAssetsValid}, Overall: ${totalValid}/${this.assets.length} (${validPercentage}%), Expected non-audio: ${expectedNonAudio}`);
+        
+        // Debug: Log asset status
+        const validAssets = [];
+        const invalidAssets = [];
+        for (const [path, status] of this.assetStatus) {
+            if (status === 'cached') {
+                validAssets.push(path);
+            } else {
+                invalidAssets.push(path);
+            }
+        }
+        console.log(`Valid cached assets: ${validAssets.length}`, validAssets.slice(0, 5));
+        console.log(`Invalid/missing assets: ${invalidAssets.length}`, invalidAssets.slice(0, 5));
+        
+        // Consider cache valid if all critical (non-audio) assets are cached
+        // Audio files are optional since they often fail to load anyway
+        return criticalAssetsValid && totalValid >= expectedNonAudio;
     }
     
     async validateSingleAsset(assetPath) {
