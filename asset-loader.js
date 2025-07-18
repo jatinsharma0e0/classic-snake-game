@@ -264,15 +264,18 @@ class AssetLoader {
             if (assetPath.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
                 // For images, check if it's a valid data URL
                 return cachedData.type === 'image' && 
-                       cachedData.data.startsWith('data:image/');
+                       cachedData.data.startsWith('data:image/') &&
+                       cachedData.data.length > 100; // Basic size check
             } else if (assetPath.match(/\.(mp3|ogg|wav)$/i)) {
                 // For audio, check if it's a valid data URL
                 return cachedData.type === 'audio' && 
-                       cachedData.data.startsWith('data:audio/');
+                       cachedData.data.startsWith('data:audio/') &&
+                       cachedData.data.length > 1000; // Basic size check
             } else if (assetPath.match(/\.(ttf|otf|woff|woff2)$/i)) {
                 // For fonts, check if it's a valid data URL
                 return cachedData.type === 'font' && 
-                       cachedData.data.startsWith('data:font/');
+                       cachedData.data.startsWith('data:font/') &&
+                       cachedData.data.length > 1000; // Basic size check
             }
             
             return true;
@@ -390,8 +393,19 @@ class AssetLoader {
             canvas.width = img.naturalWidth || img.width;
             canvas.height = img.naturalHeight || img.height;
             ctx.drawImage(img, 0, 0);
-            const dataUrl = canvas.toDataURL('image/png');
+            
+            // Use appropriate format based on file extension
+            let format = 'image/png';
+            let quality = 0.9;
+            if (src.endsWith('.jpg') || src.endsWith('.jpeg')) {
+                format = 'image/jpeg';
+            } else if (src.endsWith('.webp')) {
+                format = 'image/webp';
+            }
+            
+            const dataUrl = canvas.toDataURL(format, quality);
             this.setCachedAsset(src, dataUrl, 'image');
+            console.log(`Successfully cached image: ${src}`);
         } catch(e) {
             console.warn(`Failed to cache image: ${src}`, e);
         }
@@ -402,9 +416,25 @@ class AssetLoader {
             // For fonts, we'll store the original URL since data URLs for fonts are complex
             const response = await fetch(src);
             const arrayBuffer = await response.arrayBuffer();
-            const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-            const dataUrl = `data:font/truetype;base64,${base64}`;
+            
+            // Convert ArrayBuffer to base64 more efficiently
+            const bytes = new Uint8Array(arrayBuffer);
+            let binary = '';
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            const base64 = btoa(binary);
+            
+            // Determine MIME type based on file extension
+            let mimeType = 'font/truetype';
+            if (src.endsWith('.woff')) mimeType = 'font/woff';
+            else if (src.endsWith('.woff2')) mimeType = 'font/woff2';
+            else if (src.endsWith('.otf')) mimeType = 'font/opentype';
+            
+            const dataUrl = `data:${mimeType};base64,${base64}`;
             this.setCachedAsset(src, dataUrl, 'font');
+            console.log(`Successfully cached font: ${src}`);
         } catch(e) {
             console.warn(`Failed to cache font: ${src}`, e);
         }
@@ -414,10 +444,24 @@ class AssetLoader {
         try {
             const response = await fetch(src);
             const arrayBuffer = await response.arrayBuffer();
-            const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-            const mimeType = response.headers.get('content-type') || 'audio/mp3';
+            
+            // Convert ArrayBuffer to base64 more efficiently
+            const bytes = new Uint8Array(arrayBuffer);
+            let binary = '';
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            const base64 = btoa(binary);
+            
+            // Determine MIME type
+            let mimeType = 'audio/mpeg';
+            if (src.endsWith('.ogg')) mimeType = 'audio/ogg';
+            else if (src.endsWith('.wav')) mimeType = 'audio/wav';
+            
             const dataUrl = `data:${mimeType};base64,${base64}`;
             this.setCachedAsset(src, dataUrl, 'audio');
+            console.log(`Successfully cached audio: ${src}`);
         } catch(e) {
             console.warn(`Failed to cache audio: ${src}`, e);
         }
