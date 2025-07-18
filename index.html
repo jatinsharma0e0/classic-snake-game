@@ -49,7 +49,7 @@
             <div class="home-header">
                 <h1 class="game-title"><img src="assets/snake-icon.png" alt="Snake" class="snake-icon"> JUNGLE SNAKE</h1>
                 <div class="header-buttons">
-                    <button id="skinEditorBtn" class="skin-editor-btn" title="Customize Snake Skin">🎨</button>
+                    <button id="skinSelectorBtn" class="skin-selector-btn" title="Choose Snake Skin">🎨</button>
                     <button id="homeMuteBtn" class="mute-btn home-mute-btn" title="Toggle Sound">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93l-1.41 1.41A8.98 8.98 0 0 1 21 12a8.98 8.98 0 0 1-3.34 5.66l1.41 1.41A10.97 10.97 0 0 0 23 12a10.97 10.97 0 0 0-3.93-7.07zM16.24 7.76l-1.41 1.41A4.98 4.98 0 0 1 17 12a4.98 4.98 0 0 1-2.17 2.83l1.41 1.41A6.97 6.97 0 0 0 19 12a6.97 6.97 0 0 0-2.76-4.24z"/>
@@ -189,6 +189,37 @@
                         <button id="restartBtn" class="stone-button retry-stone-button"></button>
                         <button id="backToMenuBtn" class="stone-button home-stone-button"></button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skin Selector Panel -->
+    <div id="skinSelectorPanel" class="skin-selector-panel hidden">
+        <div class="skin-selector-overlay">
+            <div class="skin-selector-content">
+                <div class="skin-selector-header">
+                    <h2>🎨 Choose Your Snake Skin</h2>
+                    <button id="closeSkinSelector" class="close-btn">×</button>
+                </div>
+                
+                <div class="skin-grid">
+                    <div class="skin-option selected" data-skin="greeny">
+                        <div class="skin-preview">
+                            <img src="assets/skins/greeny/greeny_head.png" alt="Greeny Snake" class="skin-thumbnail">
+                            <div class="skin-food-preview">
+                                <img src="assets/skins/greeny/greeny_food.png" alt="Greeny Food" class="food-thumbnail">
+                            </div>
+                        </div>
+                        <div class="skin-name">Greeny</div>
+                        <div class="skin-description">Classic green snake</div>
+                    </div>
+                    
+                    <!-- Additional skins can be added here -->
+                </div>
+                
+                <div class="skin-selector-footer">
+                    <button id="applySkinBtn" class="apply-skin-btn">Apply Skin</button>
                 </div>
             </div>
         </div>

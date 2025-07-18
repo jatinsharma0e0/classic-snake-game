@@ -90,7 +90,8 @@ class SnakeGame {
         this.gameScreen = document.getElementById('gameScreen');
         this.startGameBtn = document.getElementById('startGameBtn');
         this.stonePlayBtn = document.querySelector('.stone-play-button-overlay');
-        this.skinEditorBtn = document.getElementById('skinEditorBtn');
+        this.skinSelectorBtn = document.getElementById('skinSelectorBtn');
+        this.skinSelectorPanel = document.getElementById('skinSelectorPanel');
         this.startScreenHighScore = document.getElementById('startScreenHighScore');
         this.scoreElement = document.getElementById('score');
         this.highScoreElement = document.getElementById('highScore');
@@ -124,6 +125,9 @@ class SnakeGame {
         // Load custom skin if available
         this.loadCustomSkin();
         
+        // Initialize skin selector
+        this.loadAvailableSkins();
+        
         // Initialize snake animation for start screen
         this.initStartScreenSnake();
     }
@@ -149,11 +153,11 @@ class SnakeGame {
                 this.showGameScreen();
             });
         }
-        this.skinEditorBtn.addEventListener('click', () => {
+        this.skinSelectorBtn.addEventListener('click', () => {
             if (this.audioManager) {
                 this.audioManager && this.audioManager.playSound('buttonClick');
             }
-            window.location.href = 'skin-editor.html';
+            this.showSkinSelector();
         });
         this.restartBtn.addEventListener('click', () => {
             if (this.audioManager) {
@@ -214,6 +218,9 @@ class SnakeGame {
         };
         
         this.tutorialOverlay.addEventListener('click', dismissTutorial);
+        
+        // Skin selector event listeners
+        this.setupSkinSelectorListeners();
         
             // Setup interaction restrictions
         this.setupInteractionRestrictions();
@@ -2372,6 +2379,111 @@ class SnakeGame {
         }
     }
     
+    // Skin Selector Functions
+    setupSkinSelectorListeners() {
+        const closeSkinSelector = document.getElementById('closeSkinSelector');
+        const applySkinBtn = document.getElementById('applySkinBtn');
+        const skinOptions = document.querySelectorAll('.skin-option');
+        
+        if (closeSkinSelector) {
+            closeSkinSelector.addEventListener('click', () => {
+                if (this.audioManager) {
+                    this.audioManager.playSound('buttonClick');
+                }
+                this.hideSkinSelector();
+            });
+        }
+        
+        if (applySkinBtn) {
+            applySkinBtn.addEventListener('click', () => {
+                if (this.audioManager) {
+                    this.audioManager.playSound('buttonClick');
+                }
+                this.applySkin();
+            });
+        }
+        
+        // Handle skin option selection
+        skinOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                if (this.audioManager) {
+                    this.audioManager.playSound('buttonClick');
+                }
+                this.selectSkin(option);
+            });
+        });
+    }
+    
+    showSkinSelector() {
+        if (this.skinSelectorPanel) {
+            this.skinSelectorPanel.classList.remove('hidden');
+        }
+    }
+    
+    hideSkinSelector() {
+        if (this.skinSelectorPanel) {
+            this.skinSelectorPanel.classList.add('hidden');
+        }
+    }
+    
+    selectSkin(option) {
+        // Remove selected class from all options
+        const allOptions = document.querySelectorAll('.skin-option');
+        allOptions.forEach(opt => opt.classList.remove('selected'));
+        
+        // Add selected class to clicked option
+        option.classList.add('selected');
+        
+        // Store selected skin
+        this.selectedSkin = option.dataset.skin;
+    }
+    
+    applySkin() {
+        if (this.selectedSkin) {
+            this.currentSkin = this.selectedSkin;
+            
+            // Save to localStorage
+            localStorage.setItem('selectedSkin', this.selectedSkin);
+            
+            // Reload skin assets
+            this.loadCustomSkin();
+            
+            // Show confirmation (optional)
+            console.log(`Applied skin: ${this.selectedSkin}`);
+        }
+        
+        this.hideSkinSelector();
+    }
+    
+    loadAvailableSkins() {
+        // Define available skins
+        const availableSkins = [
+            {
+                id: 'greeny',
+                name: 'Greeny',
+                description: 'Classic green snake',
+                head: 'assets/skins/greeny/greeny_head.png',
+                food: 'assets/skins/greeny/greeny_food.png'
+            }
+            // Add more skins here as they become available
+        ];
+        
+        // Get the current selected skin from localStorage or default to 'greeny'
+        const currentSkin = localStorage.getItem('selectedSkin') || 'greeny';
+        this.selectedSkin = currentSkin;
+        
+        // Update the UI to show the selected skin
+        const skinOptions = document.querySelectorAll('.skin-option');
+        skinOptions.forEach(option => {
+            if (option.dataset.skin === currentSkin) {
+                option.classList.add('selected');
+            } else {
+                option.classList.remove('selected');
+            }
+        });
+        
+        return availableSkins;
+    }
 
 }
 
