@@ -149,20 +149,20 @@ body {
     justify-content: center;
     gap: 15px;
     background-image: url('assets/title-bg.png');
-    background-size: 100% 140%;
+    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    padding: 35px 40px 25px 40px;
+    padding: 40px 40px 30px 40px;
     border-radius: 15px;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     width: 100%;
-    height: 140%;
+    min-height: 140px;
 }
 
 .snake-icon {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
 }
 
@@ -334,22 +334,22 @@ body {
 }
 
 .game-header h1 {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     margin-bottom: 15px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .jungle-game-title {
     font-family: 'Driftwood', Arial, sans-serif;
-    font-size: 3rem;
+    font-size: 2.2rem;
     color: #2D4A1F;
+    text-align: center;
     text-shadow:
         0 2px 0 rgba(139, 69, 19, 0.8),
         0 -2px 0 rgba(0, 0, 0, 0.6),
         2px 2px 4px rgba(0, 0, 0, 0.7),
         0 0 10px rgba(255, 255, 255, 0.3);
     margin: 10px 0 20px 0;
-    animation: titleGlow 3s ease-in-out infinite alternate;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -358,17 +358,16 @@ body {
     background-size: 100% 140%;
     background-repeat: no-repeat;
     background-position: center;
-    padding: 30px 40px;
+    padding: 50px 10px 25px 40px;
     border-radius: 15px;
-    min-height: 100px;
     position: relative;
     overflow: hidden;
+    width: 100%;
 }
 
 .game-snake-icon {
-    width: 60px;
-    height: 60px;
-    animation: wiggle 2s ease-in-out infinite;
+    width: 80px;
+    height: 80px;
 }
 
 .score-container {
@@ -403,7 +402,6 @@ body {
 
 .mute-btn {
     background: none;
-    border: none;
     cursor: pointer;
     padding: 10px;
     border-radius: 10px;
