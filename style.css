@@ -255,13 +255,15 @@ body {
     width: 70px;
     height: 70px;
     z-index: 11;
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
     transition: all 0.3s ease;
 }
 
-.start-button-container:hover .stone-play-button-overlay {
+.stone-play-button-overlay:hover {
     transform: translate(-50%, -35%) scale(1.2);
+    filter: brightness(1.2) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
 }
 
 .snake-path-container {

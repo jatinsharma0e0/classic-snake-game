@@ -89,6 +89,7 @@ class SnakeGame {
         this.startScreen = document.getElementById('startScreen');
         this.gameScreen = document.getElementById('gameScreen');
         this.startGameBtn = document.getElementById('startGameBtn');
+        this.stonePlayBtn = document.querySelector('.stone-play-button-overlay');
         this.skinEditorBtn = document.getElementById('skinEditorBtn');
         this.startScreenHighScore = document.getElementById('startScreenHighScore');
         this.scoreElement = document.getElementById('score');
@@ -144,6 +145,17 @@ class SnakeGame {
             }
             this.showGameScreen();
         });
+        
+        // Stone play button event listener
+        if (this.stonePlayBtn) {
+            this.stonePlayBtn.addEventListener('click', () => {
+                if (this.audioManager) {
+                    this.audioManager && this.audioManager.resumeAudioContext(); // Initialize audio on first interaction
+                    this.audioManager && this.audioManager.playSound('buttonClick');
+                }
+                this.showGameScreen();
+            });
+        }
         this.skinEditorBtn.addEventListener('click', () => {
             if (this.audioManager) {
                 this.audioManager && this.audioManager.playSound('buttonClick');
