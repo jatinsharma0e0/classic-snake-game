@@ -134,6 +134,8 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Reorganized asset loader structure with separate categories for optimized loading sequence
 - Fixed home page styling with improved title positioning and layout spacing
 - Adjusted title text positioning within wooden background for better visual alignment
+- Repositioned both play and settings buttons on the wooden log for better visual balance
+- Changed title background sizing to show complete wooden plank without cropping
 - Fixed home page styling with improved title positioning, subtitle layout, and overall centering
 - Optimized start-content container for better responsive layout and visual hierarchy
 - Project migration completed and fully functional in Replit environment

@@ -221,7 +221,7 @@ body {
 .stone-play-button-overlay {
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: 40%;
     transform: translate(-50%, -35%);
     width: 85px;
     height: 85px;
@@ -240,8 +240,8 @@ body {
 .settings-button-overlay {
     position: absolute;
     top: 50%;
-    right: -50px;
-    transform: translateY(-35%);
+    left: 60%;
+    transform: translate(-50%, -35%);
     width: 70px;
     height: 70px;
     z-index: 11;
@@ -252,7 +252,7 @@ body {
 }
 
 .settings-button-overlay:hover {
-    transform: translateY(-35%) scale(1.15);
+    transform: translate(-50%, -35%) scale(1.15);
     filter: brightness(1.2) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
 }
 
