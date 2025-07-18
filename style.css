@@ -247,21 +247,21 @@ body {
     filter: drop-shadow(0 15px 35px rgba(139, 69, 19, 0.6)) brightness(1.1);
 } */
 
-.play-button-overlay {
+.stone-play-button-overlay {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -35%);
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     z-index: 11;
     pointer-events: none;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
     transition: all 0.3s ease;
 }
 
-.start-button-container:hover .play-button-overlay {
-    transform: translate(-50%, -35%) scale(1.5);
+.start-button-container:hover .stone-play-button-overlay {
+    transform: translate(-50%, -35%) scale(1.2);
 }
 
 .snake-path-container {
@@ -609,35 +609,34 @@ body {
     margin-bottom: 10%
 }
 
-.leaf-button {
+.stone-button {
     background: none;
     border: none;
     cursor: pointer;
     padding: 0;
     transition: all 0.3s ease;
     position: relative;
-    width: 40%;
-    height: auto;
-    aspect-ratio: 2 / 1;
-    filter: drop-shadow(0 0.8% 1.6% rgba(0, 0, 0, 0.3));
+    width: 120px;
+    height: 120px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
-.retry-button {
-    background: url('assets/retry-button.png') no-repeat center center;
+.retry-stone-button {
+    background: url('assets/retry-stone-button.png') no-repeat center center;
     background-size: contain;
 }
 
-.home-button {
-    background: url('assets/home-button.png') no-repeat center center;
+.home-stone-button {
+    background: url('assets/home-stone-button.png') no-repeat center center;
     background-size: contain;
 }
 
-.leaf-button:hover {
-    transform: scale(1.5);
-    filter: brightness(1.04) drop-shadow(0 6px 12px rgb(26, 28, 37, 0.7));
+.stone-button:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
 }
 
-.leaf-button:active {
+.stone-button:active {
     transform: scale(0.95);
 }
 

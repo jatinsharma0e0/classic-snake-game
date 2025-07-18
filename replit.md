@@ -94,6 +94,24 @@ The application is designed for real-time interactive experiences with 3D graphi
 
 ## Recent Changes
 
+**Updated Button System with Stone Design (July 18, 2025):**
+- Replaced wooden play button with new stone-style play button featuring leaves and golden triangle
+- Updated game over screen with new stone-style retry and home buttons
+- Changed CSS classes from `.leaf-button` to `.stone-button` for better semantics
+- Updated button hover effects for stone buttons with appropriate scaling and shadow effects
+- Enhanced game over board layout with centered scores at top and buttons at bottom
+- Added subtle background contrast for score labels to improve readability
+- Maintained all existing functionality while updating visual design
+- All buttons now feature consistent stone-and-leaf nature theme
+
+**Enhanced Game Over Screen Layout (July 18, 2025):**
+- Repositioned scores to be centered at the top of the wooden board
+- Added background contrast and padding for score labels for better legibility
+- Positioned retry and home buttons at the bottom center with proper spacing
+- Maintained thematic nature styling with leaf-like motifs and earthy tones
+- Applied clean alignment and spacing for modern, balanced look
+- Enhanced visual hierarchy with proper typography and golden color scheme
+
 **Enhanced Game Over Screen Layout (July 18, 2025):**
 - Redesigned game over board layout for better visual hierarchy and clarity
 - Repositioned 'Score' and 'Best Score' labels centered at the top, stacked vertically
