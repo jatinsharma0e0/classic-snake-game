@@ -90,8 +90,11 @@ class SnakeGame {
         this.gameScreen = document.getElementById('gameScreen');
         this.startGameBtn = document.getElementById('startGameBtn');
         this.stonePlayBtn = document.querySelector('.stone-play-button-overlay');
-        this.skinSelectorBtn = document.getElementById('skinSelectorBtn');
+        this.skinSelectorBtn = document.getElementById('skinSelectorBtn'); // May be null since it's removed
         this.skinSelectorPanel = document.getElementById('skinSelectorPanel');
+        this.settingsBtn = document.getElementById('settingsBtn');
+        this.settingsModal = document.getElementById('settingsModal');
+        this.closeSettingsBtn = document.getElementById('closeSettingsBtn');
         this.startScreenHighScore = document.getElementById('startScreenHighScore');
         this.scoreElement = document.getElementById('score');
         this.highScoreElement = document.getElementById('highScore');
@@ -103,7 +106,7 @@ class SnakeGame {
         this.backToMenuBtn = document.getElementById('backToMenuBtn');
         this.homeBtn = document.getElementById('homeBtn');
         this.muteBtn = document.getElementById('muteBtn');
-        this.homeMuteBtn = document.getElementById('homeMuteBtn');
+        this.homeMuteBtn = document.getElementById('homeMuteBtn'); // May be null since it's removed
         this.tutorialOverlay = document.getElementById('tutorialOverlay');
         
         // Custom skin system
@@ -153,11 +156,49 @@ class SnakeGame {
                 this.showGameScreen();
             });
         }
-        this.skinSelectorBtn.addEventListener('click', () => {
+        
+        // Settings button functionality
+        this.settingsBtn.addEventListener('click', () => {
             if (this.audioManager) {
                 this.audioManager && this.audioManager.playSound('buttonClick');
             }
-            this.showSkinSelector();
+            this.settingsModal.classList.remove('hidden');
+        });
+        
+        this.closeSettingsBtn.addEventListener('click', () => {
+            this.settingsModal.classList.add('hidden');
+        });
+        
+        // Close settings modal when clicking outside
+        this.settingsModal.addEventListener('click', (e) => {
+            if (e.target === this.settingsModal || e.target.classList.contains('settings-overlay')) {
+                this.settingsModal.classList.add('hidden');
+            }
+        });
+        
+        // Settings sound toggle
+        const soundToggle = document.getElementById('soundToggle');
+        if (soundToggle) {
+            soundToggle.addEventListener('click', () => {
+                if (this.audioManager) {
+                    this.audioManager.toggleMute();
+                    this.updateSoundToggleButton();
+                }
+            });
+        }
+        
+        // Settings skin selection
+        const skinOptions = document.querySelectorAll('.skin-selection-grid .skin-option');
+        skinOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove selected class from all options
+                skinOptions.forEach(opt => opt.classList.remove('selected'));
+                // Add selected class to clicked option
+                option.classList.add('selected');
+                // Apply skin immediately
+                const skinName = option.dataset.skin;
+                this.applySkin(skinName);
+            });
         });
         this.restartBtn.addEventListener('click', () => {
             if (this.audioManager) {
@@ -207,7 +248,9 @@ class SnakeGame {
         };
         
         this.muteBtn.addEventListener('click', handleMuteToggle);
-        this.homeMuteBtn.addEventListener('click', handleMuteToggle);
+        if (this.homeMuteBtn) {
+            this.homeMuteBtn.addEventListener('click', handleMuteToggle);
+        }
         
         // Tutorial overlay dismissal
         const dismissTutorial = () => {
@@ -252,7 +295,34 @@ class SnakeGame {
         
         // Update both mute buttons
         this.muteBtn.innerHTML = isMuted ? muteIcon : unmuteIcon;
-        this.homeMuteBtn.innerHTML = isMuted ? muteIcon : unmuteIcon;
+        if (this.homeMuteBtn) {
+            this.homeMuteBtn.innerHTML = isMuted ? muteIcon : unmuteIcon;
+        }
+        
+        // Update settings sound toggle button
+        const soundToggle = document.getElementById('soundToggle');
+        if (soundToggle) {
+            if (isMuted) {
+                soundToggle.classList.add('muted');
+                soundToggle.innerHTML = muteIcon;
+            } else {
+                soundToggle.classList.remove('muted');
+                soundToggle.innerHTML = unmuteIcon;
+            }
+        }
+    }
+    
+    updateSoundToggleButton() {
+        if (this.audioManager) {
+            const isMuted = this.audioManager.isMuted();
+            this.updateMuteButtonIcons(isMuted);
+        }
+    }
+    
+    applySkin(skinName) {
+        this.currentSkin = skinName;
+        localStorage.setItem('selectedSkin', skinName);
+        // The skin will be applied during the next render cycle
     }
     
     loadObstacleImages() {
