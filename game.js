@@ -2386,6 +2386,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeGame() {
+    const blackOverlay = document.getElementById('blackOverlay');
     const loadingScreen = document.getElementById('loadingScreen');
     const startScreen = document.getElementById('startScreen');
     const progressFill = document.getElementById('progressFill');
@@ -2393,47 +2394,107 @@ function initializeGame() {
     
     // Set up asset loader callbacks
     window.assetLoader.setProgressCallback((progress, loaded, total) => {
-        progressFill.style.width = `${progress}%`;
-        loadingText.textContent = `Loading assets... ${progress}%`;
-        
-        // Update loading text based on progress
-        if (progress < 30) {
-            loadingText.textContent = `Loading core assets... ${progress}%`;
-        } else if (progress < 60) {
-            loadingText.textContent = `Loading sprites... ${progress}%`;
-        } else if (progress < 90) {
-            loadingText.textContent = `Loading audio... ${progress}%`;
-        } else {
-            loadingText.textContent = `Almost ready... ${progress}%`;
+        if (progressFill && loadingText) {
+            progressFill.style.width = `${progress}%`;
+            loadingText.textContent = `Loading assets... ${progress}%`;
+            
+            // Update loading text based on progress
+            if (progress < 30) {
+                loadingText.textContent = `Loading core assets... ${progress}%`;
+            } else if (progress < 60) {
+                loadingText.textContent = `Loading sprites... ${progress}%`;
+            } else if (progress < 90) {
+                loadingText.textContent = `Loading audio... ${progress}%`;
+            } else {
+                loadingText.textContent = `Almost ready... ${progress}%`;
+            }
         }
     });
     
     window.assetLoader.setCompleteCallback(() => {
         // All assets loaded, show start screen
-        loadingText.textContent = 'Ready to play!';
-        progressFill.style.width = '100%';
+        if (loadingText && progressFill) {
+            loadingText.textContent = 'Ready to play!';
+            progressFill.style.width = '100%';
+        }
         
         setTimeout(() => {
-            loadingScreen.classList.remove('active');
-            loadingScreen.style.display = 'none';
-            startScreen.style.display = 'block';
-            
-            // Initialize the game now that assets are loaded
-            gameInstance = new SnakeGame();
-            
-            // Initialize audio manager after assets are loaded
-            gameInstance.audioManager = new AudioManager();
-            
-            // Initialize audio after user interaction
-            document.addEventListener('click', function initAudio() {
-                if (gameInstance && gameInstance.audioManager) {
-                    gameInstance.audioManager.resumeAudioContext();
-                }
-                document.removeEventListener('click', initAudio);
-            });
+            showStartScreen();
         }, 1000);
     });
     
-    // Start loading assets
+    // Handle cache bypass - go directly to start screen
+    window.assetLoader.setSkipLoadingCallback(() => {
+        console.log('Assets loaded from cache, transitioning directly to start screen');
+        setTimeout(() => {
+            fadeFromBlackToStart();
+        }, 500);
+    });
+    
+    // Start asset loading/validation process
     window.assetLoader.loadAllAssets();
+}
+
+function showStartScreen() {
+    const loadingScreen = document.getElementById('loadingScreen');
+    const startScreen = document.getElementById('startScreen');
+    
+    if (loadingScreen) {
+        loadingScreen.classList.remove('active');
+        loadingScreen.style.display = 'none';
+    }
+    
+    if (startScreen) {
+        startScreen.style.display = 'block';
+    }
+    
+    initializeGameInstance();
+}
+
+function fadeFromBlackToStart() {
+    const blackOverlay = document.getElementById('blackOverlay');
+    const startScreen = document.getElementById('startScreen');
+    
+    // Smooth transition from black to start screen
+    if (startScreen) {
+        startScreen.style.display = 'block';
+        startScreen.style.opacity = '0';
+        startScreen.style.transition = 'opacity 0.8s ease-in';
+    }
+    
+    if (blackOverlay) {
+        blackOverlay.classList.add('fade-out');
+        
+        setTimeout(() => {
+            if (startScreen) {
+                startScreen.style.opacity = '1';
+            }
+        }, 200);
+        
+        setTimeout(() => {
+            if (blackOverlay) {
+                blackOverlay.style.display = 'none';
+            }
+        }, 800);
+    }
+    
+    initializeGameInstance();
+}
+
+function initializeGameInstance() {
+    if (!gameInstance) {
+        // Initialize the game now that assets are loaded
+        gameInstance = new SnakeGame();
+        
+        // Initialize audio manager after assets are loaded
+        gameInstance.audioManager = new AudioManager();
+        
+        // Initialize audio after user interaction
+        document.addEventListener('click', function initAudio() {
+            if (gameInstance && gameInstance.audioManager) {
+                gameInstance.audioManager.resumeAudioContext();
+            }
+            document.removeEventListener('click', initAudio);
+        });
+    }
 }
