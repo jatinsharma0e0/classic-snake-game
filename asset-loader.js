@@ -197,8 +197,22 @@ class AssetLoader {
                 type: type
             };
             
-            localStorage.setItem(this.getCacheKey(assetPath), JSON.stringify(cacheData));
-            localStorage.setItem(this.getCacheMetaKey(assetPath), JSON.stringify(metaData));
+            const cacheKey = this.getCacheKey(assetPath);
+            const metaKey = this.getCacheMetaKey(assetPath);
+            
+            localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+            localStorage.setItem(metaKey, JSON.stringify(metaData));
+            
+            // Debug: Verify the data was saved
+            const savedCache = localStorage.getItem(cacheKey);
+            const savedMeta = localStorage.getItem(metaKey);
+            
+            if (!savedCache || !savedMeta) {
+                console.warn(`Failed to save to localStorage for ${assetPath}: cache=${!!savedCache}, meta=${!!savedMeta}`);
+                return false;
+            }
+            
+            console.log(`Successfully saved cache for ${assetPath}: cache size=${savedCache.length}, meta size=${savedMeta.length}`);
             return true;
         } catch(e) {
             console.warn(`Failed to cache asset: ${assetPath}`, e);
