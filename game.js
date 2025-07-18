@@ -138,13 +138,6 @@ class SnakeGame {
         
         // Event listeners
         document.addEventListener('keydown', (e) => this.handleKeyPress(e));
-        this.startGameBtn.addEventListener('click', () => {
-            if (this.audioManager) {
-                this.audioManager && this.audioManager.resumeAudioContext(); // Initialize audio on first interaction
-                this.audioManager && this.audioManager.playSound('buttonClick');
-            }
-            this.showGameScreen();
-        });
         
         // Stone play button event listener
         if (this.stonePlayBtn) {

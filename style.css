@@ -233,7 +233,6 @@ body {
 }
 
 .start-game-btn-image {
-    cursor: pointer;
     transition: all 0.3s ease;
     z-index: 10;
     position: relative;
