@@ -131,16 +131,23 @@ class AssetLoader {
         if (!this.isLocalStorageAvailable()) return;
         
         // Remove assets from older versions
+        const keysToRemove = [];
         for (let key in localStorage) {
             if (key.startsWith(this.cachePrefix)) {
-                const metaKey = key + '_meta';
-                const meta = this.getCachedAssetMeta(key.replace(this.cachePrefix, ''));
+                // Skip meta keys during iteration, handle them with their corresponding data keys
+                if (key.endsWith('_meta')) continue;
+                
+                const assetPath = key.replace(this.cachePrefix, '');
+                const meta = this.getCachedAssetMeta(assetPath);
                 if (!meta || meta.version !== this.cacheVersion) {
-                    localStorage.removeItem(key);
-                    localStorage.removeItem(metaKey);
+                    keysToRemove.push(key);
+                    keysToRemove.push(key + '_meta');
                 }
             }
         }
+        
+        // Remove outdated keys
+        keysToRemove.forEach(key => localStorage.removeItem(key));
         
         // Clean up if cache is too large
         if (this.getCacheSize() > this.maxCacheSize) {
@@ -529,6 +536,39 @@ class AssetLoader {
         }
     }
     
+    applyCachedBackgrounds() {
+        // Apply cached background images immediately to prevent slow loading
+        const backgroundAssets = [
+            'assets/jungle-bg.jpg',
+            'assets/title-bg.png',
+            'assets/grass-bg.webp'
+        ];
+        
+        backgroundAssets.forEach(assetPath => {
+            const cachedData = this.getCachedAsset(assetPath);
+            if (cachedData && cachedData.data) {
+                // Apply cached background to elements that use this asset
+                if (assetPath === 'assets/jungle-bg.jpg') {
+                    const homeScreen = document.getElementById('homeScreen');
+                    if (homeScreen) {
+                        homeScreen.style.backgroundImage = `url(${cachedData.data})`;
+                    }
+                } else if (assetPath === 'assets/title-bg.png') {
+                    const titleBg = document.querySelector('.title-bg');
+                    if (titleBg) {
+                        titleBg.style.backgroundImage = `url(${cachedData.data})`;
+                    }
+                } else if (assetPath === 'assets/grass-bg.webp') {
+                    const gameScreen = document.getElementById('gameScreen');
+                    if (gameScreen) {
+                        gameScreen.style.backgroundImage = `url(${cachedData.data})`;
+                    }
+                }
+                console.log(`Applied cached background: ${assetPath}`);
+            }
+        });
+    }
+    
     async loadAllAssets() {
         console.log(`Starting asset loading process...`);
         
@@ -544,6 +584,9 @@ class AssetLoader {
                 this.loadedAssets = this.totalAssets;
                 this.updateProgress();
                 
+                // Apply cached backgrounds immediately
+                this.applyCachedBackgrounds();
+                
                 // Skip loading screen and go directly to game
                 if (this.skipLoadingCallback) {
                     this.skipLoadingCallback();
@@ -553,7 +596,10 @@ class AssetLoader {
             
             console.log(`Loading ${this.totalAssets} assets...`);
             
-            // Step 2: Load fonts first (critical for proper text rendering)
+            // Step 2: Apply cached background images immediately to prevent slow loading
+            this.applyCachedBackgrounds();
+            
+            // Step 3: Load fonts first (critical for proper text rendering)
             console.log('Loading fonts...');
             const fontPromises = this.fontAssets.map(src => this.loadAsset(src));
             await Promise.all(fontPromises);
