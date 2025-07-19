@@ -90,7 +90,7 @@ class SnakeGame {
         this.gameScreen = document.getElementById('gameScreen');
         this.startGameBtn = document.getElementById('startGameBtn');
         this.stonePlayBtn = document.querySelector('.stone-play-button-overlay');
-        this.skinSelectorBtn = document.getElementById('skinSelectorBtn'); // May be null since it's removed
+        this.skinSelectorBtn = document.getElementById('skinSelectorBtn');
         this.skinSelectorPanel = document.getElementById('skinSelectorPanel');
         this.settingsBtn = document.getElementById('settingsBtn');
         this.settingsModal = document.getElementById('settingsModal');
@@ -106,7 +106,7 @@ class SnakeGame {
         this.backToMenuBtn = document.getElementById('backToMenuBtn');
         this.homeBtn = document.getElementById('homeBtn');
         this.muteBtn = document.getElementById('muteBtn');
-        this.homeMuteBtn = document.getElementById('homeMuteBtn'); // May be null since it's removed
+        this.homeMuteBtn = document.getElementById('homeMuteBtn');
         this.tutorialOverlay = document.getElementById('tutorialOverlay');
         
         // Custom skin system
@@ -131,8 +131,7 @@ class SnakeGame {
         // Initialize skin selector
         this.loadAvailableSkins();
         
-        // Initialize snake animation for start screen
-        // Snake animation removed for simplified home page
+
     }
     
     init() {
@@ -150,8 +149,8 @@ class SnakeGame {
         if (this.stonePlayBtn) {
             this.stonePlayBtn.addEventListener('click', () => {
                 if (this.audioManager) {
-                    this.audioManager && this.audioManager.resumeAudioContext(); // Initialize audio on first interaction
-                    this.audioManager && this.audioManager.playSound('buttonClick');
+                    this.audioManager.resumeAudioContext();
+                    this.audioManager.playSound('buttonClick');
                 }
                 this.showGameScreen();
             });
@@ -160,7 +159,7 @@ class SnakeGame {
         // Settings button functionality
         this.settingsBtn.addEventListener('click', () => {
             if (this.audioManager) {
-                this.audioManager && this.audioManager.playSound('buttonClick');
+                this.audioManager.playSound('buttonClick');
             }
             this.settingsModal.classList.remove('hidden');
         });
@@ -202,13 +201,13 @@ class SnakeGame {
         });
         this.restartBtn.addEventListener('click', () => {
             if (this.audioManager) {
-                this.audioManager && this.audioManager.playSound('buttonClick');
+                this.audioManager.playSound('buttonClick');
             }
             this.restartGame();
         });
         this.restartGameBtn.addEventListener('click', () => {
             if (this.audioManager) {
-                this.audioManager && this.audioManager.playSound('buttonClick');
+                this.audioManager.playSound('buttonClick');
             }
             this.restartGame();
         });
