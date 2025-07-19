@@ -1863,12 +1863,7 @@ class SnakeGame {
         
         // Snake pathfinding properties
         this.isChasing = false;
-        this.targetFood = null;
-        this.originalPathIndex = 0;
-        this.chasingPath = [];
-        this.returnPath = [];
-        this.chasingPhase = 'normal'; // 'normal', 'chasing', 'returning'
-        this.detectionRadius = 80; // Increased distance to detect food for better chasing
+        // Simplified animation - no chasing variables needed
 
         
         // Button dimensions and position relative to container
@@ -2037,29 +2032,16 @@ class SnakeGame {
     animateStartScreenSnake() {
         if (!this.path || this.path.length === 0) return;
         
-        // Handle different movement phases
-        let currentPath = this.path;
-        let rawIndex = this.snakeAnimationFrame % this.path.length;
-        
-        // Check for nearby food and update movement behavior
-        this.updateSnakeMovement();
-        
-        // Use appropriate path based on current phase
-        if (this.chasingPhase === 'chasing' && this.chasingPath.length > 0) {
-            currentPath = this.chasingPath;
-            rawIndex = Math.min(this.snakeAnimationFrame - this.originalPathIndex, currentPath.length - 1);
-        } else if (this.chasingPhase === 'returning' && this.returnPath.length > 0) {
-            currentPath = this.returnPath;
-            rawIndex = Math.min(this.snakeAnimationFrame - this.originalPathIndex, currentPath.length - 1);
-        }
+        // Simple horizontal path animation - no dynamic chasing
+        const rawIndex = this.snakeAnimationFrame % this.path.length;
         
         // Get current head position with smooth interpolation
         const headIndex = Math.floor(rawIndex);
-        const nextHeadIndex = Math.min(headIndex + 1, currentPath.length - 1);
+        const nextHeadIndex = Math.min(headIndex + 1, this.path.length - 1);
         const t = rawIndex - headIndex; // interpolation factor
         
-        const headPos = currentPath[headIndex];
-        const nextHeadPos = currentPath[nextHeadIndex];
+        const headPos = this.path[headIndex];
+        const nextHeadPos = this.path[nextHeadIndex];
         
         // Smooth interpolation between path points
         const interpolatedHead = {
@@ -2212,143 +2194,25 @@ class SnakeGame {
         
         this.snakeAnimationFrame += 1.2; // Animation speed - increased for faster movement
         
-        // Check for food consumption
-        this.checkFoodConsumption(adjustedHeadPos);
-        
         // Continue animation
         requestAnimationFrame(() => this.animateStartScreenSnake());
     }
     
-    updateSnakeMovement() {
-        const currentPosition = this.getCurrentSnakePosition();
-        
-        if (this.chasingPhase === 'normal') {
-            // Check for nearby food to chase
-            const nearbyFood = this.findNearestFood(currentPosition);
-            if (nearbyFood && nearbyFood.distance < this.detectionRadius) {
-                this.startChasing(nearbyFood.food, currentPosition);
-            }
-        } else if (this.chasingPhase === 'chasing') {
-            // Check if reached target food
-            if (this.chasingPath.length > 0) {
-                const pathIndex = this.snakeAnimationFrame - this.originalPathIndex;
-                if (pathIndex >= this.chasingPath.length - 1) {
-                    this.consumeFood();
-                }
-            }
-        } else if (this.chasingPhase === 'returning') {
-            // Check if returned to original path
-            if (this.returnPath.length > 0) {
-                const pathIndex = this.snakeAnimationFrame - this.originalPathIndex;
-                if (pathIndex >= this.returnPath.length - 1) {
-                    this.returnToNormalPath();
-                }
-            }
-        }
-    }
+    // Removed complex chasing logic for simple horizontal animation
     
-    getCurrentSnakePosition() {
-        if (this.chasingPhase === 'normal') {
-            const rawIndex = this.snakeAnimationFrame % this.path.length;
-            const headIndex = Math.floor(rawIndex);
-            return this.path[headIndex];
-        } else if (this.chasingPath.length > 0 && this.chasingPhase === 'chasing') {
-            const pathIndex = Math.min(this.snakeAnimationFrame - this.originalPathIndex, this.chasingPath.length - 1);
-            return this.chasingPath[Math.floor(pathIndex)];
-        } else if (this.returnPath.length > 0 && this.chasingPhase === 'returning') {
-            const pathIndex = Math.min(this.snakeAnimationFrame - this.originalPathIndex, this.returnPath.length - 1);
-            return this.returnPath[Math.floor(pathIndex)];
-        }
-        return { x: 0, y: 0 };
-    }
+    // Simplified snake position tracking - no chasing logic
     
-    findNearestFood(position) {
-        let nearest = null;
-        let minDistance = Infinity;
-        
-        for (let food of this.startScreenFoodItems) {
-            if (!food.consumed) {
-                const distance = Math.sqrt(
-                    Math.pow(position.x - food.x, 2) + 
-                    Math.pow(position.y - food.y, 2)
-                );
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    nearest = { food, distance };
-                }
-            }
-        }
-        
-        return nearest;
-    }
+    // Removed food detection for simplified animation
     
-    startChasing(targetFood, currentPosition) {
-        this.chasingPhase = 'chasing';
-        this.targetFood = targetFood;
-        this.originalPathIndex = this.snakeAnimationFrame;
-        
-        // Create direct path to food
-        this.chasingPath = this.createPathToFood(currentPosition, targetFood);
-    }
+    // Removed chasing logic
     
-    createPathToFood(start, targetFood) {
-        const path = [];
-        const steps = 20; // Number of steps to reach food
-        
-        for (let i = 0; i <= steps; i++) {
-            const t = i / steps;
-            const x = start.x + (targetFood.x - start.x) * t;
-            const y = start.y + (targetFood.y - start.y) * t;
-            path.push({ x, y });
-        }
-        
-        return path;
-    }
+    // Removed path creation for food chasing
     
-    consumeFood() {
-        if (this.targetFood) {
-            // Mark food as consumed and hide it
-            this.targetFood.consumed = true;
-            const foodElement = document.getElementById(`startFood-${this.targetFood.id}`);
-            if (foodElement) {
-                foodElement.style.opacity = '0';
-                foodElement.style.transform = 'scale(0)';
-            }
-            
-            // Start returning to original path
-            this.startReturning();
-        }
-    }
+    // Removed food consumption logic
     
-    startReturning() {
-        this.chasingPhase = 'returning';
-        this.originalPathIndex = this.snakeAnimationFrame;
-        
-        // Find closest point on original path to return to
-        const currentPosition = this.getCurrentSnakePosition();
-        const returnPoint = this.findClosestPointOnOriginalPath(currentPosition);
-        
-        // Create path back to original route
-        this.returnPath = this.createPathToFood(currentPosition, returnPoint);
-    }
+    // Removed return logic
     
-    findClosestPointOnOriginalPath(currentPosition) {
-        let closest = this.path[0];
-        let minDistance = Infinity;
-        
-        for (let point of this.path) {
-            const distance = Math.sqrt(
-                Math.pow(currentPosition.x - point.x, 2) + 
-                Math.pow(currentPosition.y - point.y, 2)
-            );
-            if (distance < minDistance) {
-                minDistance = distance;
-                closest = point;
-            }
-        }
-        
-        return closest;
-    }
+    // Removed closest point logic
     
     returnToNormalPath() {
         this.chasingPhase = 'normal';
