@@ -1874,8 +1874,8 @@ class SnakeGame {
         // Button dimensions and position relative to container
         this.buttonWidth = 200;
         this.buttonHeight = 60;
-        this.containerWidth = 700;  // Expanded for proper path and food display
-        this.containerHeight = 450; // Expanded for proper path and food display
+        this.containerWidth = 1200;  // Full viewport width for overlay
+        this.containerHeight = 800; // Full viewport height for overlay
         
         // Calculate button position (centered in container)
         this.buttonLeft = (this.containerWidth - this.buttonWidth) / 2;
@@ -1910,7 +1910,8 @@ class SnakeGame {
         const centerY = this.containerHeight / 2;
         
         // Create simple horizontal line path from left to right
-        const pathLength = 300; // Length of the horizontal path
+        // Expanded for full viewport width
+        const pathLength = 500; // Longer horizontal path for full viewport
         const leftX = centerX - pathLength / 2;
         const rightX = centerX + pathLength / 2;
         
@@ -1961,18 +1962,19 @@ class SnakeGame {
         const centerY = this.containerHeight / 2;
         
         // Food positions exactly matching the simplified reference image
+        // Adjusted for full viewport dimensions
         const foodPositions = [
             // Top-left red apple
-            { x: centerX - 200, y: centerY - 70 },
+            { x: centerX - 300, y: centerY - 150 },
             
             // Middle-left red apple (with smiley face)
-            { x: centerX - 200, y: centerY + 30 },
+            { x: centerX - 300, y: centerY + 50 },
             
             // Top-right red oval
-            { x: centerX + 200, y: centerY - 70 },
+            { x: centerX + 300, y: centerY - 150 },
             
             // Bottom-right red oval
-            { x: centerX + 200, y: centerY + 70 }
+            { x: centerX + 300, y: centerY + 150 }
         ];
         
         // Create food items at exact positions

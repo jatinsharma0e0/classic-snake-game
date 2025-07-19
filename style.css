@@ -259,11 +259,10 @@ body {
 
 .snake-path-container {
     position: absolute;
-    width: 700px;   /* Expanded to accommodate wider path and larger food */
-    height: 450px;  /* Expanded to accommodate taller path and larger food */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    width: 100vw;   /* Full viewport width */
+    height: 100vh;  /* Full viewport height */
+    top: 0;
+    left: 0;
     pointer-events: none;
 }
 
@@ -271,8 +270,8 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    width: 700px;   /* Match expanded container size */
-    height: 450px;  /* Match expanded container size */
+    width: 100vw;   /* Full viewport width */
+    height: 100vh;  /* Full viewport height */
     pointer-events: none;
     z-index: 1;
 }
