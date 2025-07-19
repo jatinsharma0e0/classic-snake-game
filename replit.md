@@ -94,11 +94,21 @@ The application is designed for real-time interactive experiences with 3D graphi
 
 ## Recent Changes
 
+**Implemented Figure-8 Snake Path with Precise Food Placement (July 19, 2025):**
+- Completely redesigned snake movement to follow exact figure-8 pattern from reference image
+- Created smooth curved path with two interconnected loops around play/settings buttons
+- Snake moves in continuous figure-8 motion crossing through center intersection point
+- Applied advanced weighted smoothing algorithm for ultra-smooth curved animation
+- Positioned 6 food items at exact locations matching reference image red spots
+- Food items strategically placed outside figure-8 loops for optimal snake chasing behavior
+- Enhanced pathfinding system works seamlessly with new complex curved path
+- Maintained all food-chasing functionality with improved movement fluidity
+
 **Enhanced Snake Food-Chasing System (July 19, 2025):**
 - Implemented dynamic pathfinding for snake to chase nearby food items on start screen
 - Added intelligent detection radius (40px) for snake to spot and pursue food
 - Created smooth path interpolation system for chasing, eating, and returning behaviors
-- Snake dynamically changes from rectangular path to direct food-chasing path when food detected
+- Snake dynamically changes from figure-8 path to direct food-chasing path when food detected
 - After consuming food, snake automatically returns to closest point on original path
 - Food items disappear with scale/opacity animation when eaten, respawn after 3 seconds
 - Implemented three-phase movement system: normal → chasing → returning → normal

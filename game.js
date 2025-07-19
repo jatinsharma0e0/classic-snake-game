@@ -1881,9 +1881,9 @@ class SnakeGame {
         this.buttonLeft = (this.containerWidth - this.buttonWidth) / 2;
         this.buttonTop = (this.containerHeight - this.buttonHeight) / 2;
         
-        // Create rectangular path around button with padding
+        // Create figure-8 path around buttons as shown in the reference image
         this.pathPadding = 35;
-        this.createRectangularPath();
+        this.createFigure8Path();
         
         // Initialize body points - pre-fill with positions along the path
         for (let i = 0; i < this.bodyLength; i++) {
@@ -1902,65 +1902,67 @@ class SnakeGame {
         this.animateStartScreenSnake();
     }
     
-    createRectangularPath() {
+    createFigure8Path() {
         this.path = [];
-        const left = this.buttonLeft - this.pathPadding;
-        const right = this.buttonLeft + this.buttonWidth + this.pathPadding;
-        const top = this.buttonTop - this.pathPadding;
-        const bottom = this.buttonTop + this.buttonHeight + this.pathPadding;
-        const cornerRadius = 25;
         
-        // Top side (left to right)
-        for (let x = left + cornerRadius; x <= right - cornerRadius; x += 1) {
-            this.path.push({ x, y: top });
-        }
+        // Define key coordinates based on the reference image
+        const centerX = this.containerWidth / 2;
+        const centerY = this.containerHeight / 2;
         
-        // Top-right corner
-        for (let angle = -90; angle <= 0; angle += 1.5) {
-            const rad = (angle * Math.PI) / 180;
-            const x = right - cornerRadius + Math.cos(rad) * cornerRadius;
-            const y = top + cornerRadius + Math.sin(rad) * cornerRadius;
+        // Path parameters for perfect figure-8 matching the reference
+        const topLoopCenterY = centerY - 35;
+        const bottomLoopCenterY = centerY + 35;
+        const loopWidth = 70;  // Horizontal radius
+        const loopHeight = 25; // Vertical radius
+        
+        // Create complete figure-8 path following the green arrows precisely
+        // Starting from right side of top loop, going clockwise
+        
+        // Top loop - clockwise from right side
+        for (let t = 0; t < Math.PI * 2; t += 0.05) {
+            const x = centerX + loopWidth * Math.cos(t);
+            const y = topLoopCenterY + loopHeight * Math.sin(t);
             this.path.push({ x, y });
         }
         
-        // Right side (top to bottom)
-        for (let y = top + cornerRadius; y <= bottom - cornerRadius; y += 1) {
-            this.path.push({ x: right, y });
-        }
+        // Transition to center crossing point
+        this.path.push({ x: centerX, y: centerY });
         
-        // Bottom-right corner
-        for (let angle = 0; angle <= 90; angle += 1.5) {
-            const rad = (angle * Math.PI) / 180;
-            const x = right - cornerRadius + Math.cos(rad) * cornerRadius;
-            const y = bottom - cornerRadius + Math.sin(rad) * cornerRadius;
+        // Bottom loop - counter-clockwise from left side  
+        for (let t = Math.PI; t < Math.PI * 3; t += 0.05) {
+            const x = centerX + loopWidth * Math.cos(t);
+            const y = bottomLoopCenterY + loopHeight * Math.sin(t);
             this.path.push({ x, y });
         }
         
-        // Bottom side (right to left)
-        for (let x = right - cornerRadius; x >= left + cornerRadius; x -= 1) {
-            this.path.push({ x, y: bottom });
+        // Return to center crossing point to complete the figure-8
+        this.path.push({ x: centerX, y: centerY });
+        
+        // Smooth the path for very smooth animation
+        this.smoothPath();
+    }
+    
+    smoothPath() {
+        if (this.path.length < 3) return;
+        
+        const smoothed = [];
+        smoothed.push(this.path[0]); // Keep first point
+        
+        // Apply advanced smoothing for very smooth figure-8 animation
+        for (let i = 1; i < this.path.length - 1; i++) {
+            const prev = this.path[i - 1];
+            const curr = this.path[i];
+            const next = this.path[i + 1];
+            
+            // Weighted average smoothing for better curves
+            const smoothX = (prev.x * 0.25 + curr.x * 0.5 + next.x * 0.25);
+            const smoothY = (prev.y * 0.25 + curr.y * 0.5 + next.y * 0.25);
+            
+            smoothed.push({ x: smoothX, y: smoothY });
         }
         
-        // Bottom-left corner
-        for (let angle = 90; angle <= 180; angle += 1.5) {
-            const rad = (angle * Math.PI) / 180;
-            const x = left + cornerRadius + Math.cos(rad) * cornerRadius;
-            const y = bottom - cornerRadius + Math.sin(rad) * cornerRadius;
-            this.path.push({ x, y });
-        }
-        
-        // Left side (bottom to top)
-        for (let y = bottom - cornerRadius; y >= top + cornerRadius; y -= 1) {
-            this.path.push({ x: left, y });
-        }
-        
-        // Top-left corner
-        for (let angle = 180; angle <= 270; angle += 1.5) {
-            const rad = (angle * Math.PI) / 180;
-            const x = left + cornerRadius + Math.cos(rad) * cornerRadius;
-            const y = top + cornerRadius + Math.sin(rad) * cornerRadius;
-            this.path.push({ x, y });
-        }
+        smoothed.push(this.path[this.path.length - 1]); // Keep last point
+        this.path = smoothed;
     }
     
     createStartScreenFood() {
@@ -1968,39 +1970,46 @@ class SnakeGame {
         this.startScreenFoodContainer.innerHTML = '';
         this.startScreenFoodItems = [];
         
-        // Define areas where food can be placed (outside the snake's path)
-        const foodRadius = 8; // Food item radius
-        const minDistanceFromPath = 35; // Minimum distance from snake path
-        const minDistanceBetweenFood = 25; // Minimum distance between food items
+        // Define exact food positions based on the reference image red spots
+        const centerX = this.containerWidth / 2;
+        const centerY = this.containerHeight / 2;
         
-        // Calculate available area dimensions
-        const areaWidth = this.containerWidth;
-        const areaHeight = this.containerHeight;
-        
-        // Generate food positions
-        const maxFoodItems = 6;
-        let attempts = 0;
-        const maxAttempts = 100;
-        
-        while (this.startScreenFoodItems.length < maxFoodItems && attempts < maxAttempts) {
-            attempts++;
+        // Food positions matching the reference image layout
+        const foodPositions = [
+            // Top-left area (outside the top loop)
+            { x: centerX - 120, y: centerY - 60 },
             
-            // Generate random position
-            const x = Math.random() * (areaWidth - foodRadius * 2) + foodRadius;
-            const y = Math.random() * (areaHeight - foodRadius * 2) + foodRadius;
+            // Top-right area (outside the top loop)  
+            { x: centerX + 120, y: centerY - 50 },
             
-            // Check if position is valid (not too close to snake path or other food)
-            if (this.isValidFoodPosition(x, y, minDistanceFromPath, minDistanceBetweenFood)) {
-                const foodElement = this.createFoodElement(x, y, this.startScreenFoodItems.length);
-                this.startScreenFoodItems.push({
-                    element: foodElement,
-                    x: x,
-                    y: y,
-                    id: this.startScreenFoodItems.length,
-                    consumed: false
-                });
-            }
-        }
+            // Right side (outside the figure-8)
+            { x: centerX + 140, y: centerY + 20 },
+            
+            // Bottom-right area (outside the bottom loop)
+            { x: centerX + 100, y: centerY + 80 },
+            
+            // Bottom-left area (outside the bottom loop)
+            { x: centerX - 110, y: centerY + 75 },
+            
+            // Left side (outside the figure-8)
+            { x: centerX - 130, y: centerY + 10 }
+        ];
+        
+        // Create food items at exact positions
+        foodPositions.forEach((pos, index) => {
+            // Ensure positions are within container bounds
+            const x = Math.max(15, Math.min(pos.x, this.containerWidth - 15));
+            const y = Math.max(15, Math.min(pos.y, this.containerHeight - 15));
+            
+            const foodElement = this.createFoodElement(x, y, index);
+            this.startScreenFoodItems.push({
+                element: foodElement,
+                x: x,
+                y: y,
+                id: index,
+                consumed: false
+            });
+        });
     }
     
     isValidFoodPosition(x, y, minDistanceFromPath, minDistanceBetweenFood) {
