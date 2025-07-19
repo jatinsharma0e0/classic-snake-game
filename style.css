@@ -443,7 +443,7 @@ body {
 }
 
 .game-over-board {
-    background: url('assets/backgrounds/game-over-board.png') no-repeat center center;
+    background: url('assets/backgrounds/game_over_board.png') no-repeat center center;
     background-size: contain;
     width: 600px;
     height: 500px;
@@ -531,12 +531,12 @@ body {
 }
 
 .retry-stone-button {
-    background: url('assets/buttons/retry-stone-button.png') no-repeat center center;
+    background: url('assets/buttons/retry_stone.png') no-repeat center center;
     background-size: contain;
 }
 
 .home-stone-button {
-    background: url('assets/buttons/home-stone-button.png') no-repeat center center;
+    background: url('assets/buttons/home_stone.png') no-repeat center center;
     background-size: contain;
 }
 

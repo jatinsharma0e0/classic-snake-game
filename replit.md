@@ -94,6 +94,17 @@ The application is designed for real-time interactive experiences with 3D graphi
 
 ## Recent Changes
 
+**Assets Directory Restructure and Standardization (July 19, 2025):**
+- Completed comprehensive assets directory restructuring with clustering and clear naming conventions
+- Renamed all files from hyphen-case to underscore_case for consistency: grass-bg.webp → grass_01.webp, snake-icon.png → snake_icon.png
+- Updated all asset references across HTML, CSS, JavaScript, and asset-loader files
+- Fixed font path references: Display-Dots-Two-Sans.ttf → display_dots_two_sans.ttf
+- Updated background images, snake skin files, obstacle assets, and button references
+- Restructured snake skin directory with cleaner file names: greeny_head.png → head.png (within greeny folder)
+- Fixed game over screen asset references: retry-stone-button.png → retry_stone.png, home-stone-button.png → home_stone.png
+- All assets now load correctly with standardized naming convention and improved organization
+- Project structure follows best practices with lowercase + underscore naming throughout
+
 **Asset Renaming and Code Cleanup Completion (July 19, 2025):**
 - Renamed start-button.png to log.png for better semantic naming
 - Updated HTML: start-button-container → log-container, start-game-btn-image → log-image
