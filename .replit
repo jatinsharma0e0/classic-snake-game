@@ -47,3 +47,6 @@ author = "agent"
 task = "shell.exec"
 args = "python serve.py"
 waitForPort = 5000
+
+[agent]
+expertMode = true
