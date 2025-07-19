@@ -1878,6 +1878,9 @@ function fadeFromBlackToStart() {
     initializeGameInstance();
 }
 
+// Global game instance variable
+let gameInstance = null;
+
 function initializeGameInstance() {
     if (!gameInstance) {
         // Initialize the game now that assets are loaded
