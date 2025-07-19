@@ -205,5 +205,16 @@
     <script src="audio.js"></script>
     <script src="dev-toggle.js"></script>
     <script src="game.js"></script>
+    <script>
+        // Simplified initialization - bypass complex loading system
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, going directly to start screen');
+            
+            // Wait briefly for fonts to load, then show start screen
+            setTimeout(() => {
+                fadeFromBlackToStart();
+            }, 500);
+        });
+    </script>
 </body>
 </html>
