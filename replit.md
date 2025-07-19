@@ -94,6 +94,16 @@ The application is designed for real-time interactive experiences with 3D graphi
 
 ## Recent Changes
 
+**Full-Screen Snake Animation Overlay System (July 19, 2025):**
+- Created dedicated full-screen overlay layer for snake and food animations
+- Moved snake SVG elements from within start-button-container to independent overlay
+- Implemented transparent full-screen layer with z-index 1500 (above UI, below modals)
+- Added pointer-events: none for seamless interaction with underlying UI buttons
+- Snake and food animations now have unobstructed full-viewport space
+- Maintained clean DOM hierarchy with isolated animation logic
+- Enhanced visual focus by separating animations from cluttered UI components
+- Preserved all existing snake pathfinding and food-chasing functionality
+
 **Implemented Figure-8 Snake Path with Precise Food Placement (July 19, 2025):**
 - Completely redesigned snake movement to follow exact figure-8 pattern from reference image
 - Created smooth curved path with two interconnected loops around play/settings buttons
