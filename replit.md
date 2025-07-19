@@ -94,6 +94,14 @@ The application is designed for real-time interactive experiences with 3D graphi
 
 ## Recent Changes
 
+**Simplified Snake Path and Food System (July 19, 2025):**
+- Updated to simple horizontal line path for easier animation and gameplay
+- Snake moves left-to-right across the middle of the screen in straight line
+- Positioned 4 food items matching simplified reference design exactly
+- Food placed at strategic corners: top-left, middle-left, top-right, bottom-right
+- Maintained large 40x40px food size for clear visibility and interaction
+- Enhanced path simplicity while preserving food-chasing and consumption mechanics
+
 **Full-Screen Snake Animation Overlay System (July 19, 2025):**
 - Created dedicated full-screen overlay layer for snake and food animations
 - Moved snake SVG elements from within start-button-container to independent overlay

@@ -1905,70 +1905,23 @@ class SnakeGame {
     createFigure8Path() {
         this.path = [];
         
-        // Define key coordinates based on the attached reference image
+        // Define key coordinates for simple horizontal line path
         const centerX = this.containerWidth / 2;
         const centerY = this.containerHeight / 2;
         
-        // Create rectangular path around buttons following the green directional arrows exactly
-        // The path forms a rectangle around the button area with smooth curves at corners
+        // Create simple horizontal line path from left to right
+        const pathLength = 300; // Length of the horizontal path
+        const leftX = centerX - pathLength / 2;
+        const rightX = centerX + pathLength / 2;
         
-        const pathWidth = 180;  // Width of the rectangular path
-        const pathHeight = 100; // Height of the rectangular path
-        const cornerRadius = 25; // Radius for rounded corners
-        
-        const leftX = centerX - pathWidth / 2;
-        const rightX = centerX + pathWidth / 2;
-        const topY = centerY - pathHeight / 2;
-        const bottomY = centerY + pathHeight / 2;
-        
-        // Starting from top-right, following the green arrows clockwise
-        
-        // Top edge - moving left (arrow direction in image)
-        for (let x = rightX; x >= leftX + cornerRadius; x -= 2) {
-            this.path.push({ x, y: topY });
+        // Create horizontal line path moving from left to right
+        for (let x = leftX; x <= rightX; x += 3) {
+            this.path.push({ x, y: centerY });
         }
         
-        // Top-left corner - curved transition
-        for (let angle = 0; angle <= Math.PI / 2; angle += 0.1) {
-            const x = leftX + cornerRadius - cornerRadius * Math.cos(angle);
-            const y = topY + cornerRadius - cornerRadius * Math.sin(angle);
-            this.path.push({ x, y });
-        }
-        
-        // Left edge - moving down
-        for (let y = topY + cornerRadius; y <= bottomY - cornerRadius; y += 2) {
-            this.path.push({ x: leftX, y });
-        }
-        
-        // Bottom-left corner - curved transition
-        for (let angle = Math.PI / 2; angle <= Math.PI; angle += 0.1) {
-            const x = leftX + cornerRadius - cornerRadius * Math.cos(angle);
-            const y = bottomY - cornerRadius - cornerRadius * Math.sin(angle);
-            this.path.push({ x, y });
-        }
-        
-        // Bottom edge - moving right
-        for (let x = leftX + cornerRadius; x <= rightX - cornerRadius; x += 2) {
-            this.path.push({ x, y: bottomY });
-        }
-        
-        // Bottom-right corner - curved transition
-        for (let angle = Math.PI; angle <= 3 * Math.PI / 2; angle += 0.1) {
-            const x = rightX - cornerRadius - cornerRadius * Math.cos(angle);
-            const y = bottomY - cornerRadius - cornerRadius * Math.sin(angle);
-            this.path.push({ x, y });
-        }
-        
-        // Right edge - moving up
-        for (let y = bottomY - cornerRadius; y >= topY + cornerRadius; y -= 2) {
-            this.path.push({ x: rightX, y });
-        }
-        
-        // Top-right corner - curved transition back to start
-        for (let angle = 3 * Math.PI / 2; angle <= 2 * Math.PI; angle += 0.1) {
-            const x = rightX - cornerRadius - cornerRadius * Math.cos(angle);
-            const y = topY + cornerRadius - cornerRadius * Math.sin(angle);
-            this.path.push({ x, y });
+        // Add return path from right to left for continuous movement
+        for (let x = rightX; x >= leftX; x -= 3) {
+            this.path.push({ x, y: centerY });
         }
         
         // Smooth the path for fluid animation
@@ -2007,19 +1960,19 @@ class SnakeGame {
         const centerX = this.containerWidth / 2;
         const centerY = this.containerHeight / 2;
         
-        // Food positions exactly matching the red spots in the reference image
+        // Food positions exactly matching the simplified reference image
         const foodPositions = [
-            // Top-left red spot (large)
-            { x: centerX - 150, y: centerY - 80 },
+            // Top-left red apple
+            { x: centerX - 200, y: centerY - 70 },
             
-            // Top-right red spot (large) 
-            { x: centerX + 150, y: centerY - 80 },
+            // Middle-left red apple (with smiley face)
+            { x: centerX - 200, y: centerY + 30 },
             
-            // Bottom-left red spot (large)
-            { x: centerX - 150, y: centerY + 80 },
+            // Top-right red oval
+            { x: centerX + 200, y: centerY - 70 },
             
-            // Bottom-right red spot (large)
-            { x: centerX + 150, y: centerY + 80 }
+            // Bottom-right red oval
+            { x: centerX + 200, y: centerY + 70 }
         ];
         
         // Create food items at exact positions
