@@ -51,13 +51,7 @@ class SnakeGame {
         this.direction = { x: 0, y: 0 };
         this.lastDirection = { x: 0, y: 0 };
         
-        // Enhanced snake animation properties
-        this.tongueOut = false;
-        this.tongueTimer = 0;
-        this.mouthOpen = false;
-        this.lastTongueTime = 0;
-        this.nextTongueTime = 5000 + Math.random() * 4000; // Random interval 5-9 seconds
-        this.tongueWiggleTimer = 0;
+
         
 
         
@@ -814,34 +808,7 @@ class SnakeGame {
             this.audioManager && this.audioManager.playSound('snakeMove');
         }
         
-        // Check if snake is near food (within 1 block)
-        const distanceToFood = Math.abs(head.x - this.food.x) + Math.abs(head.y - this.food.y);
-        this.mouthOpen = distanceToFood <= 1;
-        
-        // Remove debug logging
-        // if (this.mouthOpen) {
 
-        // }
-        
-        // Random tongue animation (only when not eating)
-        // Random interval between 10-15 seconds for more frequent tongue flicks
-        if (!this.mouthOpen && Date.now() - this.lastTongueTime > this.nextTongueTime) {
-            this.tongueOut = true;
-            this.tongueTimer = 50; // Show tongue for 100ms (increased for better visibility)
-            this.lastTongueTime = Date.now();
-            this.nextTongueTime = 10000 + Math.random() * 5000; // Set next random interval (10-15 seconds)
-            
-            // Play tongue flick sound
-            this.audioManager && this.audioManager.playSound('tongueFlick');
-        }
-        
-        if (this.tongueOut) {
-            this.tongueTimer -= 16; // Assuming 60fps
-            if (this.tongueTimer <= 0) {
-                this.tongueOut = false;
-                this.tongueWiggleTimer = 0; // Reset wiggle timer when tongue retracts
-            }
-        }
         
         // Check food collision
         if (head.x === this.food.x && head.y === this.food.y) {
@@ -1386,25 +1353,7 @@ class SnakeGame {
             this.ctx.fill();
         }
         
-        // Draw adorable mouth when eating
-        if (this.mouthOpen) {
-            this.ctx.strokeStyle = '#2C3E50'; // Soft blue-gray
-            this.ctx.lineWidth = 2;
-            this.ctx.beginPath();
-            this.ctx.arc(0, radius * 0.4, radius * 0.2, 0, Math.PI);
-            this.ctx.stroke();
-        }
-        
-        // Draw vibrant coral tongue if visible
-        if (this.tongueOut) {
-            this.ctx.strokeStyle = '#FF6B6B'; // Warm coral red
-            this.ctx.lineWidth = 3;
-            this.ctx.lineCap = 'round';
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, radius * 0.4);
-            this.ctx.lineTo(0, radius * 0.8);
-            this.ctx.stroke();
-        }
+
         
         this.ctx.restore();
     }
@@ -1502,77 +1451,7 @@ class SnakeGame {
             this.ctx.fill();
         }
         
-        // Mouth positioned at front tip of head
-        const mouthX = radius * 0.8;
-        
-        if (this.mouthOpen) {
-            // Create a more visible open mouth
-            this.ctx.fillStyle = '#8B0000';
-            this.ctx.beginPath();
-            this.ctx.arc(mouthX, 0, 6, Math.PI/2, -Math.PI/2, false);
-            this.ctx.fill();
-            
-            // Add mouth interior shadow
-            this.ctx.fillStyle = '#4B0000';
-            this.ctx.beginPath();
-            this.ctx.arc(mouthX, 0, 4, Math.PI/2, -Math.PI/2, false);
-            this.ctx.fill();
-            
-            // Add teeth/fangs
-            this.ctx.fillStyle = 'white';
-            this.ctx.beginPath();
-            this.ctx.moveTo(mouthX, -4);
-            this.ctx.lineTo(mouthX + 3, -3);
-            this.ctx.lineTo(mouthX, -2);
-            this.ctx.fill();
-            
-            this.ctx.beginPath();
-            this.ctx.moveTo(mouthX, 4);
-            this.ctx.lineTo(mouthX + 3, 3);
-            this.ctx.lineTo(mouthX, 2);
-            this.ctx.fill();
-        } else {
-            // Closed mouth - just a small line
-            this.ctx.strokeStyle = '#000';
-            this.ctx.lineWidth = 1;
-            this.ctx.beginPath();
-            this.ctx.moveTo(mouthX, -3);
-            this.ctx.lineTo(mouthX, 3);
-            this.ctx.stroke();
-        }
-        
-        // Tongue (if extended and mouth is closed)
-        if (this.tongueOut && !this.mouthOpen) {
-            // Update wiggle animation with current time for consistent animation
-            const currentTime = Date.now();
-            
-            // Create wiggle effect - more noticeable side-to-side movement
-            const wiggleFrequency = 0.01; // Speed of wiggle
-            
-            const wiggleAmplitude = 1.5; // How far it wiggles (increased for visibility)
-            const wiggleOffset = Math.sin(currentTime * wiggleFrequency) * wiggleAmplitude;
-            
-            // Create slight vertical bobbing
-            const bobFrequency = 0.008;
-            const bobAmplitude = 1.5; // Increased for visibility
-            const bobOffset = Math.sin(currentTime * bobFrequency) * bobAmplitude;
-            
-            this.ctx.strokeStyle = '#FF0000';
-            this.ctx.lineWidth = 2;
-            this.ctx.beginPath();
-            
-            // Main tongue body with wiggle extending from mouth
-            this.ctx.moveTo(mouthX, 0);
-            this.ctx.lineTo(mouthX + 8 + bobOffset, wiggleOffset);
-            
-            // Forked tongue tip with wiggle
-            this.ctx.moveTo(mouthX + 8 + bobOffset, wiggleOffset);
-            this.ctx.lineTo(mouthX + 10 + bobOffset, -2 + wiggleOffset);
-            this.ctx.moveTo(mouthX + 8 + bobOffset, wiggleOffset);
-            this.ctx.lineTo(mouthX + 10 + bobOffset, 2 + wiggleOffset);
-            
-            this.ctx.stroke();
-        }
+
         
         // Restore context
         this.ctx.restore();
