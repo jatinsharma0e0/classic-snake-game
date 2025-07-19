@@ -84,8 +84,7 @@ class SnakeGame {
         this.gameScreen = document.getElementById('gameScreen');
         this.startGameBtn = document.getElementById('startGameBtn');
         this.stonePlayBtn = document.querySelector('.stone-play-button-overlay');
-        this.skinSelectorBtn = document.getElementById('skinSelectorBtn');
-        this.skinSelectorPanel = document.getElementById('skinSelectorPanel');
+
         this.settingsBtn = document.getElementById('settingsBtn');
         this.settingsModal = document.getElementById('settingsModal');
         this.closeSettingsBtn = document.getElementById('closeSettingsBtn');
@@ -254,15 +253,12 @@ class SnakeGame {
         
         this.tutorialOverlay.addEventListener('click', dismissTutorial);
         
-        // Skin selector event listeners
-        this.setupSkinSelectorListeners();
-        
-            // Setup interaction restrictions
+        // Setup interaction restrictions
         this.setupInteractionRestrictions();
         
         // Setup optimized performance features
         this.setupOptimizedKeyboardHandling();
-        this.preloadOptimizedAssets();
+
         
         // Start optimized game loop
         requestAnimationFrame((time) => this.gameLoop(time));
@@ -313,39 +309,7 @@ class SnakeGame {
     
 
 
-    setupSkinSelectorListeners() {
-        // Setup skin selector event listeners if the panel exists
-        if (this.skinSelectorPanel) {
-            const closeSkinSelector = document.getElementById('closeSkinSelector');
-            const applySkinBtn = document.getElementById('applySkinBtn');
-            
-            if (closeSkinSelector) {
-                closeSkinSelector.addEventListener('click', () => {
-                    this.skinSelectorPanel.classList.add('hidden');
-                });
-            }
-            
-            if (applySkinBtn) {
-                applySkinBtn.addEventListener('click', () => {
-                    const selectedSkin = document.querySelector('.skin-option.selected');
-                    if (selectedSkin) {
-                        const skinName = selectedSkin.dataset.skin;
-                        this.applySkin(skinName);
-                    }
-                    this.skinSelectorPanel.classList.add('hidden');
-                });
-            }
-            
-            // Setup skin option selection
-            const skinOptions = document.querySelectorAll('.skin-option');
-            skinOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    skinOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                });
-            });
-        }
-    }
+
 
 
 
@@ -1344,8 +1308,7 @@ class SnakeGame {
         else if (this.direction.y === 1) angle = Math.PI / 2; // Down
         else if (this.direction.y === -1) angle = -Math.PI / 2; // Up
         
-        // Update personality animations
-        this.updatePersonalityAnimations();
+
         
         // Cache adorable mint green snake head with warm highlights
         if (!this.gradientCache.has('adorableSnakeHead')) {
