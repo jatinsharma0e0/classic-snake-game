@@ -1868,7 +1868,7 @@ class SnakeGame {
         this.chasingPath = [];
         this.returnPath = [];
         this.chasingPhase = 'normal'; // 'normal', 'chasing', 'returning'
-        this.detectionRadius = 40; // Distance to detect food
+        this.detectionRadius = 80; // Increased distance to detect food for better chasing
 
         
         // Button dimensions and position relative to container
