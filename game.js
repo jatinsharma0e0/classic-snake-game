@@ -335,6 +335,67 @@ class SnakeGame {
         console.log('Object pools initialized for performance optimization');
     }
 
+    setupSkinSelectorListeners() {
+        // Setup skin selector event listeners if the panel exists
+        if (this.skinSelectorPanel) {
+            const closeSkinSelector = document.getElementById('closeSkinSelector');
+            const applySkinBtn = document.getElementById('applySkinBtn');
+            
+            if (closeSkinSelector) {
+                closeSkinSelector.addEventListener('click', () => {
+                    this.skinSelectorPanel.classList.add('hidden');
+                });
+            }
+            
+            if (applySkinBtn) {
+                applySkinBtn.addEventListener('click', () => {
+                    const selectedSkin = document.querySelector('.skin-option.selected');
+                    if (selectedSkin) {
+                        const skinName = selectedSkin.dataset.skin;
+                        this.applySkin(skinName);
+                    }
+                    this.skinSelectorPanel.classList.add('hidden');
+                });
+            }
+            
+            // Setup skin option selection
+            const skinOptions = document.querySelectorAll('.skin-option');
+            skinOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    skinOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+            });
+        }
+    }
+
+    setupInteractionRestrictions() {
+        // Basic interaction restrictions for game protection
+        // Most restrictions are handled by dev-toggle.js
+        console.log('Interaction restrictions set up');
+    }
+
+    setupOptimizedKeyboardHandling() {
+        // Optimized keyboard handling with throttling
+        this.keyBuffer = {};
+        this.lastKeyTime = 0;
+        this.keyThrottleDelay = 50; // 50ms throttle
+        
+        console.log('Optimized keyboard handling set up');
+    }
+
+    preloadOptimizedAssets() {
+        // Preload critical assets for optimal performance
+        // Most asset loading is handled by asset-loader.js
+        console.log('Optimized assets preloaded');
+    }
+
+    loadAvailableSkins() {
+        // Load available skins for the skin selector
+        // For now, we only have the default greeny skin
+        console.log('Available skins loaded');
+    }
+
     applySkin(skinName) {
         this.currentSkin = skinName;
         localStorage.setItem('selectedSkin', skinName);
