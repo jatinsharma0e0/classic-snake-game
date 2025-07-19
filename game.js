@@ -396,6 +396,41 @@ class SnakeGame {
         console.log('Available skins loaded');
     }
 
+    updatePersonalityAnimations() {
+        // Update personality animations like blinking, tongue movement
+        const currentTime = Date.now();
+        
+        // Handle blinking animation
+        if (currentTime - this.lastBlinkTime > this.nextBlinkTime) {
+            this.isBlinking = true;
+            this.lastBlinkTime = currentTime;
+            this.nextBlinkTime = 3000 + Math.random() * 4000; // Next blink in 3-7 seconds
+            
+            // Stop blinking after brief duration
+            setTimeout(() => {
+                this.isBlinking = false;
+            }, this.blinkDuration);
+        }
+        
+        // Handle tongue animation
+        if (!this.isDead && currentTime - this.lastTongueTime > this.nextTongueTime) {
+            this.tongueOut = true;
+            this.tongueTimer = currentTime;
+            this.lastTongueTime = currentTime;
+            this.nextTongueTime = 5000 + Math.random() * 4000; // Next tongue in 5-9 seconds
+            
+            // Hide tongue after duration
+            setTimeout(() => {
+                this.tongueOut = false;
+            }, 800);
+        }
+        
+        // Update tongue wiggle animation
+        if (this.tongueOut) {
+            this.tongueWiggleTimer = currentTime;
+        }
+    }
+
     applySkin(skinName) {
         this.currentSkin = skinName;
         localStorage.setItem('selectedSkin', skinName);
