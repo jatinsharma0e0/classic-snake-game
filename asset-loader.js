@@ -32,31 +32,31 @@ class AssetLoader {
         
         // Core game assets
         this.coreAssets = [
-            'assets/snake-icon.png',
-            'assets/log.png',
-            'assets/wooden-play-button.png',
-            'assets/settings-button.png',
-            'assets/title-bg.png',
-            'assets/jungle-bg.jpg',
-            'assets/grass-bg.webp'
+            'assets/snake/snake-icon.png',
+            'assets/backgrounds/log.png',
+            'assets/buttons/wooden-play-button.png',
+            'assets/buttons/settings-button.png',
+            'assets/backgrounds/title-bg.png',
+            'assets/backgrounds/jungle-bg.jpg',
+            'assets/backgrounds/grass-bg.webp'
         ];
         
         // Obstacle assets
         this.obstacleAssets = [
-            'assets/1-block-rock.png',
-            'assets/2-blocks-rock.png',
-            'assets/4-blocks-rock.png',
-            'assets/1-block-obstacle.png'
+            'assets/obstacles/1-block-rock.png',
+            'assets/obstacles/2-blocks-rock.png',
+            'assets/obstacles/4-blocks-rock.png',
+            'assets/obstacles/1-block-obstacle.png'
         ];
         
         // Default greeny skin assets
         this.greenySkinAssets = [
-            'assets/skins/greeny/greeny_head.png',
-            'assets/skins/greeny/greeny_body_straight.png',
-            'assets/skins/greeny/greeny_body_turn.png',
-            'assets/skins/greeny/greeny_tail.png',
-            'assets/skins/greeny/greeny_food.png',
-            'assets/skins/greeny/greeny_dead_head.png'
+            'assets/snake/skins/greeny/greeny_head.png',
+            'assets/snake/skins/greeny/greeny_body_straight.png',
+            'assets/snake/skins/greeny/greeny_body_turn.png',
+            'assets/snake/skins/greeny/greeny_tail.png',
+            'assets/snake/skins/greeny/greeny_food.png',
+            'assets/snake/skins/greeny/greeny_dead_head.png'
         ];
         
         // Audio assets - Temporarily disabled due to corrupted files

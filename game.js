@@ -67,7 +67,7 @@ class SnakeGame {
         
         // Background image
         this.grassBg = new Image();
-        this.grassBg.src = 'assets/grass-bg.webp';
+        this.grassBg.src = 'assets/backgrounds/grass-bg.webp';
         
         // Audio system - will be initialized after assets load
         this.audioManager = null;
@@ -337,7 +337,7 @@ class SnakeGame {
         
         imageNames.forEach(name => {
             const img = new Image();
-            img.src = `assets/${name}.png`;
+            img.src = `assets/obstacles/${name}.png`;
             this.obstacleImages[name] = img;
         });
     }
@@ -359,11 +359,11 @@ class SnakeGame {
         
         // Map greeny sprites to game sprite names (simplified for rotation-based rendering)
         const spriteMapping = {
-            'head_up': 'assets/skins/greeny/greeny_head.png',
-            'dead_head': 'assets/skins/greeny/greeny_dead_head.png',
-            'body_horizontal': 'assets/skins/greeny/greeny_body_straight.png',
-            'body_turn_left_down': 'assets/skins/greeny/greeny_body_turn.png',
-            'tail_up': 'assets/skins/greeny/greeny_tail.png'
+            'head_up': 'assets/snake/skins/greeny/greeny_head.png',
+            'dead_head': 'assets/snake/skins/greeny/greeny_dead_head.png',
+            'body_horizontal': 'assets/snake/skins/greeny/greeny_body_straight.png',
+            'body_turn_left_down': 'assets/snake/skins/greeny/greeny_body_turn.png',
+            'tail_up': 'assets/snake/skins/greeny/greeny_tail.png'
         };
         
         // Load each sprite
@@ -375,7 +375,7 @@ class SnakeGame {
         
         // Load the food sprite
         this.appleImage = new Image();
-        this.appleImage.src = 'assets/skins/greeny/greeny_food.png';
+        this.appleImage.src = 'assets/snake/skins/greeny/greeny_food.png';
         
         this.defaultSkinLoaded = true;
     }
