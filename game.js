@@ -67,7 +67,7 @@ class SnakeGame {
         
         // Background image
         this.grassBg = new Image();
-        this.grassBg.src = 'assets/backgrounds/grass-bg.webp';
+        this.grassBg.src = 'assets/backgrounds/grass_01.webp';
         
         // Audio system - will be initialized after assets load
         this.audioManager = null;
@@ -333,7 +333,7 @@ class SnakeGame {
     }
     
     loadObstacleImages() {
-        const imageNames = ['1-block-rock', '2-blocks-rock', '4-blocks-rock', '1-block-obstacle'];
+        const imageNames = ['rock_1_block', 'rock_2_blocks', 'rock_4_blocks', 'rock_1_block_alt'];
         
         imageNames.forEach(name => {
             const img = new Image();
@@ -359,11 +359,11 @@ class SnakeGame {
         
         // Map greeny sprites to game sprite names (simplified for rotation-based rendering)
         const spriteMapping = {
-            'head_up': 'assets/snake/skins/greeny/greeny_head.png',
-            'dead_head': 'assets/snake/skins/greeny/greeny_dead_head.png',
-            'body_horizontal': 'assets/snake/skins/greeny/greeny_body_straight.png',
-            'body_turn_left_down': 'assets/snake/skins/greeny/greeny_body_turn.png',
-            'tail_up': 'assets/snake/skins/greeny/greeny_tail.png'
+            'head_up': 'assets/snake/skins/greeny/head.png',
+            'dead_head': 'assets/snake/skins/greeny/dead_head.png',
+            'body_horizontal': 'assets/snake/skins/greeny/body_straight.png',
+            'body_turn_left_down': 'assets/snake/skins/greeny/body_turn.png',
+            'tail_up': 'assets/snake/skins/greeny/tail.png'
         };
         
         // Load each sprite
@@ -375,7 +375,7 @@ class SnakeGame {
         
         // Load the food sprite
         this.appleImage = new Image();
-        this.appleImage.src = 'assets/snake/skins/greeny/greeny_food.png';
+        this.appleImage.src = 'assets/snake/skins/greeny/food.png';
         
         this.defaultSkinLoaded = true;
     }
@@ -460,10 +460,10 @@ class SnakeGame {
         
         // Define obstacle counts and types
         const obstacleConfig = [
-            { type: '4-blocks-rock', width: 2, height: 2, count: 3 },
-            { type: '2-blocks-rock', width: 2, height: 1, count: 4 + Math.floor(Math.random() * 2) }, // 4-5
-            { type: '1-block-rock', width: 1, height: 1, count: Math.floor(Math.random() * 4) + 2 }, // 2-5
-            { type: '1-block-obstacle', width: 1, height: 1, count: Math.floor(Math.random() * 4) + 2 } // 2-5
+            { type: 'rock_4_blocks', width: 2, height: 2, count: 3 },
+            { type: 'rock_2_blocks', width: 2, height: 1, count: 4 + Math.floor(Math.random() * 2) }, // 4-5
+            { type: 'rock_1_block', width: 1, height: 1, count: Math.floor(Math.random() * 4) + 2 }, // 2-5
+            { type: 'rock_1_block_alt', width: 1, height: 1, count: Math.floor(Math.random() * 4) + 2 } // 2-5
         ];
         
         // Ensure small obstacles total 5-6

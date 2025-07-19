@@ -7,7 +7,7 @@
 
 @font-face {
     font-family: 'Display-Dots-Two-Sans';
-    src: url('assets/fonts/Display-Dots-Two-Sans.ttf') format('truetype');
+    src: url('assets/fonts/display_dots_two_sans.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -51,7 +51,7 @@ body {
     left: 0;
     width: 100%;
     height: 100vh;
-    background: url('assets/backgrounds/jungle-bg.jpg') center/cover no-repeat;
+    background: url('assets/backgrounds/jungle.jpg') center/cover no-repeat;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -115,7 +115,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 15px;
-    background-image: url('assets/backgrounds/title-bg.png');
+    background-image: url('assets/backgrounds/title_screen_bg.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -292,7 +292,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 15px;
-    background-image: url('assets/backgrounds/title-bg.png');
+    background-image: url('assets/backgrounds/title_screen_bg.png');
     background-size: 100% 140%;
     background-repeat: no-repeat;
     background-position: center;

@@ -27,36 +27,36 @@ class AssetLoader {
         // Font assets (highest priority - load first)
         this.fontAssets = [
             'assets/fonts/driftwood.ttf',
-            'assets/fonts/Display-Dots-Two-Sans.ttf'
+            'assets/fonts/display_dots_two_sans.ttf'
         ];
         
         // Core game assets
         this.coreAssets = [
-            'assets/snake/snake-icon.png',
+            'assets/snake/snake_icon.png',
             'assets/backgrounds/log.png',
-            'assets/buttons/wooden-play-button.png',
-            'assets/buttons/settings-button.png',
-            'assets/backgrounds/title-bg.png',
-            'assets/backgrounds/jungle-bg.jpg',
-            'assets/backgrounds/grass-bg.webp'
+            'assets/buttons/play_wooden.png',
+            'assets/buttons/settings.png',
+            'assets/backgrounds/title_screen_bg.png',
+            'assets/backgrounds/jungle.jpg',
+            'assets/backgrounds/grass_01.webp'
         ];
         
         // Obstacle assets
         this.obstacleAssets = [
-            'assets/obstacles/1-block-rock.png',
-            'assets/obstacles/2-blocks-rock.png',
-            'assets/obstacles/4-blocks-rock.png',
-            'assets/obstacles/1-block-obstacle.png'
+            'assets/obstacles/rock_1_block.png',
+            'assets/obstacles/rock_2_blocks.png',
+            'assets/obstacles/rock_4_blocks.png',
+            'assets/obstacles/rock_1_block_alt.png'
         ];
         
         // Default greeny skin assets
         this.greenySkinAssets = [
-            'assets/snake/skins/greeny/greeny_head.png',
-            'assets/snake/skins/greeny/greeny_body_straight.png',
-            'assets/snake/skins/greeny/greeny_body_turn.png',
-            'assets/snake/skins/greeny/greeny_tail.png',
-            'assets/snake/skins/greeny/greeny_food.png',
-            'assets/snake/skins/greeny/greeny_dead_head.png'
+            'assets/snake/skins/greeny/head.png',
+            'assets/snake/skins/greeny/body_straight.png',
+            'assets/snake/skins/greeny/body_turn.png',
+            'assets/snake/skins/greeny/tail.png',
+            'assets/snake/skins/greeny/food.png',
+            'assets/snake/skins/greeny/dead_head.png'
         ];
         
         // Audio assets - Temporarily disabled due to corrupted files
