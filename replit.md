@@ -19,7 +19,7 @@ Landing page preference: Direct access to snake game, no hub interface.
 - **serve.py**: Optional Python HTTP server for local development
 
 ### Game Features
-- **Start Screen**: Animated snake moving around start button with 2 fixed apples
+- **Start Screen**: Animated snake moving around start button
 - **Game Logic**: Classic snake gameplay with collision detection and scoring
 - **Visual Design**: Jungle theme with decorative elements and smooth animations
 - **Responsive**: Works on desktop and mobile devices
@@ -93,6 +93,18 @@ Landing page preference: Direct access to snake game, no hub interface.
 The application is designed for real-time interactive experiences with 3D graphics, audio feedback, and persistent user data. The modular architecture allows for easy extension of game mechanics, additional storage backends, and enhanced 3D features.
 
 ## Recent Changes
+
+**Removed Apple Elements from Home Screen (July 19, 2025):**
+- Completely removed all apple-related SVG elements from start screen animation
+- Cleaned up HTML by removing applesContainer and decorative apple elements 
+- Removed all JavaScript apple functions: createFixedApples, updateAppleVisibility, createAppleElement, addAppleDefinitions, checkAppleCollisions, eatApple, respawnApple
+- Eliminated apple collision detection and visibility management from start screen snake animation
+- Streamlined start screen to show only the animated snake moving around the play button
+- Maintained smooth snake animation while removing all apple interactions and visual elements
+- Code optimization by removing unused apple gradient definitions and performance caching
+- Clean, simplified start screen focuses purely on snake movement animation
+
+## Previous Changes
 
 **Updated Button System with Stone Design (July 18, 2025):**
 - Replaced wooden play button with new stone-style play button featuring leaves and golden triangle
@@ -191,7 +203,7 @@ The application is designed for real-time interactive experiences with 3D graphi
 **Simplified to Pure HTML5/CSS/JS (January 16, 2025):**
 - Removed all React, Node.js, and framework dependencies
 - Cleaned up project to contain only essential game files
-- Implemented 2 fixed apples in start screen animation that hide when snake approaches
+- Clean start screen animation with snake movement around button
 - Game now runs as standalone HTML5 application
 - Updated start button from image to styled button element
 - Project structure simplified to 3 core files: index.html, style.css, game.js
