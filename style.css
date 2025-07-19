@@ -166,7 +166,7 @@ body {
     border: 1px solid rgba(144, 238, 144, 0.3);
 }
 
-.start-button-container {
+.log-container {
     position: relative;
     margin: 40px auto;
     width: fit-content;
@@ -176,7 +176,7 @@ body {
     align-items: center;
 }
 
-.start-game-btn-image {
+.log-image {
     transition: all 0.3s ease;
     z-index: 10;
     position: relative;
@@ -615,12 +615,12 @@ body {
         margin: 20px;
     }
 
-    .start-button-container {
+    .log-container {
         width: 280px;
         height: 200px;
     }
 
-    .start-game-btn {
+    .log-btn {
         padding: 15px 30px;
         font-size: 1.2rem;
     }
@@ -657,7 +657,7 @@ body {
         padding: 20px 15px;
     }
 
-    .start-button-container {
+    .log-container {
         width: 250px;
         height: 180px;
     }

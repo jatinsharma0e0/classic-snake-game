@@ -33,7 +33,7 @@ class AssetLoader {
         // Core game assets
         this.coreAssets = [
             'assets/snake-icon.png',
-            'assets/start-button.png',
+            'assets/log.png',
             'assets/wooden-play-button.png',
             'assets/settings-button.png',
             'assets/title-bg.png',
