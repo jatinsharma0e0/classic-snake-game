@@ -319,6 +319,22 @@ class SnakeGame {
         }
     }
     
+    initializeObjectPools() {
+        // Initialize object pools for performance optimization
+        this.particlePool = [];
+        this.renderObjectPool = [];
+        this.vectorPool = [];
+        
+        // Pre-populate pools for better performance
+        for (let i = 0; i < 50; i++) {
+            this.particlePool.push({ x: 0, y: 0, vx: 0, vy: 0, life: 0, maxLife: 0 });
+            this.renderObjectPool.push({ type: '', x: 0, y: 0, width: 0, height: 0, data: null });
+            this.vectorPool.push({ x: 0, y: 0 });
+        }
+        
+        console.log('Object pools initialized for performance optimization');
+    }
+
     applySkin(skinName) {
         this.currentSkin = skinName;
         localStorage.setItem('selectedSkin', skinName);
