@@ -244,54 +244,7 @@ body {
     filter: brightness(1.5) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
 }
 
-/* Full-screen Snake Animation Overlay */
-.snake-animation-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1500; /* Above main UI, below modals */
-    pointer-events: none; /* Allow clicks to pass through to buttons below */
-    overflow: hidden;
-    background: transparent; /* Fully transparent overlay */
-}
-
-.snake-path-container {
-    position: absolute;
-    width: 100vw;   /* Full viewport width */
-    height: 100vh;  /* Full viewport height */
-    top: 0;
-    left: 0;
-    pointer-events: none;
-}
-
-.snake-svg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;   /* Full viewport width */
-    height: 100vh;  /* Full viewport height */
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* Enable interaction for snake and food elements if needed */
-.snake-svg #snakeHead,
-.snake-svg #startScreenFood {
-    pointer-events: auto; /* Allow interaction with these specific elements */
-}
-
-/* Optional: Add subtle hover effects for interactive elements */
-.snake-svg #snakeHead:hover {
-    filter: url(#snakeShadow) brightness(1.1);
-    transition: filter 0.3s ease;
-}
-
-.snake-svg #startScreenFood image:hover {
-    transform: scale(1.1);
-    transition: transform 0.2s ease;
-}
+/* Snake animation overlay styles removed for simplified home page */
 
 .decorative-apple {
     position: absolute;

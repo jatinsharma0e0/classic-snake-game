@@ -45,65 +45,7 @@
         <div class="jungle-background">
         </div>
         
-        <!-- Full-screen Snake and Food Animation Overlay -->
-        <div id="snakeAnimationOverlay" class="snake-animation-overlay">
-            <div class="snake-path-container">
-                <svg class="snake-svg" width="100%" height="100%" viewBox="0 0 1200 800">
-                    <defs>
-                        <linearGradient id="snakeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
-                            <stop offset="50%" style="stop-color:#66BB6A;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#81C784;stop-opacity:1" />
-                        </linearGradient>
-                        <linearGradient id="snakeBellyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:#A5D6A7;stop-opacity:1" />
-                            <stop offset="50%" style="stop-color:#C8E6C9;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#DCEDC8;stop-opacity:1" />
-                        </linearGradient>
-                        <filter id="snakeShadow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="rgba(76, 175, 80, 0.5)"/>
-                        </filter>
-                    </defs>
-                    
-                    <!-- Snake body path -->
-                    <path id="snakeBody" stroke="url(#snakeGradient)" stroke-width="20" 
-                          fill="none" stroke-linecap="round" stroke-linejoin="round" 
-                          filter="url(#snakeShadow)" opacity="0.95"
-                          vector-effect="non-scaling-stroke"/>
-                    
-                    <!-- Snake body spots -->
-                    <g id="bodySpots">
-                        <!-- Orange spots will be added dynamically -->
-                    </g>
-                    
-                    <!-- Snake head -->
-                    <circle id="snakeHead" r="14" fill="url(#snakeGradient)" 
-                            filter="url(#snakeShadow)"/>
-                    
-                    <!-- Snake eyes -->
-                    <circle id="leftEye" r="6" fill="white" stroke="#E0E0E0" stroke-width="0.5"/>
-                    <circle id="rightEye" r="6" fill="white" stroke="#E0E0E0" stroke-width="0.5"/>
-                    <circle id="leftPupil" r="3" fill="black"/>
-                    <circle id="rightPupil" r="3" fill="black"/>
-                    <circle id="leftInnerPupil" r="1.8" fill="black"/>
-                    <circle id="rightInnerPupil" r="1.8" fill="black"/>
-                    
-                    <!-- spots on snake head -->
-                    <circle id="headSpot1" r="1.5" fill="white" opacity="0.8"/>
-                    <circle id="headSpot2" r="1.5" fill="white" opacity="0.8"/>
-                    
-                    <!-- Snake tongue (optional) -->
-                    <path id="snakeTongue" stroke="red" stroke-width="2" 
-                          fill="none" stroke-linecap="round"/>
-                    
-                    <!-- Food items for start screen -->
-                    <g id="startScreenFood">
-                        <!-- Food items will be dynamically created here -->
-                    </g>
-
-                </svg>
-            </div>
-        </div>
+        <!-- Snake animation overlay removed for simplified home page -->
         
         <div class="start-content">
             <div class="home-header">
