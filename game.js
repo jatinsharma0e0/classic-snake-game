@@ -1874,8 +1874,8 @@ class SnakeGame {
         // Button dimensions and position relative to container
         this.buttonWidth = 200;
         this.buttonHeight = 60;
-        this.containerWidth = 350;
-        this.containerHeight = 200;
+        this.containerWidth = 600;  // Expanded for proper figure-8 display
+        this.containerHeight = 350; // Expanded for proper figure-8 display
         
         // Calculate button position (centered in container)
         this.buttonLeft = (this.containerWidth - this.buttonWidth) / 2;
