@@ -123,6 +123,16 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Maintained earthy, nature-themed styling with leaf motifs and wooden textures
 - Applied modern spacing and alignment principles for balanced, professional appearance
 
+**Developer Toggle System for Browser Restrictions (July 19, 2025):**
+- Implemented Ctrl + Shift + D keyboard shortcut to toggle browser UI restrictions on/off
+- Created comprehensive dev-toggle.js system to manage all interaction restrictions
+- When restrictions are OFF: developers can use F12, right-click, select text, scroll freely
+- When restrictions are ON: full protection against text selection, dragging, zooming, dev tools
+- Visual notification system shows current mode with floating alerts (1-2 seconds)
+- Restrictions enabled by default (production mode) for player protection
+- Removed hardcoded restrictions from game.js and style.css for centralized management
+- Allows seamless development and testing while maintaining production security
+
 **Replit Migration and Project Setup (July 18, 2025):**
 - Successfully migrated project from Replit Agent to Replit environment
 - Verified Python 3.11 and Pillow package installation

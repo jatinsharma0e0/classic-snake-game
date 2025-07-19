@@ -1788,68 +1788,13 @@ class SnakeGame {
     }
     
     setupInteractionRestrictions() {
-        // Prevent right-click context menu
-        document.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            return false;
-        });
-        
-        // Prevent text selection and dragging
-        document.addEventListener('selectstart', (e) => {
-            e.preventDefault();
-            return false;
-        });
-        
-        document.addEventListener('dragstart', (e) => {
-            e.preventDefault();
-            return false;
-        });
-        
-        // Prevent long-press on mobile (touchstart events)
-        document.addEventListener('touchstart', (e) => {
-            // Allow single touches for legitimate interactions
-            if (e.touches.length > 1) {
-                e.preventDefault();
-            }
-        });
-        
-        // Prevent mobile zooming gestures
-        document.addEventListener('touchmove', (e) => {
-            if (e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        
-        // Prevent double-tap zoom on iOS
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', (e) => {
-            const now = Date.now();
-            if (now - lastTouchEnd <= 300) {
-                e.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-        
-        // Block certain keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            // Block F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, F5, Ctrl+R
-            if (
-                e.key === 'F12' ||
-                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-                (e.ctrlKey && e.key === 'u') ||
-                (e.ctrlKey && e.key === 's') ||
-                e.key === 'F5' ||
-                (e.ctrlKey && e.key === 'r')
-            ) {
-                e.preventDefault();
-                return false;
-            }
-        });
+        // Note: Browser UI restrictions are now managed by dev-toggle.js
+        // This allows developers to toggle restrictions on/off with Ctrl+Shift+D
         
         // Ensure canvas maintains focus during gameplay
         this.maintainCanvasFocus();
         
-        // Prevent scrolling with arrow keys and space
+        // Prevent scrolling with arrow keys and space during gameplay only
         document.addEventListener('keydown', (e) => {
             if (this.gameRunning && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
                 e.preventDefault();

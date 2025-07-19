@@ -22,20 +22,8 @@ html {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* Prevent text selection and dragging on all elements */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
-    user-drag: none;
-    /* Disable touch callouts on mobile */
-    -webkit-touch-callout: none;
-    /* Prevent zooming on mobile */
-    touch-action: manipulation;
+    /* Note: User interaction restrictions are now managed by dev-toggle.js */
+    /* This allows developers to toggle restrictions on/off with Ctrl+Shift+D */
     
     /* Performance optimizations */
     -webkit-transform: translateZ(0);
