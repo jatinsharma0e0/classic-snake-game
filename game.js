@@ -52,7 +52,6 @@ class SnakeGame {
         this.lastDirection = { x: 0, y: 0 };
         
         // Enhanced snake animation properties
-        this.snakeSegments = [];
         this.tongueOut = false;
         this.tongueTimer = 0;
         this.mouthOpen = false;
@@ -60,12 +59,7 @@ class SnakeGame {
         this.nextTongueTime = 5000 + Math.random() * 4000; // Random interval 5-9 seconds
         this.tongueWiggleTimer = 0;
         
-        // Simple snake animations
-        this.blinkTime = 0;
-        this.lastBlinkTime = 0;
-        this.isBlinking = false;
-        this.blinkDuration = 150;
-        this.nextBlinkTime = 3000 + Math.random() * 4000;
+
         
         // Food properties - Normal random generation for gameplay
         this.food = this.generateFood();
@@ -113,8 +107,7 @@ class SnakeGame {
         this.currentSkin = 'default';
         this.customSkinImages = {};
         
-        // Initialize object pools for performance
-        this.initializeObjectPools();
+
         
         // Initialize game
         this.init();
@@ -313,26 +306,12 @@ class SnakeGame {
     
     updateSoundToggleButton() {
         if (this.audioManager) {
-            const isMuted = this.audioManager.isMuted();
+            const isMuted = this.audioManager.isMuted;
             this.updateMuteButtonIcons(isMuted);
         }
     }
     
-    initializeObjectPools() {
-        // Initialize object pools for performance optimization
-        this.particlePool = [];
-        this.renderObjectPool = [];
-        this.vectorPool = [];
-        
-        // Pre-populate pools for better performance
-        for (let i = 0; i < 50; i++) {
-            this.particlePool.push({ x: 0, y: 0, vx: 0, vy: 0, life: 0, maxLife: 0 });
-            this.renderObjectPool.push({ type: '', x: 0, y: 0, width: 0, height: 0, data: null });
-            this.vectorPool.push({ x: 0, y: 0 });
-        }
-        
-        console.log('Object pools initialized for performance optimization');
-    }
+
 
     setupSkinSelectorListeners() {
         // Setup skin selector event listeners if the panel exists
@@ -368,11 +347,7 @@ class SnakeGame {
         }
     }
 
-    setupInteractionRestrictions() {
-        // Basic interaction restrictions for game protection
-        // Most restrictions are handled by dev-toggle.js
-        console.log('Interaction restrictions set up');
-    }
+
 
     setupOptimizedKeyboardHandling() {
         // Optimized keyboard handling with throttling
@@ -380,55 +355,18 @@ class SnakeGame {
         this.lastKeyTime = 0;
         this.keyThrottleDelay = 50; // 50ms throttle
         
-        console.log('Optimized keyboard handling set up');
+
     }
 
-    preloadOptimizedAssets() {
-        // Preload critical assets for optimal performance
-        // Most asset loading is handled by asset-loader.js
-        console.log('Optimized assets preloaded');
-    }
+
 
     loadAvailableSkins() {
         // Load available skins for the skin selector
         // For now, we only have the default greeny skin
-        console.log('Available skins loaded');
+
     }
 
-    updatePersonalityAnimations() {
-        // Update personality animations like blinking, tongue movement
-        const currentTime = Date.now();
-        
-        // Handle blinking animation
-        if (currentTime - this.lastBlinkTime > this.nextBlinkTime) {
-            this.isBlinking = true;
-            this.lastBlinkTime = currentTime;
-            this.nextBlinkTime = 3000 + Math.random() * 4000; // Next blink in 3-7 seconds
-            
-            // Stop blinking after brief duration
-            setTimeout(() => {
-                this.isBlinking = false;
-            }, this.blinkDuration);
-        }
-        
-        // Handle tongue animation
-        if (!this.isDead && currentTime - this.lastTongueTime > this.nextTongueTime) {
-            this.tongueOut = true;
-            this.tongueTimer = currentTime;
-            this.lastTongueTime = currentTime;
-            this.nextTongueTime = 5000 + Math.random() * 4000; // Next tongue in 5-9 seconds
-            
-            // Hide tongue after duration
-            setTimeout(() => {
-                this.tongueOut = false;
-            }, 800);
-        }
-        
-        // Update tongue wiggle animation
-        if (this.tongueOut) {
-            this.tongueWiggleTimer = currentTime;
-        }
-    }
+
 
     applySkin(skinName) {
         this.currentSkin = skinName;
@@ -538,7 +476,7 @@ class SnakeGame {
                     }
                 });
                 
-                console.log('Custom skin loaded:', selectedSkin);
+
             }
         }
     }
@@ -918,7 +856,7 @@ class SnakeGame {
         
         // Remove debug logging
         // if (this.mouthOpen) {
-        //     console.log('Mouth is open! Distance to food:', distanceToFood, 'Head:', head, 'Food:', this.food);
+
         // }
         
         // Random tongue animation (only when not eating)
@@ -966,26 +904,7 @@ class SnakeGame {
         }
     }
     
-    isFacingFood(head, food) {
-        // Check if the snake is moving towards the food
-        const dx = food.x - head.x;
-        const dy = food.y - head.y;
-        
-        // If food is directly adjacent, consider it as facing
-        if (Math.abs(dx) <= 1 && Math.abs(dy) <= 1) {
-            return true;
-        }
-        
-        // Check if current direction aligns with food direction
-        if (this.direction.x !== 0) {
-            return (this.direction.x > 0 && dx > 0) || (this.direction.x < 0 && dx < 0);
-        }
-        if (this.direction.y !== 0) {
-            return (this.direction.y > 0 && dy > 0) || (this.direction.y < 0 && dy < 0);
-        }
-        
-        return false;
-    }
+
     
     gameOver() {
         // Prevent multiple game over calls
@@ -1158,69 +1077,7 @@ class SnakeGame {
         }
     }
     
-    drawSnakeHead(x, y) {
-        const centerX = x + this.gridSize / 2;
-        const centerY = y + this.gridSize / 2;
-        const radius = this.gridSize / 2 - 1;
-        
-        // Main head body (blue gradient)
-        const gradient = this.ctx.createRadialGradient(
-            centerX - radius/3, centerY - radius/3, 0,
-            centerX, centerY, radius
-        );
-        gradient.addColorStop(0, '#5DADE2');
-        gradient.addColorStop(1, '#2E86C1');
-        
-        this.ctx.fillStyle = gradient;
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        // Shadow
-        this.ctx.shadowColor = 'rgba(46, 134, 193, 0.5)';
-        this.ctx.shadowBlur = 8;
-        this.ctx.shadowOffsetX = 2;
-        this.ctx.shadowOffsetY = 2;
-        this.ctx.fill();
-        this.ctx.shadowBlur = 0;
-        this.ctx.shadowOffsetX = 0;
-        this.ctx.shadowOffsetY = 0;
-        
-        // Eyes
-        const eyeSize = 5;
-        const eyeOffset = radius / 3;
-        
-        // Left eye
-        this.ctx.fillStyle = 'white';
-        this.ctx.beginPath();
-        this.ctx.arc(centerX - eyeOffset, centerY - eyeOffset/2, eyeSize, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        // Right eye
-        this.ctx.beginPath();
-        this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        // Eye pupils
-        this.ctx.fillStyle = 'black';
-        this.ctx.beginPath();
-        this.ctx.arc(centerX - eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        this.ctx.beginPath();
-        this.ctx.arc(centerX + eyeOffset, centerY - eyeOffset/2, eyeSize/2, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        // Eye shine
-        this.ctx.fillStyle = 'white';
-        this.ctx.beginPath();
-        this.ctx.arc(centerX - eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        this.ctx.beginPath();
-        this.ctx.arc(centerX + eyeOffset + 1, centerY - eyeOffset/2 - 1, 1, 0, Math.PI * 2);
-        this.ctx.fill();
-    }
+
     
     drawSnakeBody(x, y) {
         const centerX = x + this.gridSize / 2;
@@ -1470,52 +1327,7 @@ class SnakeGame {
         }
     }
     
-    drawSnakeBodyOptimized() {
-        if (this.snake.length === 0) return;
-        
-        const bodyWidth = this.gridSize * 0.8;
-        
-        // Cache adorable mint green snake body with warm accents
-        if (!this.gradientCache.has('adorableSnakeBody')) {
-            const gradient = this.ctx.createLinearGradient(0, 0, 0, bodyWidth);
-            gradient.addColorStop(0, '#A8E6CF'); // Light mint green
-            gradient.addColorStop(0.3, '#88D8A3'); // Fresh mint
-            gradient.addColorStop(0.7, '#7ED091'); // Vibrant mint
-            gradient.addColorStop(1, '#6BB77B'); // Deeper mint for depth
-            this.gradientCache.set('adorableSnakeBody', gradient);
-        }
-        
-        // Performance: create single path for entire snake
-        this.ctx.beginPath();
-        
-        for (let i = 0; i < this.snake.length; i++) {
-            const segment = this.snake[i];
-            const x = segment.x * this.gridSize + this.gridSize / 2;
-            const y = segment.y * this.gridSize + this.gridSize / 2;
-            
-            if (i === 0) {
-                this.ctx.moveTo(x, y);
-            } else {
-                this.ctx.lineTo(x, y);
-            }
-        }
-        
-        // Single stroke for entire body with adorable mint green
-        this.ctx.strokeStyle = this.gradientCache.get('adorableSnakeBody');
-        this.ctx.lineWidth = bodyWidth;
-        this.ctx.lineCap = 'round';
-        this.ctx.lineJoin = 'round';
-        this.ctx.stroke();
-        
-        // Add cute belly accent with creamy peach color
-        if (this.snake.length > 1) {
-            this.ctx.strokeStyle = '#FFEAA7'; // Soft creamy yellow
-            this.ctx.lineWidth = bodyWidth * 0.4; // Smaller width for belly stripe
-            this.ctx.globalAlpha = 0.8;
-            this.ctx.stroke();
-            this.ctx.globalAlpha = 1.0;
-        }
-    }
+
     
     drawSnakeHeadOptimized() {
         if (this.snake.length === 0) return;
