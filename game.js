@@ -1858,6 +1858,8 @@ class SnakeGame {
         this.bodyLength = 120; // Number of points to track for body
         this.bodyPoints = [];
         this.pointSpacing = 2; // Distance between body tracking points
+        this.startScreenFoodItems = []; // Store food data
+        this.startScreenFoodContainer = document.getElementById('startScreenFood');
 
         
         // Button dimensions and position relative to container
@@ -1884,7 +1886,8 @@ class SnakeGame {
             });
         }
         
-
+        // Create food items for start screen
+        this.createStartScreenFood();
         
         // Start animation
         this.animateStartScreenSnake();
@@ -1949,6 +1952,85 @@ class SnakeGame {
             const y = top + cornerRadius + Math.sin(rad) * cornerRadius;
             this.path.push({ x, y });
         }
+    }
+    
+    createStartScreenFood() {
+        // Clear any existing food items
+        this.startScreenFoodContainer.innerHTML = '';
+        this.startScreenFoodItems = [];
+        
+        // Define areas where food can be placed (outside the snake's path)
+        const foodRadius = 8; // Food item radius
+        const minDistanceFromPath = 35; // Minimum distance from snake path
+        const minDistanceBetweenFood = 25; // Minimum distance between food items
+        
+        // Calculate available area dimensions
+        const areaWidth = this.containerWidth;
+        const areaHeight = this.containerHeight;
+        
+        // Generate food positions
+        const maxFoodItems = 6;
+        let attempts = 0;
+        const maxAttempts = 100;
+        
+        while (this.startScreenFoodItems.length < maxFoodItems && attempts < maxAttempts) {
+            attempts++;
+            
+            // Generate random position
+            const x = Math.random() * (areaWidth - foodRadius * 2) + foodRadius;
+            const y = Math.random() * (areaHeight - foodRadius * 2) + foodRadius;
+            
+            // Check if position is valid (not too close to snake path or other food)
+            if (this.isValidFoodPosition(x, y, minDistanceFromPath, minDistanceBetweenFood)) {
+                const foodElement = this.createFoodElement(x, y, this.startScreenFoodItems.length);
+                this.startScreenFoodItems.push({
+                    element: foodElement,
+                    x: x,
+                    y: y,
+                    id: this.startScreenFoodItems.length
+                });
+            }
+        }
+    }
+    
+    isValidFoodPosition(x, y, minDistanceFromPath, minDistanceBetweenFood) {
+        // Check distance from snake path
+        for (let pathPoint of this.path) {
+            const distance = Math.sqrt(Math.pow(x - pathPoint.x, 2) + Math.pow(y - pathPoint.y, 2));
+            if (distance < minDistanceFromPath) {
+                return false;
+            }
+        }
+        
+        // Check distance from existing food items
+        for (let foodItem of this.startScreenFoodItems) {
+            const distance = Math.sqrt(Math.pow(x - foodItem.x, 2) + Math.pow(y - foodItem.y, 2));
+            if (distance < minDistanceBetweenFood) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    createFoodElement(x, y, id) {
+        // Create food SVG image element
+        const foodImage = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        foodImage.setAttribute('id', `startFood-${id}`);
+        foodImage.setAttribute('x', x - 8); // Center the image
+        foodImage.setAttribute('y', y - 8);
+        foodImage.setAttribute('width', '16');
+        foodImage.setAttribute('height', '16');
+        foodImage.setAttribute('href', 'assets/home-food.png');
+        foodImage.setAttribute('opacity', '0.9');
+        
+        // Add subtle animation
+        foodImage.style.transformOrigin = `${x}px ${y}px`;
+        foodImage.style.animation = `foodFloat 3s ease-in-out infinite`;
+        foodImage.style.animationDelay = `${Math.random() * 2}s`;
+        
+        this.startScreenFoodContainer.appendChild(foodImage);
+        return foodImage;
     }
     
     animateStartScreenSnake() {

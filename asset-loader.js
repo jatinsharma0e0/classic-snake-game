@@ -36,6 +36,7 @@ class AssetLoader {
             'assets/start-button.png',
             'assets/wooden-play-button.png',
             'assets/settings-button.png',
+            'assets/home-food.png',
             'assets/title-bg.png',
             'assets/jungle-bg.jpg',
             'assets/grass-bg.webp'
