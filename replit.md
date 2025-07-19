@@ -94,6 +94,17 @@ The application is designed for real-time interactive experiences with 3D graphi
 
 ## Recent Changes
 
+**Enhanced Snake Food-Chasing System (July 19, 2025):**
+- Implemented dynamic pathfinding for snake to chase nearby food items on start screen
+- Added intelligent detection radius (40px) for snake to spot and pursue food
+- Created smooth path interpolation system for chasing, eating, and returning behaviors
+- Snake dynamically changes from rectangular path to direct food-chasing path when food detected
+- After consuming food, snake automatically returns to closest point on original path
+- Food items disappear with scale/opacity animation when eaten, respawn after 3 seconds
+- Implemented three-phase movement system: normal → chasing → returning → normal
+- Enhanced start screen interactivity with realistic snake hunting behavior
+- Maintains smooth body animation and head rotation throughout all movement phases
+
 **Added Food Elements to Start Screen (July 19, 2025):**
 - Implemented home-food.png based food system around start screen snake animation
 - Added intelligent food positioning that avoids overlapping with snake's movement path

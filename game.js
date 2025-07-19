@@ -1860,6 +1860,15 @@ class SnakeGame {
         this.pointSpacing = 2; // Distance between body tracking points
         this.startScreenFoodItems = []; // Store food data
         this.startScreenFoodContainer = document.getElementById('startScreenFood');
+        
+        // Snake pathfinding properties
+        this.isChasing = false;
+        this.targetFood = null;
+        this.originalPathIndex = 0;
+        this.chasingPath = [];
+        this.returnPath = [];
+        this.chasingPhase = 'normal'; // 'normal', 'chasing', 'returning'
+        this.detectionRadius = 40; // Distance to detect food
 
         
         // Button dimensions and position relative to container
@@ -1987,7 +1996,8 @@ class SnakeGame {
                     element: foodElement,
                     x: x,
                     y: y,
-                    id: this.startScreenFoodItems.length
+                    id: this.startScreenFoodItems.length,
+                    consumed: false
                 });
             }
         }
@@ -2036,14 +2046,29 @@ class SnakeGame {
     animateStartScreenSnake() {
         if (!this.path || this.path.length === 0) return;
         
+        // Handle different movement phases
+        let currentPath = this.path;
+        let rawIndex = this.snakeAnimationFrame % this.path.length;
+        
+        // Check for nearby food and update movement behavior
+        this.updateSnakeMovement();
+        
+        // Use appropriate path based on current phase
+        if (this.chasingPhase === 'chasing' && this.chasingPath.length > 0) {
+            currentPath = this.chasingPath;
+            rawIndex = Math.min(this.snakeAnimationFrame - this.originalPathIndex, currentPath.length - 1);
+        } else if (this.chasingPhase === 'returning' && this.returnPath.length > 0) {
+            currentPath = this.returnPath;
+            rawIndex = Math.min(this.snakeAnimationFrame - this.originalPathIndex, currentPath.length - 1);
+        }
+        
         // Get current head position with smooth interpolation
-        const rawIndex = this.snakeAnimationFrame % this.path.length;
         const headIndex = Math.floor(rawIndex);
-        const nextHeadIndex = (headIndex + 1) % this.path.length;
+        const nextHeadIndex = Math.min(headIndex + 1, currentPath.length - 1);
         const t = rawIndex - headIndex; // interpolation factor
         
-        const headPos = this.path[headIndex];
-        const nextHeadPos = this.path[nextHeadIndex];
+        const headPos = currentPath[headIndex];
+        const nextHeadPos = currentPath[nextHeadIndex];
         
         // Smooth interpolation between path points
         const interpolatedHead = {
@@ -2196,8 +2221,183 @@ class SnakeGame {
         
         this.snakeAnimationFrame += 1.2; // Animation speed - increased for faster movement
         
+        // Check for food consumption
+        this.checkFoodConsumption(adjustedHeadPos);
+        
         // Continue animation
         requestAnimationFrame(() => this.animateStartScreenSnake());
+    }
+    
+    updateSnakeMovement() {
+        const currentPosition = this.getCurrentSnakePosition();
+        
+        if (this.chasingPhase === 'normal') {
+            // Check for nearby food to chase
+            const nearbyFood = this.findNearestFood(currentPosition);
+            if (nearbyFood && nearbyFood.distance < this.detectionRadius) {
+                this.startChasing(nearbyFood.food, currentPosition);
+            }
+        } else if (this.chasingPhase === 'chasing') {
+            // Check if reached target food
+            if (this.chasingPath.length > 0) {
+                const pathIndex = this.snakeAnimationFrame - this.originalPathIndex;
+                if (pathIndex >= this.chasingPath.length - 1) {
+                    this.consumeFood();
+                }
+            }
+        } else if (this.chasingPhase === 'returning') {
+            // Check if returned to original path
+            if (this.returnPath.length > 0) {
+                const pathIndex = this.snakeAnimationFrame - this.originalPathIndex;
+                if (pathIndex >= this.returnPath.length - 1) {
+                    this.returnToNormalPath();
+                }
+            }
+        }
+    }
+    
+    getCurrentSnakePosition() {
+        if (this.chasingPhase === 'normal') {
+            const rawIndex = this.snakeAnimationFrame % this.path.length;
+            const headIndex = Math.floor(rawIndex);
+            return this.path[headIndex];
+        } else if (this.chasingPath.length > 0 && this.chasingPhase === 'chasing') {
+            const pathIndex = Math.min(this.snakeAnimationFrame - this.originalPathIndex, this.chasingPath.length - 1);
+            return this.chasingPath[Math.floor(pathIndex)];
+        } else if (this.returnPath.length > 0 && this.chasingPhase === 'returning') {
+            const pathIndex = Math.min(this.snakeAnimationFrame - this.originalPathIndex, this.returnPath.length - 1);
+            return this.returnPath[Math.floor(pathIndex)];
+        }
+        return { x: 0, y: 0 };
+    }
+    
+    findNearestFood(position) {
+        let nearest = null;
+        let minDistance = Infinity;
+        
+        for (let food of this.startScreenFoodItems) {
+            if (!food.consumed) {
+                const distance = Math.sqrt(
+                    Math.pow(position.x - food.x, 2) + 
+                    Math.pow(position.y - food.y, 2)
+                );
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearest = { food, distance };
+                }
+            }
+        }
+        
+        return nearest;
+    }
+    
+    startChasing(targetFood, currentPosition) {
+        this.chasingPhase = 'chasing';
+        this.targetFood = targetFood;
+        this.originalPathIndex = this.snakeAnimationFrame;
+        
+        // Create direct path to food
+        this.chasingPath = this.createPathToFood(currentPosition, targetFood);
+    }
+    
+    createPathToFood(start, targetFood) {
+        const path = [];
+        const steps = 20; // Number of steps to reach food
+        
+        for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const x = start.x + (targetFood.x - start.x) * t;
+            const y = start.y + (targetFood.y - start.y) * t;
+            path.push({ x, y });
+        }
+        
+        return path;
+    }
+    
+    consumeFood() {
+        if (this.targetFood) {
+            // Mark food as consumed and hide it
+            this.targetFood.consumed = true;
+            const foodElement = document.getElementById(`startFood-${this.targetFood.id}`);
+            if (foodElement) {
+                foodElement.style.opacity = '0';
+                foodElement.style.transform = 'scale(0)';
+            }
+            
+            // Start returning to original path
+            this.startReturning();
+        }
+    }
+    
+    startReturning() {
+        this.chasingPhase = 'returning';
+        this.originalPathIndex = this.snakeAnimationFrame;
+        
+        // Find closest point on original path to return to
+        const currentPosition = this.getCurrentSnakePosition();
+        const returnPoint = this.findClosestPointOnOriginalPath(currentPosition);
+        
+        // Create path back to original route
+        this.returnPath = this.createPathToFood(currentPosition, returnPoint);
+    }
+    
+    findClosestPointOnOriginalPath(currentPosition) {
+        let closest = this.path[0];
+        let minDistance = Infinity;
+        
+        for (let point of this.path) {
+            const distance = Math.sqrt(
+                Math.pow(currentPosition.x - point.x, 2) + 
+                Math.pow(currentPosition.y - point.y, 2)
+            );
+            if (distance < minDistance) {
+                minDistance = distance;
+                closest = point;
+            }
+        }
+        
+        return closest;
+    }
+    
+    returnToNormalPath() {
+        this.chasingPhase = 'normal';
+        this.targetFood = null;
+        this.chasingPath = [];
+        this.returnPath = [];
+        
+        // Respawn consumed food after a delay
+        setTimeout(() => this.respawnFood(), 3000);
+    }
+    
+    respawnFood() {
+        // Find consumed food and respawn it
+        for (let food of this.startScreenFoodItems) {
+            if (food.consumed) {
+                food.consumed = false;
+                const foodElement = document.getElementById(`startFood-${food.id}`);
+                if (foodElement) {
+                    foodElement.style.opacity = '0.9';
+                    foodElement.style.transform = 'scale(1)';
+                }
+            }
+        }
+    }
+    
+    checkFoodConsumption(headPosition) {
+        // Check if snake head is close enough to any food
+        for (let food of this.startScreenFoodItems) {
+            if (!food.consumed) {
+                const distance = Math.sqrt(
+                    Math.pow(headPosition.x - food.x, 2) + 
+                    Math.pow(headPosition.y - food.y, 2)
+                );
+                
+                // If very close to food while in normal mode, start chasing
+                if (distance < 12 && this.chasingPhase === 'normal') {
+                    this.startChasing(food, headPosition);
+                }
+            }
+        }
     }
     
     updateBodySpots() {
