@@ -557,11 +557,43 @@ class AudioManager {
     playSound(soundName) {
         if (!this.audioContext || this.isMuted || !this.sounds[soundName]) return;
         
+        // Check UI sounds setting for button clicks
+        if (soundName === 'buttonClick' && !this.settings.uiSounds) return;
+        
         try {
-            this.sounds[soundName]();
+            const buffer = this.sounds[soundName]();
+            if (buffer) {
+                this.playBuffer(buffer, 'sfx');
+            }
         } catch (error) {
             console.log('Error playing sound:', error);
         }
+    }
+    
+    // Play an audio buffer with volume control
+    playBuffer(buffer, volumeType = 'sfx') {
+        if (!this.audioContext || !buffer) return;
+        
+        const source = this.audioContext.createBufferSource();
+        const gainNode = this.audioContext.createGain();
+        
+        source.buffer = buffer;
+        source.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        // Set volume based on type and settings
+        const volume = this.getEffectiveVolume(volumeType);
+        gainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
+        
+        source.start();
+        
+        // Clean up after playing
+        source.onended = () => {
+            source.disconnect();
+            gainNode.disconnect();
+        };
+        
+        return source;
     }
     
     // Toggle mute
@@ -715,7 +747,7 @@ class AudioManager {
                 this.settings.uiSounds = !this.settings.uiSounds;
                 uiSoundsToggle.classList.toggle('active', this.settings.uiSounds);
                 this.saveSettings();
-                if (this.settings.uiSounds) this.playPreviewSound('click');
+                if (this.settings.uiSounds) this.playSound('buttonClick');
             });
         }
         
@@ -744,13 +776,13 @@ class AudioManager {
         
         switch (type) {
             case 'click':
-                this.playButtonClick();
+                this.playSound('buttonClick');
                 break;
             case 'music':
                 this.playShortMusicPreview();
                 break;
             case 'eat':
-                this.playEatFood();
+                this.playSound('eatFood');
                 break;
         }
     }
