@@ -205,14 +205,41 @@
     <script src="dev-toggle.js"></script>
     <script src="game.js"></script>
     <script>
-        // Simplified initialization - bypass complex loading system
+        // Proper asset loading integration
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, going directly to start screen');
+            console.log('Page loaded, initializing asset preloader');
             
-            // Wait briefly for fonts to load, then show start screen
-            setTimeout(() => {
-                fadeFromBlackToStart();
-            }, 500);
+            // Initialize the asset loader
+            const assetLoader = new AssetLoader();
+            
+            // Set up progress callback for loading screen
+            assetLoader.setProgressCallback((progress) => {
+                const progressFill = document.getElementById('progressFill');
+                const loadingText = document.getElementById('loadingText');
+                if (progressFill && loadingText) {
+                    progressFill.style.width = progress + '%';
+                    loadingText.textContent = `Loading assets... ${Math.round(progress)}%`;
+                }
+            });
+            
+            // Set up completion callback
+            assetLoader.setCompleteCallback(() => {
+                console.log('All assets loaded, starting game');
+                setTimeout(() => {
+                    fadeFromBlackToStart();
+                }, 500);
+            });
+            
+            // Set up skip callback for cached assets
+            assetLoader.setSkipLoadingCallback(() => {
+                console.log('Assets already cached, starting game quickly');
+                setTimeout(() => {
+                    fadeFromBlackToStart();
+                }, 300);
+            });
+            
+            // Start the asset loading process
+            assetLoader.loadAssets();
         });
     </script>
 </body>

@@ -571,7 +571,7 @@ class AssetLoader {
         });
     }
     
-    async loadAllAssets() {
+    async loadAssets() {
         console.log(`Starting asset loading process...`);
         
         try {
