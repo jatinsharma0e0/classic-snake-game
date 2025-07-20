@@ -527,8 +527,17 @@ class AudioManager {
     playBackgroundMusic() {
         if (!this.audioContext || this.isMuted || !this.onStartScreen) return;
         
+        // Don't restart if already playing
+        if (this.backgroundMusic && this.backgroundMusic.playbackState !== 'finished') {
+            return;
+        }
+        
         if (this.backgroundMusic) {
-            this.backgroundMusic.stop();
+            try {
+                this.backgroundMusic.stop();
+            } catch (e) {
+                // Music was already stopped
+            }
         }
         
         const buffer = this.createBackgroundMusic();
@@ -547,6 +556,13 @@ class AudioManager {
         
         this.backgroundMusic = source;
         this.backgroundMusic.gainNode = gainNode; // Store reference for volume changes
+        
+        // Mark as finished when it ends
+        source.onended = () => {
+            if (this.backgroundMusic === source) {
+                this.backgroundMusic = null;
+            }
+        };
     }
     
     // Stop background music
@@ -644,9 +660,9 @@ class AudioManager {
                 break;
             case 'music':
                 this.settings.musicVolume = volume;
-                if (this.backgroundMusic) {
-                    // Restart music with new volume
-                    this.playBackgroundMusic();
+                if (this.backgroundMusic && this.backgroundMusic.gainNode) {
+                    // Update volume without restarting music
+                    this.backgroundMusic.gainNode.gain.setValueAtTime(this.getEffectiveVolume('music'), this.audioContext.currentTime);
                 }
                 break;
             case 'sfx':

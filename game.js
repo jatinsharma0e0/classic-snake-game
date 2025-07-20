@@ -136,7 +136,7 @@ class SnakeGame {
             this.stonePlayBtn.addEventListener('click', () => {
                 if (this.audioManager) {
                     this.audioManager.resumeAudioContext().then(() => {
-                        // Ensure background music starts if not already playing
+                        // Only start background music if not already playing
                         if (this.audioManager.onStartScreen && !this.audioManager.isMuted && !this.audioManager.backgroundMusic) {
                             this.audioManager.playBackgroundMusic();
                         }
@@ -152,7 +152,7 @@ class SnakeGame {
         this.settingsBtn.addEventListener('click', () => {
             if (this.audioManager) {
                 this.audioManager.resumeAudioContext().then(() => {
-                    // Ensure background music starts if not already playing
+                    // Only start background music if not already playing
                     if (this.audioManager.onStartScreen && !this.audioManager.isMuted && !this.audioManager.backgroundMusic) {
                         this.audioManager.playBackgroundMusic();
                     }
