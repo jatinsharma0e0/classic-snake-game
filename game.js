@@ -1662,32 +1662,41 @@ class SnakeGame {
 
 function fadeFromBlackToStart() {
     const blackOverlay = document.getElementById('blackOverlay');
+    const loadingScreen = document.getElementById('loadingScreen');
     const startScreen = document.getElementById('startScreen');
     
-    // Smooth transition from black to start screen
+    console.log('Starting transition to start screen');
+    
+    // Hide loading screen and black overlay
+    if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 500);
+    }
+    
+    if (blackOverlay) {
+        blackOverlay.style.opacity = '0';
+        setTimeout(() => {
+            blackOverlay.style.display = 'none';
+        }, 500);
+    }
+    
+    // Show start screen with smooth transition
     if (startScreen) {
         startScreen.style.display = 'block';
         startScreen.style.opacity = '0';
         startScreen.style.transition = 'opacity 0.8s ease-in';
-    }
-    
-    if (blackOverlay) {
-        blackOverlay.classList.add('fade-out');
         
         setTimeout(() => {
-            if (startScreen) {
-                startScreen.style.opacity = '1';
-            }
-        }, 200);
-        
-        setTimeout(() => {
-            if (blackOverlay) {
-                blackOverlay.style.display = 'none';
-            }
-        }, 800);
+            startScreen.style.opacity = '1';
+        }, 100);
     }
     
-    initializeGameInstance();
+    // Initialize game instance after transition starts
+    setTimeout(() => {
+        initializeGameInstance();
+    }, 200);
 }
 
 // Global game instance variable
