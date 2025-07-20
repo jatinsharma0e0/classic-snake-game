@@ -707,6 +707,10 @@ class AudioManager {
         switch(type) {
             case 'master':
                 this.settings.masterVolume = volume;
+                // Update background music volume immediately when master volume changes
+                if (this.backgroundMusic && this.backgroundMusic.gainNode) {
+                    this.backgroundMusic.gainNode.gain.setValueAtTime(this.getEffectiveVolume('music'), this.audioContext.currentTime);
+                }
                 break;
             case 'music':
                 this.settings.musicVolume = volume;
