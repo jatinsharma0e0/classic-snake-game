@@ -6,6 +6,7 @@ class AudioManager {
         this.sounds = {};
         this.backgroundMusic = null;
         this.isMuted = false;
+        this.autoPlayAttempted = false;
         
         // Audio settings with defaults
         this.settings = {
@@ -31,6 +32,7 @@ class AudioManager {
         this.initializeAudio();
         this.createSounds();
         this.initializeSettingsUI();
+        this.setupAutoPlay();
     }
     
     async initializeAudio() {
@@ -544,6 +546,7 @@ class AudioManager {
         source.start();
         
         this.backgroundMusic = source;
+        this.backgroundMusic.gainNode = gainNode; // Store reference for volume changes
     }
     
     // Stop background music
@@ -884,6 +887,101 @@ class AudioManager {
             default:
                 this.triggerVibration(100, 0.5); // Default vibration
         }
+    }
+    
+    // Setup autoplay attempts with multiple fallback strategies
+    setupAutoPlay() {
+        // Strategy 1: Try immediate autoplay (works in some browsers)
+        this.attemptAutoPlay();
+        
+        // Strategy 2: Multiple event listeners for earliest possible user interaction
+        const events = ['click', 'touchstart', 'keydown', 'mousemove', 'scroll'];
+        const autoPlayHandler = () => {
+            if (!this.autoPlayAttempted) {
+                this.attemptAutoPlay();
+                // Remove all event listeners after first successful attempt
+                events.forEach(event => {
+                    document.removeEventListener(event, autoPlayHandler);
+                });
+            }
+        };
+        
+        events.forEach(event => {
+            document.addEventListener(event, autoPlayHandler, { once: true, passive: true });
+        });
+        
+        // Strategy 3: Page visibility change (when user returns to tab)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && !this.autoPlayAttempted) {
+                this.attemptAutoPlay();
+            }
+        });
+        
+        // Strategy 4: Delayed attempt after page load
+        setTimeout(() => {
+            if (!this.autoPlayAttempted) {
+                this.attemptAutoPlay();
+            }
+        }, 1000);
+    }
+    
+    // Attempt to start background music automatically
+    async attemptAutoPlay() {
+        if (this.autoPlayAttempted || this.isMuted || !this.onStartScreen) return;
+        
+        try {
+            await this.resumeAudioContext();
+            if (this.audioContext && this.audioContext.state === 'running') {
+                this.playBackgroundMusic();
+                this.autoPlayAttempted = true;
+                console.log('Background music started automatically');
+            }
+        } catch (error) {
+            console.log('Autoplay prevented by browser:', error);
+            // Fallback: try with very low volume first
+            try {
+                const originalVolume = this.settings.musicVolume;
+                this.settings.musicVolume = 1; // Very low volume
+                await this.resumeAudioContext();
+                this.playBackgroundMusic();
+                // Gradually increase volume
+                this.fadeInMusic(originalVolume);
+                this.autoPlayAttempted = true;
+            } catch (fallbackError) {
+                console.log('Fallback autoplay also failed:', fallbackError);
+            }
+        }
+    }
+    
+    // Fade in music to desired volume
+    fadeInMusic(targetVolume) {
+        if (!this.backgroundMusic) return;
+        
+        const duration = 2000; // 2 seconds fade in
+        const steps = 50;
+        const stepDuration = duration / steps;
+        const volumeStep = targetVolume / steps;
+        
+        let currentStep = 0;
+        const fadeInterval = setInterval(() => {
+            currentStep++;
+            const newVolume = Math.min(volumeStep * currentStep, targetVolume);
+            this.settings.musicVolume = newVolume;
+            
+            if (this.backgroundMusic && this.backgroundMusic.buffer) {
+                // Update the gain node if possible
+                const gainNodes = this.backgroundMusic.context.destination.input || [];
+                gainNodes.forEach(node => {
+                    if (node.gain) {
+                        node.gain.setValueAtTime(this.getEffectiveVolume('music'), this.audioContext.currentTime);
+                    }
+                });
+            }
+            
+            if (currentStep >= steps) {
+                clearInterval(fadeInterval);
+            }
+        }, stepDuration);
     }
 
     // Generate and download all game sounds as audio files in a ZIP
