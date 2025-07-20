@@ -137,6 +137,7 @@ class SnakeGame {
                 if (this.audioManager) {
                     this.audioManager.resumeAudioContext();
                     this.audioManager.playSound('buttonClick');
+                    this.audioManager.vibrateForEvent('button_click');
                 }
                 this.showGameScreen();
             });
@@ -146,6 +147,7 @@ class SnakeGame {
         this.settingsBtn.addEventListener('click', () => {
             if (this.audioManager) {
                 this.audioManager.playSound('buttonClick');
+                this.audioManager.vibrateForEvent('button_click');
             }
             this.settingsModal.classList.remove('hidden');
         });
@@ -211,18 +213,21 @@ class SnakeGame {
         this.restartBtn.addEventListener('click', () => {
             if (this.audioManager) {
                 this.audioManager.playSound('buttonClick');
+                this.audioManager.vibrateForEvent('button_click');
             }
             this.restartGame();
         });
         this.restartGameBtn.addEventListener('click', () => {
             if (this.audioManager) {
                 this.audioManager.playSound('buttonClick');
+                this.audioManager.vibrateForEvent('button_click');
             }
             this.restartGame();
         });
         this.backToMenuBtn.addEventListener('click', () => {
             if (this.audioManager) {
                 this.audioManager.playSound('buttonClick');
+                this.audioManager.vibrateForEvent('button_click');
             }
             
             // Unblock interactions when returning to menu
@@ -234,6 +239,7 @@ class SnakeGame {
         this.homeBtn.addEventListener('click', () => {
             if (this.audioManager) {
                 this.audioManager.playSound('buttonClick');
+                this.audioManager.vibrateForEvent('button_click');
             }
             
             // Unblock interactions when returning to menu
@@ -251,6 +257,7 @@ class SnakeGame {
                 
                 if (!isMuted) {
                     this.audioManager.playSound('buttonClick');
+                    this.audioManager.vibrateForEvent('button_click');
                 }
             }
         };
@@ -647,6 +654,7 @@ class SnakeGame {
         // Set audio manager to game screen mode and play game start sound
         this.audioManager && this.audioManager.setScreen(false);
         this.audioManager && this.audioManager.playSound('gameStart');
+        this.audioManager && this.audioManager.vibrateForEvent('button_click');
     }
     
     handleKeyPress(e) {
@@ -803,6 +811,7 @@ class SnakeGame {
         if (head.x < 0 || head.x >= this.tileCountX || 
             head.y < 0 || head.y >= this.tileCountY) {
             this.audioManager && this.audioManager.playSound('collision');
+            this.audioManager && this.audioManager.vibrateForEvent('collision');
             this.gameOver();
             return;
         }
@@ -811,6 +820,7 @@ class SnakeGame {
         for (let i = 1; i < this.snake.length; i++) {
             if (this.snake[i].x === head.x && this.snake[i].y === head.y) {
                 this.audioManager && this.audioManager.playSound('collision');
+                this.audioManager && this.audioManager.vibrateForEvent('collision');
                 this.gameOver();
                 return;
             }
@@ -819,6 +829,7 @@ class SnakeGame {
         // Check obstacle collision
         if (this.checkObstacleCollision(head)) {
             this.audioManager && this.audioManager.playSound('collision');
+            this.audioManager && this.audioManager.vibrateForEvent('collision');
             this.gameOver();
             return;
         }
@@ -839,8 +850,9 @@ class SnakeGame {
             this.updateScoreDisplay();
             this.food = this.generateFood();
             
-            // Play eating sound
+            // Play eating sound and vibration
             this.audioManager && this.audioManager.playSound('eatFood');
+            this.audioManager && this.audioManager.vibrateForEvent('eat_food');
             
             // Update high score if needed
             if (this.score > this.highScore) {
@@ -874,8 +886,9 @@ class SnakeGame {
         // Mark snake as dead (for X X eyes)
         this.isDead = true;
         
-        // Play hit impact sound
+        // Play hit impact sound and game over vibration
         this.audioManager && this.audioManager.playSound('hitImpact');
+        this.audioManager && this.audioManager.vibrateForEvent('game_over');
         
         // Start hit animation
         this.hitAnimation = true;

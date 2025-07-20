@@ -757,8 +757,8 @@ class AudioManager {
                 this.settings.vibration = !this.settings.vibration;
                 vibrationToggle.classList.toggle('active', this.settings.vibration);
                 this.saveSettings();
-                if (this.settings.vibration && navigator.vibrate) {
-                    navigator.vibrate(100); // Test vibration
+                if (this.settings.vibration) {
+                    this.vibrateForEvent('button_click'); // Test vibration with enhanced system
                 }
             });
         }
@@ -810,10 +810,78 @@ class AudioManager {
         oscillator.stop(this.audioContext.currentTime + 0.5);
     }
     
-    // Add vibration support
-    triggerVibration(pattern = 100) {
-        if (this.settings.vibration && navigator.vibrate) {
+    // Enhanced vibration support for all devices (mobile, laptop with gamepad, etc.)
+    triggerVibration(pattern = 100, intensity = 0.5) {
+        if (!this.settings.vibration) return;
+        
+        // Mobile device vibration using navigator.vibrate
+        if (navigator.vibrate) {
             navigator.vibrate(pattern);
+        }
+        
+        // Laptop/Desktop gamepad vibration support
+        this.triggerGamepadVibration(intensity, pattern);
+        
+        // Web Vibration API fallback for supported browsers
+        this.triggerWebVibration(pattern);
+    }
+    
+    // Gamepad vibration for laptops/desktops with connected controllers
+    triggerGamepadVibration(intensity = 0.5, duration = 100) {
+        if (!navigator.getGamepads) return;
+        
+        const gamepads = navigator.getGamepads();
+        for (let i = 0; i < gamepads.length; i++) {
+            const gamepad = gamepads[i];
+            if (gamepad && gamepad.vibrationActuator) {
+                // Use the Gamepad Vibration API
+                gamepad.vibrationActuator.playEffect('dual-rumble', {
+                    startDelay: 0,
+                    duration: duration,
+                    weakMagnitude: intensity * 0.7,
+                    strongMagnitude: intensity
+                }).catch(() => {
+                    // Fallback if vibration fails
+                    console.debug('Gamepad vibration not supported or failed');
+                });
+            }
+        }
+    }
+    
+    // Web Vibration API for browsers that support it
+    triggerWebVibration(pattern) {
+        // Some browsers support vibration on desktop through peripheral devices
+        if ('vibrate' in navigator && typeof navigator.vibrate === 'function') {
+            try {
+                navigator.vibrate(pattern);
+            } catch (e) {
+                console.debug('Web vibration not supported or failed:', e);
+            }
+        }
+    }
+    
+    // Different vibration patterns for different game events
+    vibrateForEvent(eventType) {
+        if (!this.settings.vibration) return;
+        
+        switch (eventType) {
+            case 'button_click':
+                this.triggerVibration(50, 0.3); // Light, quick vibration
+                break;
+            case 'eat_food':
+                this.triggerVibration([100, 50, 100], 0.4); // Double pulse
+                break;
+            case 'collision':
+                this.triggerVibration([200, 100, 200], 0.8); // Strong collision feedback
+                break;
+            case 'game_over':
+                this.triggerVibration([300, 200, 300, 200, 300], 0.7); // Game over sequence
+                break;
+            case 'level_up':
+                this.triggerVibration([80, 80, 80, 80, 80], 0.5); // Rapid success pattern
+                break;
+            default:
+                this.triggerVibration(100, 0.5); // Default vibration
         }
     }
 
