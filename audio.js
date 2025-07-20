@@ -68,216 +68,241 @@ class AudioManager {
     
     // Cheerful button click sound
     createClickSound() {
-        if (!this.audioContext) return;
+        if (!this.audioContext) return null;
         
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
+        const duration = 0.15;
+        const sampleRate = this.audioContext.sampleRate;
+        const length = Math.floor(duration * sampleRate);
+        const buffer = this.audioContext.createBuffer(2, length, sampleRate);
         
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
+        const leftData = buffer.getChannelData(0);
+        const rightData = buffer.getChannelData(1);
         
-        oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(1200, this.audioContext.currentTime + 0.1);
+        for (let i = 0; i < length; i++) {
+            const t = i / sampleRate;
+            const freq = 800 + (400 * t / duration); // Frequency sweep from 800 to 1200Hz
+            const envelope = Math.exp(-t * 6); // Exponential decay
+            const signal = Math.sin(2 * Math.PI * freq * t) * envelope * 0.3;
+            
+            leftData[i] = signal;
+            rightData[i] = signal;
+        }
         
-        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(this.sfxVolume * 0.3, this.audioContext.currentTime + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.15);
-        
-        oscillator.type = 'sine';
-        oscillator.start(this.audioContext.currentTime);
-        oscillator.stop(this.audioContext.currentTime + 0.15);
+        return buffer;
     }
     
     // Upbeat game start fanfare
     createGameStartSound() {
-        if (!this.audioContext) return;
+        if (!this.audioContext) return null;
         
         const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-        const duration = 0.15;
+        const noteDuration = 0.15;
+        const totalDuration = notes.length * noteDuration;
+        const sampleRate = this.audioContext.sampleRate;
+        const length = Math.floor(totalDuration * sampleRate);
+        const buffer = this.audioContext.createBuffer(2, length, sampleRate);
+        
+        const leftData = buffer.getChannelData(0);
+        const rightData = buffer.getChannelData(1);
         
         notes.forEach((freq, index) => {
-            const oscillator = this.audioContext.createOscillator();
-            const gainNode = this.audioContext.createGain();
+            const startSample = Math.floor(index * noteDuration * sampleRate);
+            const endSample = Math.floor((index + 1) * noteDuration * sampleRate);
             
-            oscillator.connect(gainNode);
-            gainNode.connect(this.audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
-            oscillator.type = 'triangle';
-            
-            const startTime = this.audioContext.currentTime + (index * duration);
-            gainNode.gain.setValueAtTime(0, startTime);
-            gainNode.gain.linearRampToValueAtTime(this.sfxVolume * 0.4, startTime + 0.02);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-            
-            oscillator.start(startTime);
-            oscillator.stop(startTime + duration);
+            for (let i = startSample; i < endSample && i < length; i++) {
+                const t = (i - startSample) / sampleRate;
+                const envelope = Math.exp(-t * 4) * (1 - Math.exp(-t * 20)); // Attack + decay
+                const signal = Math.sin(2 * Math.PI * freq * t) * envelope * 0.4;
+                
+                leftData[i] += signal;
+                rightData[i] += signal;
+            }
         });
+        
+        return buffer;
     }
     
     // Subtle movement sound (used occasionally)
     createMoveSound() {
-        if (!this.audioContext) return;
+        if (!this.audioContext) return null;
         
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
-        const filter = this.audioContext.createBiquadFilter();
+        const duration = 0.08;
+        const sampleRate = this.audioContext.sampleRate;
+        const length = Math.floor(duration * sampleRate);
+        const buffer = this.audioContext.createBuffer(2, length, sampleRate);
         
-        oscillator.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
+        const leftData = buffer.getChannelData(0);
+        const rightData = buffer.getChannelData(1);
         
-        oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
-        oscillator.frequency.linearRampToValueAtTime(150, this.audioContext.currentTime + 0.08);
+        for (let i = 0; i < length; i++) {
+            const t = i / sampleRate;
+            const freq = 200 - (50 * t / duration); // Frequency sweep from 200 to 150Hz
+            const envelope = Math.exp(-t * 12); // Quick decay
+            
+            // Sawtooth wave approximation
+            const sawtooth = 2 * (freq * t - Math.floor(freq * t + 0.5));
+            const signal = sawtooth * envelope * 0.1;
+            
+            leftData[i] = signal;
+            rightData[i] = signal;
+        }
         
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(800, this.audioContext.currentTime);
-        
-        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(this.sfxVolume * 0.1, this.audioContext.currentTime + 0.02);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.08);
-        
-        oscillator.type = 'sawtooth';
-        oscillator.start(this.audioContext.currentTime);
-        oscillator.stop(this.audioContext.currentTime + 0.08);
+        return buffer;
     }
     
     // Satisfying eating sound
     createEatSound() {
-        if (!this.audioContext) return;
+        if (!this.audioContext) return null;
         
-        // Create a crunchy eating sound with multiple components
+        const duration = 0.2;
+        const sampleRate = this.audioContext.sampleRate;
+        const length = Math.floor(duration * sampleRate);
+        const buffer = this.audioContext.createBuffer(2, length, sampleRate);
+        
+        const leftData = buffer.getChannelData(0);
+        const rightData = buffer.getChannelData(1);
+        
+        // Create a crunchy eating sound with multiple frequency components
         const frequencies = [400, 600, 800];
         
         frequencies.forEach((freq, index) => {
-            const oscillator = this.audioContext.createOscillator();
-            const gainNode = this.audioContext.createGain();
-            const filter = this.audioContext.createBiquadFilter();
+            const startSample = Math.floor(index * 0.03 * sampleRate);
+            const componentDuration = 0.1;
+            const endSample = Math.floor((index * 0.03 + componentDuration) * sampleRate);
             
-            oscillator.connect(filter);
-            filter.connect(gainNode);
-            gainNode.connect(this.audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(freq * 0.5, this.audioContext.currentTime + 0.1);
-            
-            filter.type = 'bandpass';
-            filter.frequency.setValueAtTime(freq * 1.5, this.audioContext.currentTime);
-            
-            const startTime = this.audioContext.currentTime + (index * 0.03);
-            gainNode.gain.setValueAtTime(0, startTime);
-            gainNode.gain.linearRampToValueAtTime(this.sfxVolume * 0.3, startTime + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 0.1);
-            
-            oscillator.type = 'square';
-            oscillator.start(startTime);
-            oscillator.stop(startTime + 0.1);
+            for (let i = startSample; i < endSample && i < length; i++) {
+                const t = (i - startSample) / sampleRate;
+                const freqSweep = freq * (1 - 0.5 * t / componentDuration); // Frequency drops by half
+                const envelope = Math.exp(-t * 10); // Quick decay
+                
+                // Square wave approximation
+                const square = Math.sign(Math.sin(2 * Math.PI * freqSweep * t));
+                const signal = square * envelope * 0.3;
+                
+                leftData[i] += signal;
+                rightData[i] += signal;
+            }
         });
+        
+        return buffer;
     }
     
     // Quick tongue flick sound
     createTongueSound() {
-        if (!this.audioContext) return;
+        if (!this.audioContext) return null;
         
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
+        const duration = 0.05;
+        const sampleRate = this.audioContext.sampleRate;
+        const length = Math.floor(duration * sampleRate);
+        const buffer = this.audioContext.createBuffer(2, length, sampleRate);
         
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
+        const leftData = buffer.getChannelData(0);
+        const rightData = buffer.getChannelData(1);
         
-        oscillator.frequency.setValueAtTime(1200, this.audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(800, this.audioContext.currentTime + 0.05);
+        for (let i = 0; i < length; i++) {
+            const t = i / sampleRate;
+            const freq = 1200 * Math.exp(-t * 8); // Exponential frequency drop from 1200 to ~800Hz
+            const envelope = Math.exp(-t * 20); // Very quick decay
+            const signal = Math.sin(2 * Math.PI * freq * t) * envelope * 0.2;
+            
+            leftData[i] = signal;
+            rightData[i] = signal;
+        }
         
-        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(this.sfxVolume * 0.2, this.audioContext.currentTime + 0.005);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.05);
-        
-        oscillator.type = 'sine';
-        oscillator.start(this.audioContext.currentTime);
-        oscillator.stop(this.audioContext.currentTime + 0.05);
+        return buffer;
     }
     
     // Funny collision sound
     createCollisionSound() {
-        if (!this.audioContext) return;
+        if (!this.audioContext) return null;
         
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
-        const filter = this.audioContext.createBiquadFilter();
+        const duration = 0.2;
+        const sampleRate = this.audioContext.sampleRate;
+        const length = Math.floor(duration * sampleRate);
+        const buffer = this.audioContext.createBuffer(2, length, sampleRate);
         
-        oscillator.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
+        const leftData = buffer.getChannelData(0);
+        const rightData = buffer.getChannelData(1);
         
-        oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
-        oscillator.frequency.linearRampToValueAtTime(100, this.audioContext.currentTime + 0.2);
+        for (let i = 0; i < length; i++) {
+            const t = i / sampleRate;
+            const freq = 200 - (100 * t / duration); // Linear frequency drop from 200 to 100Hz
+            const envelope = Math.exp(-t * 5); // Medium decay
+            
+            // Sawtooth wave approximation
+            const sawtooth = 2 * (freq * t - Math.floor(freq * t + 0.5));
+            const signal = sawtooth * envelope * 0.4;
+            
+            leftData[i] = signal;
+            rightData[i] = signal;
+        }
         
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(400, this.audioContext.currentTime);
-        
-        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(this.sfxVolume * 0.4, this.audioContext.currentTime + 0.02);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.2);
-        
-        oscillator.type = 'sawtooth';
-        oscillator.start(this.audioContext.currentTime);
-        oscillator.stop(this.audioContext.currentTime + 0.2);
+        return buffer;
     }
     
     // Dramatic hit impact sound
     createHitSound() {
-        if (!this.audioContext) return;
+        if (!this.audioContext) return null;
         
-        // Create a more dramatic version of collision
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
-        const filter = this.audioContext.createBiquadFilter();
+        const duration = 0.3;
+        const sampleRate = this.audioContext.sampleRate;
+        const length = Math.floor(duration * sampleRate);
+        const buffer = this.audioContext.createBuffer(2, length, sampleRate);
         
-        oscillator.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
+        const leftData = buffer.getChannelData(0);
+        const rightData = buffer.getChannelData(1);
         
-        oscillator.frequency.setValueAtTime(150, this.audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(50, this.audioContext.currentTime + 0.3);
+        for (let i = 0; i < length; i++) {
+            const t = i / sampleRate;
+            const freq = 150 * Math.exp(-t * 3.5); // Exponential frequency drop from 150 to ~50Hz
+            const envelope = Math.exp(-t * 3.3); // Slower decay for dramatic effect
+            
+            // Square wave approximation
+            const square = Math.sign(Math.sin(2 * Math.PI * freq * t));
+            const signal = square * envelope * 0.6;
+            
+            leftData[i] = signal;
+            rightData[i] = signal;
+        }
         
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(300, this.audioContext.currentTime);
-        
-        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(this.sfxVolume * 0.6, this.audioContext.currentTime + 0.05);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.3);
-        
-        oscillator.type = 'square';
-        oscillator.start(this.audioContext.currentTime);
-        oscillator.stop(this.audioContext.currentTime + 0.3);
+        return buffer;
     }
     
     // Lighthearted game over sound
     createGameOverSound() {
-        if (!this.audioContext) return;
+        if (!this.audioContext) return null;
         
         // Descending musical phrase
         const notes = [523.25, 466.16, 415.30, 369.99]; // C5, Bb4, Ab4, F#4
-        const duration = 0.3;
+        const noteDuration = 0.3;
+        const noteSpacing = 0.21; // 70% overlap
+        const totalDuration = notes.length * noteSpacing + noteDuration;
+        const sampleRate = this.audioContext.sampleRate;
+        const length = Math.floor(totalDuration * sampleRate);
+        const buffer = this.audioContext.createBuffer(2, length, sampleRate);
+        
+        const leftData = buffer.getChannelData(0);
+        const rightData = buffer.getChannelData(1);
         
         notes.forEach((freq, index) => {
-            const oscillator = this.audioContext.createOscillator();
-            const gainNode = this.audioContext.createGain();
+            const startSample = Math.floor(index * noteSpacing * sampleRate);
+            const endSample = Math.floor((index * noteSpacing + noteDuration) * sampleRate);
             
-            oscillator.connect(gainNode);
-            gainNode.connect(this.audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
-            oscillator.type = 'triangle';
-            
-            const startTime = this.audioContext.currentTime + (index * duration * 0.7);
-            gainNode.gain.setValueAtTime(0, startTime);
-            gainNode.gain.linearRampToValueAtTime(this.sfxVolume * 0.3, startTime + 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-            
-            oscillator.start(startTime);
-            oscillator.stop(startTime + duration);
+            for (let i = startSample; i < endSample && i < length; i++) {
+                const t = (i - startSample) / sampleRate;
+                const envelope = Math.exp(-t * 3) * (1 - Math.exp(-t * 15)); // Attack + decay
+                
+                // Triangle wave approximation
+                const trianglePhase = (freq * t) % 1;
+                const triangle = trianglePhase < 0.5 ? 4 * trianglePhase - 1 : 3 - 4 * trianglePhase;
+                const signal = triangle * envelope * 0.3;
+                
+                leftData[i] += signal;
+                rightData[i] += signal;
+            }
         });
+        
+        return buffer;
     }
     
     // Create whimsical cartoon-style background music
