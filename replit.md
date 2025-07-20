@@ -123,14 +123,16 @@ The application is designed for real-time interactive experiences with 3D graphi
 
 ## Recent Changes
 
-**Sound Download Feature Added (July 20, 2025):**
-- Added download button in sound settings to export all game audio files
-- Integrated JSZip library for proper ZIP file creation and compression
-- Created comprehensive audio export system that generates WAV files from Web Audio API
-- Download includes all 9 game sounds: button clicks, game start, snake movement, eating, tongue flick, collision, impact, game over, and background music
-- ZIP package includes README.txt with file descriptions and generation timestamp
-- Added loading state and error handling for download process
-- Files are properly named with "jungle_snake_" prefix for easy identification
+**Comprehensive Audio Control System Added (July 20, 2025):**
+- Implemented Master Volume, Music Volume, and SFX Volume sliders (0-100%) with live preview
+- Added persistent audio settings saved in localStorage across sessions
+- Created real-time volume adjustment with immediate audio feedback
+- Integrated UI Click Sounds toggle and Mobile Vibration toggle for enhanced control
+- Enhanced sound download feature to export all 9 game sounds as WAV files in ZIP format
+- All audio functions now use effective volume calculation (master × specific volume)
+- Added preview sounds when adjusting sliders: click sound for master/SFX, music chord for music
+- Modern toggle switches with smooth animations and golden jungle theme styling
+- Audio settings automatically load on game start and persist across browser sessions
 
 **Replit Migration Completed (July 20, 2025):**
 - Successfully migrated Snake game project from Replit Agent to Replit environment

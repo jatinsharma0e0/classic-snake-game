@@ -6,9 +6,19 @@ class AudioManager {
         this.sounds = {};
         this.backgroundMusic = null;
         this.isMuted = false;
-        this.masterVolume = 0.7;
-        this.musicVolume = 0.3;
-        this.sfxVolume = 0.5;
+        
+        // Audio settings with defaults
+        this.settings = {
+            masterVolume: 100,
+            musicVolume: 70,
+            sfxVolume: 80,
+            uiSounds: true,
+            vibration: true
+        };
+        
+        // Load settings from localStorage
+        this.loadSettings();
+        
         this.onStartScreen = true; // Track which screen we're on
         
         // Performance optimizations
@@ -20,6 +30,7 @@ class AudioManager {
         
         this.initializeAudio();
         this.createSounds();
+        this.initializeSettingsUI();
     }
     
     async initializeAudio() {
@@ -527,7 +538,7 @@ class AudioManager {
         source.connect(gainNode);
         gainNode.connect(this.audioContext.destination);
         
-        gainNode.gain.setValueAtTime(this.musicVolume, this.audioContext.currentTime);
+        gainNode.gain.setValueAtTime(this.getEffectiveVolume('music'), this.audioContext.currentTime);
         source.loop = true;
         source.start();
         
@@ -581,24 +592,196 @@ class AudioManager {
         }
     }
     
-    // Set volume levels
+    // Set volume levels (legacy method for backwards compatibility)
     setVolume(type, volume) {
         volume = Math.max(0, Math.min(1, volume));
+        this.updateVolume(type, Math.round(volume * 100));
+    }
+    
+    // Update volume levels (new method using percentage)
+    updateVolume(type, volume) {
+        volume = Math.max(0, Math.min(100, volume));
         
         switch(type) {
             case 'master':
-                this.masterVolume = volume;
+                this.settings.masterVolume = volume;
                 break;
             case 'music':
-                this.musicVolume = volume;
+                this.settings.musicVolume = volume;
                 if (this.backgroundMusic) {
                     // Restart music with new volume
                     this.playBackgroundMusic();
                 }
                 break;
             case 'sfx':
-                this.sfxVolume = volume;
+                this.settings.sfxVolume = volume;
                 break;
+        }
+        this.saveSettings();
+    }
+    
+    // Load settings from localStorage
+    loadSettings() {
+        const savedSettings = localStorage.getItem('jungleSnakeAudioSettings');
+        if (savedSettings) {
+            try {
+                const parsed = JSON.parse(savedSettings);
+                this.settings = { ...this.settings, ...parsed };
+            } catch (error) {
+                console.log('Error loading audio settings:', error);
+            }
+        }
+    }
+    
+    // Save settings to localStorage
+    saveSettings() {
+        try {
+            localStorage.setItem('jungleSnakeAudioSettings', JSON.stringify(this.settings));
+        } catch (error) {
+            console.log('Error saving audio settings:', error);
+        }
+    }
+    
+    // Get effective volume (master * specific)
+    getEffectiveVolume(type) {
+        const master = this.settings.masterVolume / 100;
+        const specific = this.settings[type + 'Volume'] / 100;
+        return master * specific;
+    }
+    
+    // Initialize Settings UI
+    initializeSettingsUI() {
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.setupSettingsUI());
+        } else {
+            this.setupSettingsUI();
+        }
+    }
+    
+    // Setup Settings UI Elements
+    setupSettingsUI() {
+        // Volume sliders
+        const masterSlider = document.getElementById('masterVolume');
+        const musicSlider = document.getElementById('musicVolume');
+        const sfxSlider = document.getElementById('sfxVolume');
+        
+        // Volume value displays
+        const masterValue = document.getElementById('masterVolumeValue');
+        const musicValue = document.getElementById('musicVolumeValue');
+        const sfxValue = document.getElementById('sfxVolumeValue');
+        
+        // Toggle switches
+        const uiSoundsToggle = document.getElementById('uiSoundsToggle');
+        const vibrationToggle = document.getElementById('vibrationToggle');
+        
+        if (masterSlider && musicSlider && sfxSlider) {
+            // Set initial values
+            masterSlider.value = this.settings.masterVolume;
+            musicSlider.value = this.settings.musicVolume;
+            sfxSlider.value = this.settings.sfxVolume;
+            
+            if (masterValue) masterValue.textContent = this.settings.masterVolume + '%';
+            if (musicValue) musicValue.textContent = this.settings.musicVolume + '%';
+            if (sfxValue) sfxValue.textContent = this.settings.sfxVolume + '%';
+            
+            // Add event listeners
+            masterSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                this.updateVolume('master', value);
+                if (masterValue) masterValue.textContent = value + '%';
+                this.playPreviewSound('click');
+            });
+            
+            musicSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                this.updateVolume('music', value);
+                if (musicValue) musicValue.textContent = value + '%';
+                this.playPreviewSound('music');
+            });
+            
+            sfxSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                this.updateVolume('sfx', value);
+                if (sfxValue) sfxValue.textContent = value + '%';
+                this.playPreviewSound('eat');
+            });
+        }
+        
+        // Setup toggle switches
+        if (uiSoundsToggle) {
+            uiSoundsToggle.classList.toggle('active', this.settings.uiSounds);
+            uiSoundsToggle.addEventListener('click', () => {
+                this.settings.uiSounds = !this.settings.uiSounds;
+                uiSoundsToggle.classList.toggle('active', this.settings.uiSounds);
+                this.saveSettings();
+                if (this.settings.uiSounds) this.playPreviewSound('click');
+            });
+        }
+        
+        if (vibrationToggle) {
+            vibrationToggle.classList.toggle('active', this.settings.vibration);
+            vibrationToggle.addEventListener('click', () => {
+                this.settings.vibration = !this.settings.vibration;
+                vibrationToggle.classList.toggle('active', this.settings.vibration);
+                this.saveSettings();
+                if (this.settings.vibration && navigator.vibrate) {
+                    navigator.vibrate(100); // Test vibration
+                }
+            });
+        }
+    }
+    
+    // Play preview sound for live feedback
+    playPreviewSound(type) {
+        if (!this.audioContext) return;
+        
+        // Throttle preview sounds to prevent spam
+        const now = Date.now();
+        const lastPlay = this.lastPlayTime.get('preview') || 0;
+        if (now - lastPlay < 150) return; // 150ms throttle
+        this.lastPlayTime.set('preview', now);
+        
+        switch (type) {
+            case 'click':
+                this.playButtonClick();
+                break;
+            case 'music':
+                this.playShortMusicPreview();
+                break;
+            case 'eat':
+                this.playEatFood();
+                break;
+        }
+    }
+    
+    // Play short music preview
+    playShortMusicPreview() {
+        if (!this.audioContext) return;
+        
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        // Play a pleasant chord (C major)
+        oscillator.frequency.setValueAtTime(523.25, this.audioContext.currentTime); // C5
+        oscillator.type = 'triangle';
+        
+        const volume = this.getEffectiveVolume('music');
+        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume * 0.3, this.audioContext.currentTime + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.5);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 0.5);
+    }
+    
+    // Add vibration support
+    triggerVibration(pattern = 100) {
+        if (this.settings.vibration && navigator.vibrate) {
+            navigator.vibrate(pattern);
         }
     }
 
