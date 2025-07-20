@@ -378,7 +378,7 @@ class SnakeGame {
         
         imageNames.forEach(name => {
             const img = new Image();
-            img.src = `assets/obstacles/${name}.png`;
+            img.src = `assets/obstacles/${name}.webp`;
             this.obstacleImages[name] = img;
         });
     }
@@ -400,11 +400,11 @@ class SnakeGame {
         
         // Map greeny sprites to game sprite names (simplified for rotation-based rendering)
         const spriteMapping = {
-            'head_up': 'assets/snake/skins/greeny/head.png',
-            'dead_head': 'assets/snake/skins/greeny/dead_head.png',
-            'body_horizontal': 'assets/snake/skins/greeny/body_straight.png',
-            'body_turn_left_down': 'assets/snake/skins/greeny/body_turn.png',
-            'tail_up': 'assets/snake/skins/greeny/tail.png'
+            'head_up': 'assets/snake/skins/greeny/head.webp',
+            'dead_head': 'assets/snake/skins/greeny/dead_head.webp',
+            'body_horizontal': 'assets/snake/skins/greeny/body_straight.webp',
+            'body_turn_left_down': 'assets/snake/skins/greeny/body_turn.webp',
+            'tail_up': 'assets/snake/skins/greeny/tail.webp'
         };
         
         // Load each sprite
@@ -416,7 +416,7 @@ class SnakeGame {
         
         // Load the food sprite
         this.appleImage = new Image();
-        this.appleImage.src = 'assets/snake/skins/greeny/food.png';
+        this.appleImage.src = 'assets/snake/skins/greeny/food.webp';
         
         this.defaultSkinLoaded = true;
     }

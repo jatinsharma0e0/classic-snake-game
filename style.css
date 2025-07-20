@@ -51,7 +51,7 @@ body {
     left: 0;
     width: 100%;
     height: 100vh;
-    background: url('assets/backgrounds/jungle.jpg') center/cover no-repeat;
+    background: url('assets/backgrounds/jungle.webp') center/cover no-repeat;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -115,7 +115,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 15px;
-    background-image: url('assets/backgrounds/title_screen_bg.png');
+    background-image: url('assets/backgrounds/title_screen_bg.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -292,7 +292,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 15px;
-    background-image: url('assets/backgrounds/title_screen_bg.png');
+    background-image: url('assets/backgrounds/title_screen_bg.webp');
     background-size: 100% 140%;
     background-repeat: no-repeat;
     background-position: center;
@@ -443,7 +443,7 @@ body {
 }
 
 .game-over-board {
-    background: url('assets/backgrounds/game_over_board.png') no-repeat center center;
+    background: url('assets/backgrounds/game_over_board.webp') no-repeat center center;
     background-size: contain;
     width: 600px;
     height: 500px;
@@ -531,12 +531,12 @@ body {
 }
 
 .retry-stone-button {
-    background: url('assets/buttons/retry_stone.png') no-repeat center center;
+    background: url('assets/buttons/retry_stone.webp') no-repeat center center;
     background-size: contain;
 }
 
 .home-stone-button {
-    background: url('assets/buttons/home_stone.png') no-repeat center center;
+    background: url('assets/buttons/home_stone.webp') no-repeat center center;
     background-size: contain;
 }
 

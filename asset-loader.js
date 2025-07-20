@@ -32,44 +32,45 @@ class AssetLoader {
         
         // Core game assets
         this.coreAssets = [
-            'assets/snake/snake_icon.png',
-            'assets/backgrounds/log.png',
-            'assets/buttons/play_wooden.png',
-            'assets/buttons/settings.png',
-            'assets/backgrounds/title_screen_bg.png',
-            'assets/backgrounds/jungle.jpg',
+            'assets/snake/snake_icon.webp',
+            'assets/backgrounds/log.webp',
+            'assets/buttons/play_wooden.webp',
+            'assets/buttons/settings.webp',
+            'assets/backgrounds/title_screen_bg.webp',
+            'assets/backgrounds/jungle.webp',
             'assets/backgrounds/grass_01.webp'
         ];
         
         // Obstacle assets
         this.obstacleAssets = [
-            'assets/obstacles/rock_1_block.png',
-            'assets/obstacles/rock_2_blocks.png',
-            'assets/obstacles/rock_4_blocks.png',
-            'assets/obstacles/rock_1_block_alt.png'
+            'assets/obstacles/rock_1_block.webp',
+            'assets/obstacles/rock_2_blocks.webp',
+            'assets/obstacles/rock_4_blocks.webp',
+            'assets/obstacles/rock_1_block_alt.webp'
         ];
         
         // Default greeny skin assets
         this.greenySkinAssets = [
-            'assets/snake/skins/greeny/head.png',
-            'assets/snake/skins/greeny/body_straight.png',
-            'assets/snake/skins/greeny/body_turn.png',
-            'assets/snake/skins/greeny/tail.png',
-            'assets/snake/skins/greeny/food.png',
-            'assets/snake/skins/greeny/dead_head.png'
+            'assets/snake/skins/greeny/head.webp',
+            'assets/snake/skins/greeny/body_straight.webp',
+            'assets/snake/skins/greeny/body_turn.webp',
+            'assets/snake/skins/greeny/tail.webp',
+            'assets/snake/skins/greeny/food.webp',
+            'assets/snake/skins/greeny/dead_head.webp'
         ];
         
-        // Audio assets - Temporarily disabled due to corrupted files
+        // Audio assets - Now optimized MP3 format
         this.audioAssets = [
-            // 'assets/audio/background_music.mp3',
-            // 'assets/audio/button_click.mp3',
-            // 'assets/audio/game_start.mp3',
-            // 'assets/audio/snake_move.mp3',
-            // 'assets/audio/eat_food.mp3',
-            // 'assets/audio/tongue_flick.mp3',
-            // 'assets/audio/collision.mp3',
-            // 'assets/audio/hit_impact.mp3',
-            // 'assets/audio/game_over.mp3'
+            'assets/audio/jungle_snake_background_music.mp3',
+            'assets/audio/jungle_snake_button_click.mp3',
+            'assets/audio/jungle_snake_game_start.mp3',
+            'assets/audio/jungle_snake_snake_move.mp3',
+            'assets/audio/jungle_snake_eat_food.mp3',
+            'assets/audio/jungle_snake_tongue_flick.mp3',
+            'assets/audio/jungle_snake_collision.mp3',
+            'assets/audio/jungle_snake_hit_impact.mp3',
+            'assets/audio/jungle_snake_game_over.mp3',
+            'assets/audio/jungle_snake_hover.mp3'
         ];
         
         // Combine all assets (fonts first for priority loading)
