@@ -1,0 +1,155 @@
+🎮 Task: Implement Full Offline Support for the Game
+We want to ensure the game is fully playable offline, after the first load. The goal is that players can visit the site once, download everything they need, and continue playing seamlessly even when disconnected from the internet.
+
+🎯 Objectives
+✅ Make the entire game (HTML, CSS, JS, images, audio, fonts, etc.) available offline after initial load.
+✅ Cache all necessary assets efficiently and serve them from local storage/cache when offline.
+✅ Detect when the player is offline and still allow them to play without any visible errors.
+✅ Ensure cached content updates gracefully when the game is updated (cache invalidation).
+✅ Maintain optimal performance — no redundant downloads or slowdowns.
+
+📄 Requirements
+📁 Assets to Cache
+HTML
+
+/index.html
+
+Other pages if any.
+
+CSS & JS
+
+All your game scripts and stylesheets.
+
+Images
+
+All .webp, .png (if transparent), .jpg used in the game, including:
+
+Spritesheets
+
+Buttons
+
+Backgrounds
+
+Icons
+
+Audio
+
+All .mp3 files (background music & sound effects).
+
+Fonts
+
+Any .woff2, .ttf, or web fonts.
+
+Other
+
+Any JSON/config/data files required at runtime.
+
+🚀 Strategy
+🔷 Service Worker
+Implement a Service Worker (SW) that intercepts network requests and serves cached assets when offline.
+It should:
+
+Cache all required assets during installation.
+
+Serve assets from cache if network fails.
+
+Detect and update cache when assets change (cache-busting).
+
+🛠 Technical Guidelines
+Service Worker Registration
+Register a SW from your main JS:
+
+js
+Copy
+Edit
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js').then(() => {
+    console.log('Service Worker registered and ready for offline use.');
+  }).catch(err => {
+    console.error('Service Worker registration failed:', err);
+  });
+}
+Service Worker Script (service-worker.js)
+Example Skeleton
+js
+Copy
+Edit
+const CACHE_NAME = 'snake-game-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/styles.css',
+  '/game.js',
+  '/assets/audio/...',
+  '/assets/images/...',
+  '/assets/fonts/...',
+];
+
+// Install event → cache files
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(urlsToCache);
+    })
+  );
+});
+
+// Fetch event → serve from cache if available
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
+  );
+});
+
+// Activate event → clean up old caches
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.filter(name => name !== CACHE_NAME)
+                  .map(name => caches.delete(name))
+      );
+    })
+  );
+});
+💡 Best Practices
+✅ Use a versioned CACHE_NAME and update it when assets change.
+✅ Use a tool (e.g., Workbox, webpack plugin) to generate the asset list dynamically.
+✅ Consider showing a notification when new content is available and prompt the user to refresh.
+✅ Implement fallback HTML or a message if something is missing.
+✅ Optionally show an “Offline Mode” banner or badge when offline.
+✅ Test thoroughly in DevTools → Application → Service Workers & Offline mode.
+
+🧪 Testing
+🔷 In Chrome DevTools → Application → check “Offline”
+🔷 Verify all assets load properly when disconnected.
+🔷 Verify new version is fetched when you deploy updates.
+🔷 Confirm no broken audio/images/fonts when offline.
+
+📂 Deliverables
+✅ service-worker.js fully implemented & tested
+✅ All assets cached & available offline
+✅ Backup of current production files before deploying
+✅ Documentation or README explaining:
+
+How the SW works
+
+How to update cache when deploying new assets
+
+How to disable/re-enable SW if needed
+
+🪄 Suggested Tools
+Workbox — automates much of the SW setup
+
+Chrome DevTools — test & debug offline mode
+
+Lighthouse — audit offline capabilities
+
+Optional: webpack + Workbox plugin
+
+📌 Optional Enhancements
+✨ Show a progress bar for asset caching on first load.
+✨ Allow the user to manually refresh cached content if desired.
+✨ Preload & warm up the cache with low priority for non-critical assets.
