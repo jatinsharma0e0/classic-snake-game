@@ -35,10 +35,14 @@ class AssetLoader {
             'assets/snake/snake_icon.webp',
             'assets/backgrounds/log.webp',
             'assets/buttons/play_wooden.webp',
+            'assets/buttons/play_default.webp',
             'assets/buttons/settings.webp',
             'assets/backgrounds/title_screen_bg.webp',
             'assets/backgrounds/jungle.webp',
-            'assets/backgrounds/grass_01.webp'
+            'assets/backgrounds/grass_01.webp',
+            'assets/backgrounds/grass_02.webp',
+            'assets/backgrounds/grass_03.webp',
+            'assets/backgrounds/game_over_board.webp'
         ];
         
         // Obstacle assets
@@ -56,7 +60,15 @@ class AssetLoader {
             'assets/snake/skins/greeny/body_turn.webp',
             'assets/snake/skins/greeny/tail.webp',
             'assets/snake/skins/greeny/food.webp',
-            'assets/snake/skins/greeny/dead_head.webp'
+            'assets/snake/skins/greeny/dead_head.webp',
+            'assets/snake/sprites/greeny/greeny_spritesheet.webp'
+        ];
+        
+        // Button and UI assets
+        this.buttonAssets = [
+            'assets/buttons/home_food_icon.webp',
+            'assets/buttons/home_stone.webp',
+            'assets/buttons/retry_stone.webp'
         ];
         
         // Audio assets - Now optimized MP3 format
@@ -79,6 +91,7 @@ class AssetLoader {
             ...this.coreAssets,
             ...this.obstacleAssets,
             ...this.greenySkinAssets,
+            ...this.buttonAssets,
             ...this.audioAssets
         ];
         
@@ -616,6 +629,7 @@ class AssetLoader {
                 ...this.coreAssets,
                 ...this.obstacleAssets,
                 ...this.greenySkinAssets,
+                ...this.buttonAssets,
                 ...this.audioAssets
             ];
             const otherPromises = otherAssets.map(src => this.loadAsset(src));
