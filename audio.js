@@ -577,7 +577,7 @@ class AudioManager {
         }
     }
 
-    // Generate and download all game sounds as audio files
+    // Generate and download all game sounds as audio files in a ZIP
     async downloadAllSounds() {
         if (!this.audioContext) {
             await this.initializeAudio();
@@ -597,28 +597,69 @@ class AudioManager {
         ];
 
         try {
-            await this.downloadSoundsIndividually(soundList);
-            alert('All game sounds have been downloaded successfully!');
+            await this.downloadSoundsAsZip(soundList);
+            alert('All game sounds have been downloaded as a ZIP file!');
         } catch (error) {
             console.error('Error downloading sounds:', error);
             alert('Error downloading sounds. Please try again.');
         }
     }
 
-    // Download sounds individually
-    async downloadSoundsIndividually(soundList) {
+    // Download all sounds as a ZIP file
+    async downloadSoundsAsZip(soundList) {
+        // Check if JSZip is available
+        if (typeof JSZip === 'undefined') {
+            console.error('JSZip library not loaded');
+            alert('ZIP creation library not available. Please try again.');
+            return;
+        }
+
+        const zip = new JSZip();
+        
+        // Create README file
+        let readmeContent = "Jungle Snake Game - Audio Files\n";
+        readmeContent += "================================\n\n";
+        readmeContent += "This ZIP contains all the audio files used in the Jungle Snake game.\n";
+        readmeContent += "All sounds are generated using Web Audio API for a cheerful, nature-themed experience.\n\n";
+        readmeContent += "Files included:\n";
+        
+        // Generate and add audio files to ZIP
         for (const sound of soundList) {
             try {
                 const buffer = sound.generator();
                 if (buffer) {
                     const blob = await this.audioBufferToWav(buffer);
-                    this.downloadBlob(blob, `jungle_snake_${sound.name}.wav`);
-                    // Small delay between downloads to avoid overwhelming the browser
-                    await new Promise(resolve => setTimeout(resolve, 300));
+                    const fileName = `jungle_snake_${sound.name}.wav`;
+                    zip.file(fileName, blob);
+                    readmeContent += `- ${fileName}: ${sound.description}\n`;
                 }
             } catch (error) {
                 console.error(`Error generating ${sound.name}:`, error);
+                readmeContent += `- ${sound.name}.wav: Error generating sound\n`;
             }
+        }
+        
+        readmeContent += "\nGenerated on: " + new Date().toLocaleString();
+        readmeContent += "\nTotal sounds: " + soundList.length;
+        readmeContent += "\n\nEnjoy your Jungle Snake game sounds!";
+        
+        // Add README to ZIP
+        zip.file("README.txt", readmeContent);
+        
+        try {
+            // Generate ZIP file and download
+            const zipBlob = await zip.generateAsync({
+                type: "blob",
+                compression: "DEFLATE",
+                compressionOptions: {
+                    level: 6
+                }
+            });
+            
+            this.downloadBlob(zipBlob, 'jungle_snake_sounds.zip');
+        } catch (error) {
+            console.error('Error creating ZIP file:', error);
+            alert('Error creating ZIP file. Please try again.');
         }
     }
 

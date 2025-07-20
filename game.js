@@ -172,7 +172,7 @@ class SnakeGame {
             });
         }
 
-        // Download sounds button
+        // Settings download sounds button
         const downloadSoundsBtn = document.getElementById('downloadSoundsBtn');
         if (downloadSoundsBtn) {
             downloadSoundsBtn.addEventListener('click', async () => {
