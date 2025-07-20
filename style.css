@@ -1216,6 +1216,36 @@ body {
     color: #ff6b6b;
 }
 
+.download-button {
+    background: rgba(74, 144, 226, 0.2);
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    color: #4a90e2;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.download-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.download-button:hover {
+    background: rgba(74, 144, 226, 0.3);
+    transform: scale(1.05);
+    border-color: rgba(74, 144, 226, 0.5);
+}
+
+.download-button:active {
+    transform: scale(0.95);
+}
+
 .skin-selection-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));

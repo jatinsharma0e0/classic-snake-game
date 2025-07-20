@@ -171,6 +171,29 @@ class SnakeGame {
                 }
             });
         }
+
+        // Download sounds button
+        const downloadSoundsBtn = document.getElementById('downloadSoundsBtn');
+        if (downloadSoundsBtn) {
+            downloadSoundsBtn.addEventListener('click', async () => {
+                if (this.audioManager) {
+                    this.audioManager.playSound('buttonClick');
+                    // Show loading state
+                    downloadSoundsBtn.disabled = true;
+                    downloadSoundsBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Processing...';
+                    
+                    try {
+                        await this.audioManager.downloadAllSounds();
+                    } catch (error) {
+                        console.error('Download failed:', error);
+                    } finally {
+                        // Restore button state
+                        downloadSoundsBtn.disabled = false;
+                        downloadSoundsBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download';
+                    }
+                }
+            });
+        }
         
         // Settings skin selection
         const skinOptions = document.querySelectorAll('.skin-selection-grid .skin-option');

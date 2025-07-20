@@ -576,6 +576,107 @@ class AudioManager {
                 break;
         }
     }
+
+    // Generate and download all game sounds as audio files
+    async downloadAllSounds() {
+        if (!this.audioContext) {
+            await this.initializeAudio();
+            await this.resumeAudioContext();
+        }
+        
+        const soundList = [
+            { name: 'button_click', generator: () => this.createClickSound(), description: 'Button Click Sound' },
+            { name: 'game_start', generator: () => this.createGameStartSound(), description: 'Game Start Fanfare' },
+            { name: 'snake_move', generator: () => this.createMoveSound(), description: 'Snake Movement' },
+            { name: 'eat_food', generator: () => this.createEatSound(), description: 'Eating Food Sound' },
+            { name: 'tongue_flick', generator: () => this.createTongueSound(), description: 'Tongue Flick' },
+            { name: 'collision', generator: () => this.createCollisionSound(), description: 'Collision Sound' },
+            { name: 'hit_impact', generator: () => this.createHitSound(), description: 'Hit Impact' },
+            { name: 'game_over', generator: () => this.createGameOverSound(), description: 'Game Over Sound' },
+            { name: 'background_music', generator: () => this.createBackgroundMusic(), description: 'Background Music' }
+        ];
+
+        try {
+            await this.downloadSoundsIndividually(soundList);
+            alert('All game sounds have been downloaded successfully!');
+        } catch (error) {
+            console.error('Error downloading sounds:', error);
+            alert('Error downloading sounds. Please try again.');
+        }
+    }
+
+    // Download sounds individually
+    async downloadSoundsIndividually(soundList) {
+        for (const sound of soundList) {
+            try {
+                const buffer = sound.generator();
+                if (buffer) {
+                    const blob = await this.audioBufferToWav(buffer);
+                    this.downloadBlob(blob, `jungle_snake_${sound.name}.wav`);
+                    // Small delay between downloads to avoid overwhelming the browser
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+            } catch (error) {
+                console.error(`Error generating ${sound.name}:`, error);
+            }
+        }
+    }
+
+    // Convert AudioBuffer to WAV format
+    async audioBufferToWav(buffer) {
+        const length = buffer.length;
+        const numberOfChannels = buffer.numberOfChannels;
+        const sampleRate = buffer.sampleRate;
+        
+        // Create WAV header
+        const arrayBuffer = new ArrayBuffer(44 + length * numberOfChannels * 2);
+        const view = new DataView(arrayBuffer);
+        
+        // WAV header
+        const writeString = (offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+        
+        writeString(0, 'RIFF');
+        view.setUint32(4, 36 + length * numberOfChannels * 2, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, numberOfChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * numberOfChannels * 2, true);
+        view.setUint16(32, numberOfChannels * 2, true);
+        view.setUint16(34, 16, true);
+        writeString(36, 'data');
+        view.setUint32(40, length * numberOfChannels * 2, true);
+        
+        // Convert float samples to 16-bit PCM
+        let offset = 44;
+        for (let i = 0; i < length; i++) {
+            for (let channel = 0; channel < numberOfChannels; channel++) {
+                const sample = Math.max(-1, Math.min(1, buffer.getChannelData(channel)[i]));
+                view.setInt16(offset, sample * 0x7FFF, true);
+                offset += 2;
+            }
+        }
+        
+        return new Blob([arrayBuffer], { type: 'audio/wav' });
+    }
+
+    // Download blob as file
+    downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
 }
 
 // Export for use in game
