@@ -41,7 +41,7 @@
     </div>
     
     <!-- Start Screen -->
-    <div id="startScreen" class="start-screen" style="display: none;">
+    <div id="startScreen" class="start-screen" style="display: none;" onmousemove="if(window.gameInstance && window.gameInstance.audioManager) window.gameInstance.audioManager.attemptAutoPlay()">
         <div class="jungle-background">
         </div>
         

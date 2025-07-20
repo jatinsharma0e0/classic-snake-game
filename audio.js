@@ -951,26 +951,38 @@ class AudioManager {
     
     // Setup autoplay attempts with multiple fallback strategies
     setupAutoPlay() {
-        // Strategy 1: Listen for any user interaction to unlock audio
+        // Strategy 1: Try immediate autoplay (may work in some browsers/conditions)
+        setTimeout(() => {
+            this.attemptAutoPlay();
+        }, 100);
+        
+        // Strategy 2: Listen for ANY user interaction to unlock audio immediately
         const userInteractionHandler = async () => {
             if (!this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
                 await this.attemptAutoPlay();
             }
         };
         
-        // Add interaction listeners that persist until successful
-        const events = ['click', 'touchstart', 'keydown'];
+        // Add very sensitive interaction listeners (including mouse movement)
+        const events = ['click', 'touchstart', 'keydown', 'mousemove', 'scroll', 'mouseenter', 'touchmove'];
         events.forEach(event => {
-            document.addEventListener(event, userInteractionHandler, { passive: true });
+            document.addEventListener(event, userInteractionHandler, { once: true, passive: true });
         });
         
         // Store handler for later removal
         this.userInteractionHandler = userInteractionHandler;
         this.interactionEvents = events;
         
-        // Strategy 2: Page visibility change (when user returns to tab)
+        // Strategy 3: Page visibility change (when user returns to tab)
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && !this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
+                this.attemptAutoPlay();
+            }
+        });
+        
+        // Strategy 4: Focus events (when user focuses on page)
+        window.addEventListener('focus', () => {
+            if (!this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
                 this.attemptAutoPlay();
             }
         });
@@ -997,7 +1009,10 @@ class AudioManager {
                 }
             }
         } catch (error) {
-            console.log('Autoplay prevented by browser - waiting for user interaction');
+            // Silent fail for immediate attempts, keep listeners active
+            if (error.name !== 'NotAllowedError') {
+                console.log('Autoplay attempt failed:', error);
+            }
         }
     }
     
