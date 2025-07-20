@@ -333,21 +333,31 @@ class AudioManager {
         const leftData = buffer.getChannelData(0);
         const rightData = buffer.getChannelData(1);
         
-        // Gentle ascending chime
-        const baseFreq = 800; // Higher pitched for subtlety
-        const harmonicFreq = baseFreq * 1.5; // Perfect fifth
-        
-        // Main tone - very short and sweet
-        this.addTone(leftData, rightData, baseFreq, 0.0, 0.08, sampleRate, 'hover', 0.15);
-        // Harmonic - even shorter for sparkle effect
-        this.addTone(leftData, rightData, harmonicFreq, 0.03, 0.05, sampleRate, 'hover', 0.08);
-        
-        // Add tiny bit of shimmer
+        // Generate the hover sound manually
         for (let i = 0; i < leftData.length; i++) {
             const t = i / sampleRate;
+            
+            // Main tone - gentle chime at 800Hz
+            const baseFreq = 800;
+            const mainEnvelope = Math.exp(-t * 12.5); // Quick decay
+            const mainTone = Math.sin(2 * Math.PI * baseFreq * t) * mainEnvelope * 0.15;
+            
+            // Harmonic tone - starts at 0.03s for sparkle effect
+            const harmonicFreq = baseFreq * 1.5; // Perfect fifth
+            const harmonicEnvelope = t >= 0.03 ? Math.exp(-(t - 0.03) * 20) : 0;
+            const harmonicTone = Math.sin(2 * Math.PI * harmonicFreq * t) * harmonicEnvelope * 0.08;
+            
+            // Add tiny shimmer
             const shimmer = Math.sin(t * Math.PI * 12000) * 0.02 * Math.exp(-t * 20);
-            leftData[i] += shimmer;
-            rightData[i] += shimmer;
+            
+            // Combine all components
+            let signal = 0;
+            if (t < 0.08) signal += mainTone; // Main tone only for first 0.08s
+            if (t >= 0.03 && t < 0.08) signal += harmonicTone; // Harmonic for 0.03-0.08s
+            signal += shimmer;
+            
+            leftData[i] = signal;
+            rightData[i] = signal;
         }
         
         return buffer;
