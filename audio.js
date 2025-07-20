@@ -38,20 +38,26 @@ class AudioManager {
     
     async initializeAudio() {
         try {
-            // Create audio context after user interaction
+            // Create audio context - will be suspended until user interaction
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             this.isInitialized = true;
         } catch (error) {
-            console.log('Audio not supported:', error);
+            // Silently fail if audio not supported
+            this.isInitialized = false;
         }
     }
     
     // Ensure audio context is running (call on first user interaction)
     async resumeAudioContext() {
-        if (this.audioContext && this.audioContext.state === 'suspended') {
-            await this.audioContext.resume();
+        try {
+            if (this.audioContext && this.audioContext.state === 'suspended') {
+                await this.audioContext.resume();
+            }
+            return Promise.resolve();
+        } catch (error) {
+            // Silently handle resume failures - browser restrictions
+            return Promise.resolve();
         }
-        return Promise.resolve();
     }
     
     // Create cheerful sound effects using Web Audio API
@@ -949,51 +955,46 @@ class AudioManager {
         }
     }
     
-    // Setup autoplay attempts with multiple fallback strategies
+    // Setup autoplay with silent error handling
     setupAutoPlay() {
-        // Strategy 1: Try immediate autoplay (may work in some browsers/conditions)
+        // Strategy 1: Silent autoplay after 1 second delay
         setTimeout(() => {
-            this.attemptAutoPlay();
-        }, 100);
+            if (!this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
+                this.silentAutoPlay();
+            }
+        }, 1000);
         
         // Strategy 2: Listen for ANY user interaction to unlock audio immediately
         const userInteractionHandler = async () => {
             if (!this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
-                await this.attemptAutoPlay();
+                await this.silentAutoPlay();
             }
         };
         
-        // Add very sensitive interaction listeners (including mouse movement)
-        const events = ['click', 'touchstart', 'keydown', 'mousemove', 'scroll', 'mouseenter', 'touchmove'];
+        // Add interaction listeners
+        const events = ['click', 'touchstart', 'keydown', 'mousemove', 'scroll', 'mouseenter'];
         events.forEach(event => {
             document.addEventListener(event, userInteractionHandler, { once: true, passive: true });
         });
         
-        // Store handler for later removal
+        // Store handler for cleanup
         this.userInteractionHandler = userInteractionHandler;
         this.interactionEvents = events;
         
-        // Strategy 3: Page visibility change (when user returns to tab)
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && !this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
-                this.attemptAutoPlay();
-            }
-        });
-        
-        // Strategy 4: Focus events (when user focuses on page)
+        // Strategy 3: Page focus events
         window.addEventListener('focus', () => {
             if (!this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
-                this.attemptAutoPlay();
+                this.silentAutoPlay();
             }
         });
     }
     
-    // Attempt to start background music automatically
-    async attemptAutoPlay() {
+    // Silent autoplay attempt without console warnings
+    async silentAutoPlay() {
         if (this.autoPlayAttempted || this.isMuted || !this.onStartScreen) return;
         
         try {
-            // Resume audio context first
+            // Resume audio context silently
             await this.resumeAudioContext();
             
             if (this.audioContext && this.audioContext.state === 'running') {
@@ -1009,10 +1010,7 @@ class AudioManager {
                 }
             }
         } catch (error) {
-            // Silent fail for immediate attempts, keep listeners active
-            if (error.name !== 'NotAllowedError') {
-                console.log('Autoplay attempt failed:', error);
-            }
+            // Completely silent - no console warnings
         }
     }
     
