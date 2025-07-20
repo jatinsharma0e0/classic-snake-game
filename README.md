@@ -145,3 +145,5 @@ When deploying new assets:
 - Battery-conscious background updates
 
 The game provides a seamless offline experience while maintaining optimal performance and user experience across all devices.
+
+NOTE: BACKGROUND MUSIC STARTS AUTOMATIC.
