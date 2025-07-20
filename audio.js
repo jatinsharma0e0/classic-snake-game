@@ -951,38 +951,29 @@ class AudioManager {
     
     // Setup autoplay attempts with multiple fallback strategies
     setupAutoPlay() {
-        // Strategy 1: Try immediate autoplay (works in some browsers)
-        this.attemptAutoPlay();
-        
-        // Strategy 2: Multiple event listeners for earliest possible user interaction
-        const events = ['click', 'touchstart', 'keydown', 'mousemove', 'scroll'];
-        const autoPlayHandler = () => {
-            if (!this.autoPlayAttempted) {
-                this.attemptAutoPlay();
-                // Remove all event listeners after first successful attempt
-                events.forEach(event => {
-                    document.removeEventListener(event, autoPlayHandler);
-                });
+        // Strategy 1: Listen for any user interaction to unlock audio
+        const userInteractionHandler = async () => {
+            if (!this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
+                await this.attemptAutoPlay();
             }
         };
         
+        // Add interaction listeners that persist until successful
+        const events = ['click', 'touchstart', 'keydown'];
         events.forEach(event => {
-            document.addEventListener(event, autoPlayHandler, { once: true, passive: true });
+            document.addEventListener(event, userInteractionHandler, { passive: true });
         });
         
-        // Strategy 3: Page visibility change (when user returns to tab)
+        // Store handler for later removal
+        this.userInteractionHandler = userInteractionHandler;
+        this.interactionEvents = events;
+        
+        // Strategy 2: Page visibility change (when user returns to tab)
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && !this.autoPlayAttempted) {
+            if (!document.hidden && !this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
                 this.attemptAutoPlay();
             }
         });
-        
-        // Strategy 4: Delayed attempt after page load
-        setTimeout(() => {
-            if (!this.autoPlayAttempted) {
-                this.attemptAutoPlay();
-            }
-        }, 1000);
     }
     
     // Attempt to start background music automatically
@@ -990,26 +981,23 @@ class AudioManager {
         if (this.autoPlayAttempted || this.isMuted || !this.onStartScreen) return;
         
         try {
+            // Resume audio context first
             await this.resumeAudioContext();
+            
             if (this.audioContext && this.audioContext.state === 'running') {
                 this.playBackgroundMusic();
                 this.autoPlayAttempted = true;
                 console.log('Background music started automatically');
+                
+                // Remove interaction listeners after successful start
+                if (this.userInteractionHandler && this.interactionEvents) {
+                    this.interactionEvents.forEach(event => {
+                        document.removeEventListener(event, this.userInteractionHandler);
+                    });
+                }
             }
         } catch (error) {
-            console.log('Autoplay prevented by browser:', error);
-            // Fallback: try with very low volume first
-            try {
-                const originalVolume = this.settings.musicVolume;
-                this.settings.musicVolume = 1; // Very low volume
-                await this.resumeAudioContext();
-                this.playBackgroundMusic();
-                // Gradually increase volume
-                this.fadeInMusic(originalVolume);
-                this.autoPlayAttempted = true;
-            } catch (fallbackError) {
-                console.log('Fallback autoplay also failed:', fallbackError);
-            }
+            console.log('Autoplay prevented by browser - waiting for user interaction');
         }
     }
     

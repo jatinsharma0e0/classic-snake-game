@@ -1710,17 +1710,7 @@ function initializeGameInstance() {
         // Initialize audio manager after assets are loaded
         gameInstance.audioManager = new AudioManager();
         
-        // Initialize audio after user interaction
-        document.addEventListener('click', function initAudio() {
-            if (gameInstance && gameInstance.audioManager) {
-                gameInstance.audioManager.resumeAudioContext().then(() => {
-                    // Start background music if we're on the start screen and not muted
-                    if (gameInstance.audioManager.onStartScreen && !gameInstance.audioManager.isMuted) {
-                        gameInstance.audioManager.playBackgroundMusic();
-                    }
-                });
-            }
-            document.removeEventListener('click', initAudio);
-        });
+        // The AudioManager now handles its own autoplay setup
+        // No additional initialization needed here
     }
 }
