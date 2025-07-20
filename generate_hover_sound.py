@@ -67,6 +67,6 @@ if __name__ == "__main__":
     # Generate the hover sound
     audio, sample_rate = generate_hover_sound()
     
-    # Save to assets/audio directory
-    save_wav("assets/audio/hover.wav", audio, sample_rate)
-    print("Hover sound generated and saved to assets/audio/hover.wav")
+    # Save to assets/audio directory with proper naming convention
+    save_wav("assets/audio/jungle_snake_hover.wav", audio, sample_rate)
+    print("Hover sound generated and saved to assets/audio/jungle_snake_hover.wav")

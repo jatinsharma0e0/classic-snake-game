@@ -141,7 +141,7 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Respects UI Sounds setting - disabled when UI sounds are turned off
 - Integrated into sound download ZIP with proper WAV file generation
 - Auto-detects interactive elements: buttons, sliders, toggles, and custom UI components
-- Created physical assets/audio/hover.wav file for reference and consistency
+- Created physical assets/audio/jungle_snake_hover.wav file following naming conventions
 
 **Automatic Background Music System (July 20, 2025):**
 - Implemented automatic background music that starts without requiring user clicks
