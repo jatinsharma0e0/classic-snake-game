@@ -135,9 +135,14 @@ class SnakeGame {
         if (this.stonePlayBtn) {
             this.stonePlayBtn.addEventListener('click', () => {
                 if (this.audioManager) {
-                    this.audioManager.resumeAudioContext();
-                    this.audioManager.playSound('buttonClick');
-                    this.audioManager.vibrateForEvent('button_click');
+                    this.audioManager.resumeAudioContext().then(() => {
+                        // Ensure background music starts if not already playing
+                        if (this.audioManager.onStartScreen && !this.audioManager.isMuted && !this.audioManager.backgroundMusic) {
+                            this.audioManager.playBackgroundMusic();
+                        }
+                        this.audioManager.playSound('buttonClick');
+                        this.audioManager.vibrateForEvent('button_click');
+                    });
                 }
                 this.showGameScreen();
             });
@@ -146,8 +151,14 @@ class SnakeGame {
         // Settings button functionality
         this.settingsBtn.addEventListener('click', () => {
             if (this.audioManager) {
-                this.audioManager.playSound('buttonClick');
-                this.audioManager.vibrateForEvent('button_click');
+                this.audioManager.resumeAudioContext().then(() => {
+                    // Ensure background music starts if not already playing
+                    if (this.audioManager.onStartScreen && !this.audioManager.isMuted && !this.audioManager.backgroundMusic) {
+                        this.audioManager.playBackgroundMusic();
+                    }
+                    this.audioManager.playSound('buttonClick');
+                    this.audioManager.vibrateForEvent('button_click');
+                });
             }
             this.settingsModal.classList.remove('hidden');
         });
@@ -1693,7 +1704,12 @@ function initializeGameInstance() {
         // Initialize audio after user interaction
         document.addEventListener('click', function initAudio() {
             if (gameInstance && gameInstance.audioManager) {
-                gameInstance.audioManager.resumeAudioContext();
+                gameInstance.audioManager.resumeAudioContext().then(() => {
+                    // Start background music if we're on the start screen and not muted
+                    if (gameInstance.audioManager.onStartScreen && !gameInstance.audioManager.isMuted) {
+                        gameInstance.audioManager.playBackgroundMusic();
+                    }
+                });
             }
             document.removeEventListener('click', initAudio);
         });

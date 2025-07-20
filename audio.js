@@ -48,6 +48,7 @@ class AudioManager {
         if (this.audioContext && this.audioContext.state === 'suspended') {
             await this.audioContext.resume();
         }
+        return Promise.resolve();
     }
     
     // Create cheerful sound effects using Web Audio API
