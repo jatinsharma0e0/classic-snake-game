@@ -210,7 +210,7 @@ async function cacheAssetsInBatches(cache, assets, batchSize) {
     }
 }
 
-// Message handler for cache updates
+// Message handler for cache updates and cleanup
 self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
@@ -227,6 +227,38 @@ self.addEventListener('message', event => {
                     total: ASSETS_TO_CACHE.length,
                     version: CACHE_VERSION
                 });
+            });
+    }
+    
+    // Handle force stop message from cleanup utility
+    if (event.data && event.data.type === 'FORCE_STOP') {
+        console.log('[ServiceWorker] Received FORCE_STOP message, unregistering...');
+        
+        // Unregister this service worker
+        self.registration.unregister()
+            .then(() => {
+                console.log('[ServiceWorker] Successfully unregistered via FORCE_STOP');
+                
+                // Take control of clients to ensure clean transition
+                return self.clients.claim();
+            })
+            .then(() => {
+                console.log('[ServiceWorker] Claimed clients after unregistration');
+                
+                // Notify all clients that SW has been unregistered
+                return self.clients.matchAll();
+            })
+            .then(clients => {
+                clients.forEach(client => {
+                    client.postMessage({
+                        type: 'SW_UNREGISTERED',
+                        message: 'Service Worker has been unregistered',
+                        timestamp: event.data.timestamp || Date.now()
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('[ServiceWorker] Error during FORCE_STOP cleanup:', error);
             });
     }
 });

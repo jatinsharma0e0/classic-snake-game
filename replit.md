@@ -197,6 +197,20 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Game now fully playable offline with zero network dependency after first load
 - Documented offline architecture in README.md with technical implementation details
 
+**Service Worker & Cache Cleanup Utility (July 20, 2025):**
+- Developed comprehensive SW cleanup utility (sw-cleanup-utility.js) for development and debugging
+- Implemented FORCE_STOP message handling in service worker for graceful unregistration
+- Created ServiceWorkerCleanupUtility class with full cleanup, status checking, and verification
+- Added developer panel UI accessible via Ctrl+Shift+D with visual cleanup controls
+- Integrated cleanup utility into dev-toggle system with professional UI styling
+- Console functions available: cleanServiceWorkers(), cleanEverything(), swStatus()
+- Robust error handling and batch processing prevents browser overload during cleanup
+- Complete verification system ensures no service workers or caches remain after cleanup
+- Enhanced service worker with FORCE_STOP listener for cooperative unregistration
+- Developer panel includes: SW/cache cleanup, localStorage clearing, status checking, hard refresh
+- Mobile-responsive cleanup interface with touch-friendly controls
+- Comprehensive documentation in SW_CLEANUP_INSTRUCTIONS.md for development workflow
+
 **Complete Asset Optimization (July 20, 2025):**
 - Converted all 10 audio files from WAV to MP3 format achieving 87% size reduction (5.7MB → 700KB)
 - Converted all 25 images from PNG/JPG to WebP format while preserving transparency

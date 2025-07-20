@@ -277,7 +277,7 @@ class DevToggleManager {
             this.notification.style.opacity = '1';
         });
         
-        // Auto-remove after 2 seconds
+        // Auto-hide after 3 seconds
         setTimeout(() => {
             if (this.notification) {
                 this.notification.style.transform = 'translateY(100px)';
@@ -289,7 +289,137 @@ class DevToggleManager {
                     }
                 }, 300);
             }
-        }, 2000);
+        }, 3000);
+    }
+    
+    createDevPanel() {
+        // Create developer panel
+        const devPanel = document.createElement('div');
+        devPanel.id = 'dev-panel';
+        devPanel.className = 'dev-panel hidden';
+        devPanel.innerHTML = `
+            <div class="dev-panel-header">
+                <h3>🛠 Developer Panel</h3>
+                <button class="dev-panel-close">×</button>
+            </div>
+            <div class="dev-panel-content">
+                <div class="dev-section">
+                    <h4>Service Worker & Cache Management</h4>
+                    <div class="dev-buttons">
+                        <button id="cleanSwBtn" class="dev-btn primary">🧹 Clean SW & Caches</button>
+                        <button id="cleanAllBtn" class="dev-btn warning">🗑 Clean Everything</button>
+                        <button id="swStatusBtn" class="dev-btn info">📊 SW Status</button>
+                    </div>
+                </div>
+                <div class="dev-section">
+                    <h4>Quick Actions</h4>
+                    <div class="dev-buttons">
+                        <button id="refreshBtn" class="dev-btn">🔄 Hard Refresh</button>
+                        <button id="clearLocalStorageBtn" class="dev-btn">💾 Clear localStorage</button>
+                    </div>
+                </div>
+                <div class="dev-section">
+                    <h4>Debug Info</h4>
+                    <div id="debugInfo" class="debug-info">
+                        <p>Press Ctrl+Shift+D to toggle restrictions</p>
+                        <p>Check console for detailed logs</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(devPanel);
+        this.setupDevPanelEvents(devPanel);
+        
+        return devPanel;
+    }
+    
+    setupDevPanelEvents(panel) {
+        // Close button
+        panel.querySelector('.dev-panel-close').addEventListener('click', () => {
+            panel.classList.add('hidden');
+        });
+        
+        // Clean SW & Caches
+        panel.querySelector('#cleanSwBtn').addEventListener('click', async () => {
+            if (window.swCleanup) {
+                console.log('🧹 Starting Service Worker cleanup...');
+                await window.swCleanup.performFullCleanup();
+            } else {
+                console.error('SW Cleanup utility not available');
+            }
+        });
+        
+        // Clean Everything
+        panel.querySelector('#cleanAllBtn').addEventListener('click', async () => {
+            if (confirm('This will clear all caches, service workers, and localStorage. Continue?')) {
+                if (window.swCleanup) {
+                    console.log('🗑 Starting complete cleanup...');
+                    await window.swCleanup.performCompleteCleanup();
+                    alert('Complete cleanup finished. Consider refreshing the page.');
+                } else {
+                    console.error('SW Cleanup utility not available');
+                }
+            }
+        });
+        
+        // SW Status
+        panel.querySelector('#swStatusBtn').addEventListener('click', async () => {
+            if (window.swCleanup) {
+                const status = await window.swCleanup.getStatus();
+                console.log('📊 SW Status:', status);
+                const debugInfo = panel.querySelector('#debugInfo');
+                debugInfo.innerHTML = `
+                    <p><strong>Service Workers:</strong> ${status.serviceWorkers}</p>
+                    <p><strong>Caches:</strong> ${status.caches}</p>
+                    <p><strong>SW Supported:</strong> ${status.isSupported}</p>
+                    <p><em>Check console for detailed logs</em></p>
+                `;
+            }
+        });
+        
+        // Hard Refresh
+        panel.querySelector('#refreshBtn').addEventListener('click', () => {
+            window.location.reload(true);
+        });
+        
+        // Clear localStorage
+        panel.querySelector('#clearLocalStorageBtn').addEventListener('click', () => {
+            if (confirm('Clear all localStorage data?')) {
+                localStorage.clear();
+                console.log('💾 localStorage cleared');
+                alert('localStorage cleared');
+            }
+        });
+    }
+    
+    toggleDevPanel() {
+        let panel = document.getElementById('dev-panel');
+        if (!panel) {
+            panel = this.createDevPanel();
+        }
+        
+        panel.classList.toggle('hidden');
+    }
+    
+    // Enhanced toggle to include dev panel
+    toggleRestrictions() {
+        this.restrictionsEnabled = !this.restrictionsEnabled;
+        
+        if (this.restrictionsEnabled) {
+            this.applyRestrictions();
+            this.showNotification('🔒 Restrictions Enabled: Dev mode OFF', 'enabled');
+            // Hide dev panel when restrictions are enabled
+            const panel = document.getElementById('dev-panel');
+            if (panel) panel.classList.add('hidden');
+        } else {
+            this.removeRestrictions();
+            this.showNotification('🔓 Restrictions Disabled: Dev mode ON', 'disabled');
+            // Show dev panel when restrictions are disabled
+            setTimeout(() => this.toggleDevPanel(), 500);
+        }
+        
+        console.log(`🔄 DevToggle: Restrictions ${this.restrictionsEnabled ? 'ENABLED' : 'DISABLED'}`);
     }
     
     // Public method to get current state

@@ -1,0 +1,92 @@
+🧹 Task: Implement Service Worker & Cache Cleanup Utility
+🎯 Objective
+Develop a safe, robust utility script that can be run in the browser to:
+✅ Detect all registered Service Workers for the current origin and scope.
+✅ Send a FORCE_STOP message to active workers requesting them to unregister themselves.
+✅ Unregister all Service Workers gracefully.
+✅ Delete all CacheStorage entries (caches) for the current origin.
+✅ Verify that no workers or caches remain after cleanup.
+✅ Optionally expose this as a debug/maintenance feature on the page for development & QA.
+
+📄 Requirements
+🔍 Detection
+Use navigator.serviceWorker.getRegistrations() to list all SWs.
+
+Log the scope and scriptURL of each registration for visibility.
+
+📩 Communicate
+Post a message (FORCE_STOP) to each active SW.
+
+In the SW code, listen for FORCE_STOP and call self.registration.unregister() + clients.claim().
+
+🗑 Unregister
+After sending message, also call registration.unregister() from the page.
+
+Handle any errors gracefully.
+
+🚮 Clear Caches
+Use caches.keys() to list all caches.
+
+Delete each cache with caches.delete(name).
+
+✅ Verify
+After cleanup, check again:
+
+No active or installing SWs remain.
+
+No caches remain.
+
+Log a clear summary of actions & results in the console.
+
+🚀 UI (Optional)
+Add a button in a hidden/dev-only panel: “🔄 Clean Service Workers & Caches”
+
+When clicked, run the cleanup script & display results.
+
+🧪 Notes
+This must be run on the exact same origin & path where the SW is registered.
+
+Works only in browsers that support Service Workers (HTTPS or localhost).
+
+Should not break production if accidentally invoked — keep it development-only or behind a flag.
+
+🔧 Example Code Patterns
+On the Page:
+js
+Copy
+Edit
+navigator.serviceWorker.getRegistrations().then(regs => {
+  regs.forEach(async reg => {
+    console.log(`Unregistering SW: ${reg.scope}`);
+    if (reg.active) {
+      reg.active.postMessage({ type: 'FORCE_STOP' });
+    }
+    await reg.unregister();
+  });
+});
+
+caches.keys().then(keys => {
+  keys.forEach(key => {
+    console.log(`Deleting cache: ${key}`);
+    caches.delete(key);
+  });
+});
+In Service Worker:
+js
+Copy
+Edit
+self.addEventListener('message', event => {
+  if (event.data?.type === 'FORCE_STOP') {
+    self.registration.unregister().then(() => {
+      console.log('SW unregistered via FORCE_STOP');
+    });
+  }
+});
+🪄 Deliverables
+Utility script embedded in the game/app, or a standalone debug page.
+
+Logs in browser console showing all cleaned registrations & caches.
+
+Optional button/UI for easy access in development mode.
+
+Instructions for QA/devs on how to run it and verify cleanup.
