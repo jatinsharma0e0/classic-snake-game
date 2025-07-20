@@ -1696,8 +1696,6 @@ function fadeFromBlackToStart() {
     // Initialize game instance after transition starts
     setTimeout(() => {
         initializeGameInstance();
-        // Expose game instance globally for aggressive autoplay
-        window.gameInstance = gameInstance;
     }, 200);
 }
 

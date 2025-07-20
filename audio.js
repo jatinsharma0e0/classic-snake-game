@@ -951,19 +951,12 @@ class AudioManager {
     
     // Setup autoplay attempts with multiple fallback strategies
     setupAutoPlay() {
-        // Strategy 1: Try immediate autoplay after short delay
+        // Strategy 1: Try immediate autoplay (may work in some browsers/conditions)
         setTimeout(() => {
             this.attemptAutoPlay();
         }, 100);
         
-        // Strategy 2: Forced autoplay after 1 second (user requested)
-        setTimeout(() => {
-            if (!this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
-                this.forceAutoPlay();
-            }
-        }, 1000);
-        
-        // Strategy 3: Listen for ANY user interaction to unlock audio immediately
+        // Strategy 2: Listen for ANY user interaction to unlock audio immediately
         const userInteractionHandler = async () => {
             if (!this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
                 await this.attemptAutoPlay();
@@ -980,17 +973,17 @@ class AudioManager {
         this.userInteractionHandler = userInteractionHandler;
         this.interactionEvents = events;
         
-        // Strategy 4: Page visibility change (when user returns to tab)
+        // Strategy 3: Page visibility change (when user returns to tab)
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && !this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
-                this.forceAutoPlay();
+                this.attemptAutoPlay();
             }
         });
         
-        // Strategy 5: Focus events (when user focuses on page)
+        // Strategy 4: Focus events (when user focuses on page)
         window.addEventListener('focus', () => {
             if (!this.autoPlayAttempted && this.onStartScreen && !this.isMuted) {
-                this.forceAutoPlay();
+                this.attemptAutoPlay();
             }
         });
     }
@@ -1020,52 +1013,6 @@ class AudioManager {
             if (error.name !== 'NotAllowedError') {
                 console.log('Autoplay attempt failed:', error);
             }
-        }
-    }
-    
-    // Force autoplay after delay (more aggressive approach)
-    async forceAutoPlay() {
-        if (this.autoPlayAttempted || this.isMuted || !this.onStartScreen) return;
-        
-        try {
-            // Create a new audio context if needed
-            if (!this.audioContext) {
-                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            
-            // Multiple resume attempts
-            for (let i = 0; i < 3; i++) {
-                try {
-                    if (this.audioContext.state === 'suspended') {
-                        await this.audioContext.resume();
-                    }
-                    
-                    if (this.audioContext.state === 'running') {
-                        this.playBackgroundMusic();
-                        this.autoPlayAttempted = true;
-                        console.log('Background music force-started after 1 second delay');
-                        
-                        // Remove interaction listeners after successful start
-                        if (this.userInteractionHandler && this.interactionEvents) {
-                            this.interactionEvents.forEach(event => {
-                                document.removeEventListener(event, this.userInteractionHandler);
-                            });
-                        }
-                        return;
-                    }
-                } catch (resumeError) {
-                    console.log(`Resume attempt ${i + 1} failed:`, resumeError);
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                }
-            }
-            
-            // Final attempt with direct music start
-            this.playBackgroundMusic();
-            this.autoPlayAttempted = true;
-            console.log('Background music started with direct approach');
-            
-        } catch (error) {
-            console.log('Force autoplay failed, browser restrictions too strict:', error);
         }
     }
     
