@@ -134,6 +134,15 @@ The application is designed for real-time interactive experiences with 3D graphi
 - Modern toggle switches with smooth animations and golden jungle theme styling
 - Audio settings automatically load on game start and persist across browser sessions
 
+**UI Hover Sound Effects System (July 20, 2025):**
+- Added subtle hover sound effects for all interactive UI elements (buttons, sliders, toggles)
+- Gentle ascending chime sound (800Hz base + 1200Hz harmonic) with 0.15s duration
+- Prevents audio spam with 300ms cooldown per element to avoid rapid hover triggering
+- Respects UI Sounds setting - disabled when UI sounds are turned off
+- Integrated into sound download ZIP with proper WAV file generation
+- Auto-detects interactive elements: buttons, sliders, toggles, and custom UI components
+- Created physical assets/audio/hover.wav file for reference and consistency
+
 **Automatic Background Music System (July 20, 2025):**
 - Implemented automatic background music that starts without requiring user clicks
 - Multiple autoplay strategies: immediate attempt, user interaction detection, page visibility, delayed fallback

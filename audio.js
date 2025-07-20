@@ -33,6 +33,7 @@ class AudioManager {
         this.createSounds();
         this.initializeSettingsUI();
         this.setupAutoPlay();
+        this.addHoverSounds();
     }
     
     async initializeAudio() {
@@ -78,6 +79,9 @@ class AudioManager {
         
         // Game over - lighthearted defeat
         this.sounds.gameOver = () => this.createGameOverSound();
+        
+        // Hover sound - subtle UI feedback
+        this.sounds.hover = () => this.createHoverSound();
     }
     
     // Cheerful button click sound
@@ -315,6 +319,36 @@ class AudioManager {
                 rightData[i] += signal;
             }
         });
+        
+        return buffer;
+    }
+    
+    // Subtle hover sound - gentle UI feedback
+    createHoverSound() {
+        if (!this.audioContext) return null;
+        
+        const sampleRate = this.audioContext.sampleRate;
+        const duration = 0.15; // Very short, subtle
+        const buffer = this.audioContext.createBuffer(2, duration * sampleRate, sampleRate);
+        const leftData = buffer.getChannelData(0);
+        const rightData = buffer.getChannelData(1);
+        
+        // Gentle ascending chime
+        const baseFreq = 800; // Higher pitched for subtlety
+        const harmonicFreq = baseFreq * 1.5; // Perfect fifth
+        
+        // Main tone - very short and sweet
+        this.addTone(leftData, rightData, baseFreq, 0.0, 0.08, sampleRate, 'hover', 0.15);
+        // Harmonic - even shorter for sparkle effect
+        this.addTone(leftData, rightData, harmonicFreq, 0.03, 0.05, sampleRate, 'hover', 0.08);
+        
+        // Add tiny bit of shimmer
+        for (let i = 0; i < leftData.length; i++) {
+            const t = i / sampleRate;
+            const shimmer = Math.sin(t * Math.PI * 12000) * 0.02 * Math.exp(-t * 20);
+            leftData[i] += shimmer;
+            rightData[i] += shimmer;
+        }
         
         return buffer;
     }
@@ -577,8 +611,8 @@ class AudioManager {
     playSound(soundName) {
         if (!this.audioContext || this.isMuted || !this.sounds[soundName]) return;
         
-        // Check UI sounds setting for button clicks
-        if (soundName === 'buttonClick' && !this.settings.uiSounds) return;
+        // Check UI sounds setting for button clicks and hover sounds
+        if ((soundName === 'buttonClick' || soundName === 'hover') && !this.settings.uiSounds) return;
         
         try {
             const buffer = this.sounds[soundName]();
@@ -1016,6 +1050,7 @@ class AudioManager {
             { name: 'collision', generator: () => this.createCollisionSound(), description: 'Collision Sound' },
             { name: 'hit_impact', generator: () => this.createHitSound(), description: 'Hit Impact' },
             { name: 'game_over', generator: () => this.createGameOverSound(), description: 'Game Over Sound' },
+            { name: 'hover', generator: () => this.createHoverSound(), description: 'UI Hover Sound' },
             { name: 'background_music', generator: () => this.createBackgroundMusic(), description: 'Background Music' }
         ];
 
@@ -1140,6 +1175,54 @@ class AudioManager {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+    }
+    
+    // Add hover sound to UI elements
+    addHoverSounds() {
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.setupHoverSounds());
+        } else {
+            this.setupHoverSounds();
+        }
+    }
+    
+    // Setup hover sounds for all interactive elements
+    setupHoverSounds() {
+        // Find all interactive elements
+        const interactiveSelectors = [
+            'button',
+            '.stone-button',
+            '.settings-btn',
+            '.close-settings',
+            '.toggle-switch',
+            '.volume-slider',
+            '.download-sounds-btn',
+            '[role="button"]',
+            'input[type="range"]',
+            'input[type="checkbox"]'
+        ];
+        
+        const elements = document.querySelectorAll(interactiveSelectors.join(', '));
+        
+        elements.forEach(element => {
+            // Track hover state to prevent spam
+            let hasHovered = false;
+            
+            const handleMouseEnter = () => {
+                if (!hasHovered && this.settings.uiSounds) {
+                    this.playSound('hover');
+                    hasHovered = true;
+                    
+                    // Reset hover state after a short delay
+                    setTimeout(() => {
+                        hasHovered = false;
+                    }, 300);
+                }
+            };
+            
+            element.addEventListener('mouseenter', handleMouseEnter, { passive: true });
+        });
     }
 }
 
