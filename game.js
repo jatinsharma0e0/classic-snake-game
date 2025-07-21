@@ -24,6 +24,11 @@ class SnakeGame {
         this.fpsBuffer = [];
         this.maxFpsBufferSize = 30;
         
+        // Loop management for performance optimization
+        this.animationFrameId = null;
+        this.isLoopActive = false;
+        this.shouldRender = true;
+        
         // Game state
         this.gameRunning = false;
         this.gameStarted = false;
@@ -295,8 +300,8 @@ class SnakeGame {
         this.setupOptimizedKeyboardHandling();
 
         
-        // Start optimized game loop
-        requestAnimationFrame((time) => this.gameLoop(time));
+        // Initialize game loop but don't start yet - will be started when needed
+        this.initializeGameLoop();
     }
     
     updateMuteButtonIcons(isMuted) {
@@ -630,6 +635,10 @@ class SnakeGame {
         
         // Set audio manager to start screen mode and play background music
         this.audioManager && this.audioManager.setScreen(true);
+        this.audioManager && this.audioManager.resumeAudioProcessing();
+        
+        // Pause game loop when on start screen to save performance
+        this.pauseGameLoop();
     }
     
     showGameScreen() {
@@ -664,8 +673,12 @@ class SnakeGame {
         
         // Set audio manager to game screen mode and play game start sound
         this.audioManager && this.audioManager.setScreen(false);
+        this.audioManager && this.audioManager.resumeAudioProcessing();
         this.audioManager && this.audioManager.playSound('gameStart');
         this.audioManager && this.audioManager.vibrateForEvent('button_click');
+        
+        // Resume game loop when entering game screen
+        this.resumeGameLoop();
     }
     
     handleKeyPress(e) {
@@ -780,6 +793,10 @@ class SnakeGame {
     restartGame() {
         // Unblock interactions when restarting
         this.blockUnderlyingInteractions(false);
+        
+        // Resume optimizations when restarting
+        this.shouldRender = true;
+        this.audioManager && this.audioManager.resumeAudioProcessing();
         
         this.startGame();
     }
@@ -950,6 +967,10 @@ class SnakeGame {
             
             // Play game over sound
             this.audioManager && this.audioManager.playSound('gameOver');
+            
+            // Reduce loop frequency when game over screen is shown
+            this.shouldRender = false; // Stop rendering until needed
+            this.audioManager && this.audioManager.pauseAudioProcessing(); // Pause audio processing
             
             // Clear the timeout reference
             this.gameOverTimeout = null;
@@ -1546,6 +1567,12 @@ class SnakeGame {
     }
     
     gameLoop(currentTime) {
+        // Exit if loop should not be active
+        if (!this.isLoopActive) {
+            this.animationFrameId = null;
+            return;
+        }
+        
         // Initialize timing on first frame
         if (!this.lastFrameTime) {
             this.lastFrameTime = currentTime;
@@ -1563,21 +1590,51 @@ class SnakeGame {
         const adaptiveFrameDuration = this.getAdaptiveFrameDuration();
         
         if (this.deltaTime >= adaptiveFrameDuration) {
-            // Update game logic at fixed intervals
-            if (currentTime - this.lastGameUpdate >= this.gameSpeed) {
+            // Update game logic at fixed intervals - only when game is running
+            if (this.gameRunning && currentTime - this.lastGameUpdate >= this.gameSpeed) {
                 if (!this.hitAnimation) {
                     this.updateGame();
                 }
                 this.lastGameUpdate = currentTime;
             }
             
-            // Always render for smooth animations
-            this.render();
-            this.frameCount++;
+            // Only render when needed
+            if (this.shouldRender) {
+                this.render();
+                this.frameCount++;
+            }
         }
         
         // Continue game loop using RAF for optimal timing
-        requestAnimationFrame((time) => this.gameLoop(time));
+        this.animationFrameId = requestAnimationFrame((time) => this.gameLoop(time));
+    }
+    
+    // Initialize game loop without starting it
+    initializeGameLoop() {
+        this.isLoopActive = false;
+        this.shouldRender = false;
+        // Game loop will be started when needed
+    }
+    
+    // Resume game loop for active gameplay
+    resumeGameLoop() {
+        if (this.isLoopActive) return; // Already active
+        
+        this.isLoopActive = true;
+        this.shouldRender = true;
+        this.lastFrameTime = 0; // Reset timing
+        this.animationFrameId = requestAnimationFrame((time) => this.gameLoop(time));
+    }
+    
+    // Pause game loop to save performance when not needed
+    pauseGameLoop() {
+        this.isLoopActive = false;
+        this.shouldRender = false;
+        
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+        }
     }
     
     updateFPS(deltaTime) {

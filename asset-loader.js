@@ -19,6 +19,11 @@ class AssetLoader {
         this.validationTimeout = 3000; // Max time for validation
         this.maxCacheSize = 50 * 1024 * 1024; // 50MB cache limit
         
+        // Performance optimizations
+        this.loadingPaused = false; // Pause asset loading when not needed
+        this.priorityAssets = []; // Assets that need immediate loading
+        this.deferredAssets = []; // Assets that can be loaded later
+        
         // Define all assets that need to be preloaded
         this.defineAssets();
     }

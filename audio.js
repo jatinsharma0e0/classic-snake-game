@@ -28,6 +28,7 @@ class AudioManager {
         this.activeSources = [];
         this.audioPool = new Map(); // Reuse audio nodes
         this.lastPlayTime = new Map(); // Prevent audio spam
+        this.audioProcessingPaused = false; // Pause audio processing when not needed
         
         this.initializeAudio();
         this.createSounds();
@@ -625,10 +626,19 @@ class AudioManager {
     
     // Play a sound effect
     playSound(soundName) {
-        if (!this.audioContext || this.isMuted || !this.sounds[soundName]) return;
+        // Early exit optimizations
+        if (!this.audioContext || this.isMuted || this.audioProcessingPaused || !this.sounds[soundName]) return;
         
         // Check UI sounds setting for button clicks and hover sounds
         if ((soundName === 'buttonClick' || soundName === 'hover') && !this.settings.uiSounds) return;
+        
+        // Prevent audio spam with cooldowns
+        const now = Date.now();
+        const lastPlay = this.lastPlayTime.get(soundName) || 0;
+        const cooldown = soundName === 'hover' ? 100 : 50; // Different cooldowns per sound
+        
+        if (now - lastPlay < cooldown) return;
+        this.lastPlayTime.set(soundName, now);
         
         try {
             const buffer = this.sounds[soundName]();
@@ -637,6 +647,20 @@ class AudioManager {
             }
         } catch (error) {
             console.log('Error playing sound:', error);
+        }
+    }
+    
+    // Pause audio processing to save performance
+    pauseAudioProcessing() {
+        this.audioProcessingPaused = true;
+        this.stopBackgroundMusic();
+    }
+    
+    // Resume audio processing
+    resumeAudioProcessing() {
+        this.audioProcessingPaused = false;
+        if (this.onStartScreen && !this.isMuted) {
+            this.playBackgroundMusic();
         }
     }
     
