@@ -97,8 +97,8 @@
                         <div class="volume-control">
                             <label for="musicVolume">Music Volume</label>
                             <div class="slider-container">
-                                <input type="range" id="musicVolume" class="volume-slider" min="0" max="100" value="70">
-                                <span class="volume-value" id="musicVolumeValue">70%</span>
+                                <input type="range" id="musicVolume" class="volume-slider" min="0" max="100" value="40">
+                                <span class="volume-value" id="musicVolumeValue">40%</span>
                             </div>
                         </div>
                         
@@ -106,8 +106,8 @@
                         <div class="volume-control">
                             <label for="sfxVolume">Sound Effects Volume</label>
                             <div class="slider-container">
-                                <input type="range" id="sfxVolume" class="volume-slider" min="0" max="100" value="80">
-                                <span class="volume-value" id="sfxVolumeValue">80%</span>
+                                <input type="range" id="sfxVolume" class="volume-slider" min="0" max="100" value="7">
+                                <span class="volume-value" id="sfxVolumeValue">7%</span>
                             </div>
                         </div>
                         
@@ -137,6 +137,18 @@
                                     <line x1="12" y1="15" x2="12" y2="3"/>
                                 </svg>
                                 Download
+                            </button>
+                        </div>
+                        
+                        <!-- Reset to Defaults -->
+                        <div class="setting-item">
+                            <label for="resetSettingsBtn">Reset All Settings</label>
+                            <button id="resetSettingsBtn" class="reset-button">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                    <path d="M3 3v5h5"/>
+                                </svg>
+                                Reset to Defaults
                             </button>
                         </div>
                     </div>

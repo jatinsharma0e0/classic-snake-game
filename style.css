@@ -1246,6 +1246,36 @@ body {
     transform: scale(0.95);
 }
 
+.reset-button {
+    background: rgba(255, 82, 82, 0.2);
+    border: 2px solid rgba(255, 82, 82, 0.3);
+    color: #ff5252;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.reset-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.reset-button:hover {
+    background: rgba(255, 82, 82, 0.3);
+    transform: scale(1.05);
+    border-color: rgba(255, 82, 82, 0.5);
+}
+
+.reset-button:active {
+    transform: scale(0.95);
+}
+
 /* Volume Control Styles */
 .volume-control {
     padding: 15px;

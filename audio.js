@@ -8,13 +8,22 @@ class AudioManager {
         this.isMuted = false;
         this.autoPlayAttempted = false;
         
-        // Audio settings with defaults
+        // Audio settings with defaults (matching UI image)
         this.settings = {
+            masterVolume: 100,   // 100% master volume
+            musicVolume: 40,     // 40% music volume  
+            sfxVolume: 7,        // 7% sound effects volume
+            uiSounds: true,      // UI click sounds enabled
+            vibration: false     // Vibration disabled by default
+        };
+        
+        // Store default settings for reset functionality
+        this.defaultSettings = {
             masterVolume: 100,
-            musicVolume: 70,
-            sfxVolume: 80,
+            musicVolume: 40,
+            sfxVolume: 7,
             uiSounds: true,
-            vibration: true
+            vibration: false
         };
         
         // Load settings from localStorage
@@ -860,6 +869,65 @@ class AudioManager {
                 }
             });
         }
+        
+        // Setup reset to defaults button
+        const resetButton = document.getElementById('resetSettingsBtn');
+        if (resetButton) {
+            resetButton.addEventListener('click', () => {
+                this.resetToDefaults();
+            });
+        }
+    }
+    
+    // Reset all settings to default values
+    resetToDefaults() {
+        // Reset settings object
+        this.settings = { ...this.defaultSettings };
+        
+        // Save to localStorage
+        this.saveSettings();
+        
+        // Update UI elements
+        const masterSlider = document.getElementById('masterVolume');
+        const musicSlider = document.getElementById('musicVolume');
+        const sfxSlider = document.getElementById('sfxVolume');
+        const masterValue = document.getElementById('masterVolumeValue');
+        const musicValue = document.getElementById('musicVolumeValue');
+        const sfxValue = document.getElementById('sfxVolumeValue');
+        const uiSoundsToggle = document.getElementById('uiSoundsToggle');
+        const vibrationToggle = document.getElementById('vibrationToggle');
+        
+        // Update sliders and values
+        if (masterSlider) {
+            masterSlider.value = this.settings.masterVolume;
+            if (masterValue) masterValue.textContent = this.settings.masterVolume + '%';
+        }
+        if (musicSlider) {
+            musicSlider.value = this.settings.musicVolume;
+            if (musicValue) musicValue.textContent = this.settings.musicVolume + '%';
+        }
+        if (sfxSlider) {
+            sfxSlider.value = this.settings.sfxVolume;
+            if (sfxValue) sfxValue.textContent = this.settings.sfxVolume + '%';
+        }
+        
+        // Update toggles
+        if (uiSoundsToggle) {
+            uiSoundsToggle.classList.toggle('active', this.settings.uiSounds);
+        }
+        if (vibrationToggle) {
+            vibrationToggle.classList.toggle('active', this.settings.vibration);
+        }
+        
+        // Update background music volume immediately if playing
+        if (this.backgroundMusic && this.backgroundMusic.gainNode) {
+            this.backgroundMusic.gainNode.gain.setValueAtTime(this.getEffectiveVolume('music'), this.audioContext.currentTime);
+        }
+        
+        // Play confirmation sound
+        this.playSound('buttonClick');
+        
+        console.log('Settings reset to defaults:', this.settings);
     }
     
     // Play preview sound for live feedback
