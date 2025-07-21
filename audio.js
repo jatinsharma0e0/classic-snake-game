@@ -824,10 +824,16 @@ class AudioManager {
             if (musicValue) musicValue.textContent = this.settings.musicVolume + '%';
             if (sfxValue) sfxValue.textContent = this.settings.sfxVolume + '%';
             
+            // Initialize slider backgrounds
+            this.updateSliderBackground(masterSlider, this.settings.masterVolume);
+            this.updateSliderBackground(musicSlider, this.settings.musicVolume);
+            this.updateSliderBackground(sfxSlider, this.settings.sfxVolume);
+            
             // Add event listeners
             masterSlider.addEventListener('input', (e) => {
                 const value = parseInt(e.target.value);
                 this.updateVolume('master', value);
+                this.updateSliderBackground(masterSlider, value);
                 if (masterValue) masterValue.textContent = value + '%';
                 this.playPreviewSound('click');
             });
@@ -835,6 +841,7 @@ class AudioManager {
             musicSlider.addEventListener('input', (e) => {
                 const value = parseInt(e.target.value);
                 this.updateVolume('music', value);
+                this.updateSliderBackground(musicSlider, value);
                 if (musicValue) musicValue.textContent = value + '%';
                 this.playPreviewSound('music');
             });
@@ -842,6 +849,7 @@ class AudioManager {
             sfxSlider.addEventListener('input', (e) => {
                 const value = parseInt(e.target.value);
                 this.updateVolume('sfx', value);
+                this.updateSliderBackground(sfxSlider, value);
                 if (sfxValue) sfxValue.textContent = value + '%';
                 this.playPreviewSound('eat');
             });
@@ -900,14 +908,17 @@ class AudioManager {
         // Update sliders and values
         if (masterSlider) {
             masterSlider.value = this.settings.masterVolume;
+            this.updateSliderBackground(masterSlider, this.settings.masterVolume);
             if (masterValue) masterValue.textContent = this.settings.masterVolume + '%';
         }
         if (musicSlider) {
             musicSlider.value = this.settings.musicVolume;
+            this.updateSliderBackground(musicSlider, this.settings.musicVolume);
             if (musicValue) musicValue.textContent = this.settings.musicVolume + '%';
         }
         if (sfxSlider) {
             sfxSlider.value = this.settings.sfxVolume;
+            this.updateSliderBackground(sfxSlider, this.settings.sfxVolume);
             if (sfxValue) sfxValue.textContent = this.settings.sfxVolume + '%';
         }
         
@@ -928,6 +939,25 @@ class AudioManager {
         this.playSound('buttonClick');
         
         console.log('Settings reset to defaults:', this.settings);
+    }
+    
+    // Update slider background to show progress fill
+    updateSliderBackground(slider, value) {
+        if (!slider) return;
+        
+        const percentage = value;
+        const activeColor = '#4caf50';      // Bright jungle green for filled portion
+        const inactiveStart = '#2d4a2d';    // Dark jungle green for empty portion
+        const inactiveEnd = '#1a3e1a';      // Even darker green
+        
+        // Create gradient that fills from left based on current value
+        const background = `linear-gradient(90deg, 
+            ${activeColor} 0%, 
+            ${activeColor} ${percentage}%, 
+            ${inactiveStart} ${percentage}%, 
+            ${inactiveEnd} 100%)`;
+            
+        slider.style.background = background;
     }
     
     // Play preview sound for live feedback
