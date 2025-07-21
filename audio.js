@@ -798,6 +798,28 @@ class AudioManager {
         }
     }
     
+    // Helper method to get the appropriate slider thumb image based on value
+    getSliderThumbImage(value) {
+        value = parseInt(value, 10);
+        if (value === 0) return "level_0.webp";
+        if (value >= 1 && value <= 25) return "level_1-25.webp";
+        if (value >= 26 && value <= 50) return "level_26-50.webp";
+        if (value >= 51 && value <= 75) return "level_51-75.webp";
+        if (value >= 76 && value <= 99) return "level_76-99.webp";
+        if (value === 100) return "level_100.webp";
+    }
+    
+    // Update slider thumb image based on current value
+    updateSliderThumb(slider) {
+        if (!slider) return;
+        
+        const value = slider.value;
+        const imageName = this.getSliderThumbImage(value);
+        const imageUrl = `assets/slider/${imageName}`;
+        
+        slider.style.setProperty('--thumb-image', `url(${imageUrl})`);
+    }
+    
     // Setup Settings UI Elements
     setupSettingsUI() {
         // Volume sliders
@@ -829,11 +851,17 @@ class AudioManager {
             this.updateSliderBackground(musicSlider, this.settings.musicVolume);
             this.updateSliderBackground(sfxSlider, this.settings.sfxVolume);
             
+            // Initialize slider thumbs with appropriate images
+            this.updateSliderThumb(masterSlider);
+            this.updateSliderThumb(musicSlider);
+            this.updateSliderThumb(sfxSlider);
+            
             // Add event listeners
             masterSlider.addEventListener('input', (e) => {
                 const value = parseInt(e.target.value);
                 this.updateVolume('master', value);
                 this.updateSliderBackground(masterSlider, value);
+                this.updateSliderThumb(masterSlider);
                 if (masterValue) masterValue.textContent = value + '%';
                 this.playPreviewSound('click');
             });
@@ -842,6 +870,7 @@ class AudioManager {
                 const value = parseInt(e.target.value);
                 this.updateVolume('music', value);
                 this.updateSliderBackground(musicSlider, value);
+                this.updateSliderThumb(musicSlider);
                 if (musicValue) musicValue.textContent = value + '%';
                 this.playPreviewSound('music');
             });
@@ -850,6 +879,7 @@ class AudioManager {
                 const value = parseInt(e.target.value);
                 this.updateVolume('sfx', value);
                 this.updateSliderBackground(sfxSlider, value);
+                this.updateSliderThumb(sfxSlider);
                 if (sfxValue) sfxValue.textContent = value + '%';
                 this.playPreviewSound('eat');
             });
@@ -909,16 +939,19 @@ class AudioManager {
         if (masterSlider) {
             masterSlider.value = this.settings.masterVolume;
             this.updateSliderBackground(masterSlider, this.settings.masterVolume);
+            this.updateSliderThumb(masterSlider);
             if (masterValue) masterValue.textContent = this.settings.masterVolume + '%';
         }
         if (musicSlider) {
             musicSlider.value = this.settings.musicVolume;
             this.updateSliderBackground(musicSlider, this.settings.musicVolume);
+            this.updateSliderThumb(musicSlider);
             if (musicValue) musicValue.textContent = this.settings.musicVolume + '%';
         }
         if (sfxSlider) {
             sfxSlider.value = this.settings.sfxVolume;
             this.updateSliderBackground(sfxSlider, this.settings.sfxVolume);
+            this.updateSliderThumb(sfxSlider);
             if (sfxValue) sfxValue.textContent = this.settings.sfxVolume + '%';
         }
         
