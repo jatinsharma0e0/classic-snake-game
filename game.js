@@ -683,10 +683,19 @@ class SnakeGame {
         }
         
         // ESC to return to menu
-        if (e.code === 'Escape') {
-            this.showStartScreen();
-            return;
-        }
+            if (e.code === 'Escape') {
+                if (this.isInStartScreen) {
+                    return; // Already showing start screen — do nothing
+                }
+                this.isInStartScreen = true;
+
+                this.showStartScreen();
+
+                // Optional: reset the flag when ready
+                // If `showStartScreen` itself resets the flag when done, then great.
+                // Otherwise you can reset after a delay or when some event happens.
+                return;
+            }
         
         // Start game or restart with Space (only when on game screen)
         if (e.code === 'Space' && !this.startScreen.classList.contains('hidden')) {
