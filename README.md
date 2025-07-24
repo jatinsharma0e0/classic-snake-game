@@ -5,19 +5,19 @@ A beautifully crafted, jungle-themed Snake game built with pure HTML5, CSS3, and
 ## 🎮 Demo & Screenshots
 
 ### Start Screen
-![Start Screen](assets/screenshots/start_screen.png)
+![Start Screen](assets/screenshots/screenshot1.png)
 *Immersive jungle-themed start screen with atmospheric lighting*
 
 ### Audio Settings
-![Audio Settings](assets/screenshots/settings_modal.png)
+![Audio Settings](assets/screenshots/screenshot2.png)
 *Comprehensive audio control system with volume sliders and toggles*
 
 ### Gameplay
-![Gameplay](assets/screenshots/gameplay.png)
+![Gameplay](assets/screenshots/screenshot3.png)
 *Classic snake gameplay with jungle aesthetics and obstacle challenges*
 
 ### Game Over
-![Game Over](assets/screenshots/game_over.png)
+![Game Over](assets/screenshots/screenshot4.png)
 *Wooden game over board with score display and retry options*
 
 ## ✨ Features
@@ -266,9 +266,8 @@ copies or substantial portions of the Software.
 ## 📧 Contact
 
 ### Developer
-- **GitHub**: [Your GitHub Profile](https://github.com/yourusername)
-- **Email**: your.email@example.com
-- **Replit**: [@yourusername](https://replit.com/@yourusername)
+- **GitHub**: [jatinsharma0e0](https://github.com/jatinsharma0e0)
+- **Email**: jatin0e0help@gmail.com
 
 ### Feedback & Support
 - **Bug Reports**: Please open an issue on GitHub
@@ -276,8 +275,8 @@ copies or substantial portions of the Software.
 - **General Questions**: Reach out via email or Replit DMs
 
 ### Project Links
-- **Live Demo**: [Play Jungle Snake](https://your-repl-name.your-username.repl.co)
-- **Source Code**: [GitHub Repository](https://github.com/yourusername/jungle-snake)
+- **Live Demo**: [Play Jungle Snake](https://junglesnakegame.vercel.app)
+- **Source Code**: [GitHub Repository](https://github.com/jatinsharma0e0/classic-snake-game)
 - **Development Log**: See `replit.md` for detailed change history
 
 ---
